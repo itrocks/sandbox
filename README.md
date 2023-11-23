@@ -41,6 +41,22 @@ INSERT INTO ts.user SET id = 1, active = 1, email = 'happy@email.com', login = '
 INSERT INTO ts.user SET id = 2, active = 0, email = 'friend@email.com', login = 'friend', password = 'xxxx'; 
 ```
 
+## Configuration
+
+- Create a folder named `local`
+- Create a file named `local/dao.ts`:
+
+```ts
+export default
+{
+	database: 'ts',
+	engine:   'mysql',
+	host:     'localhost',
+	password: 'password',
+	user:     'common'
+}
+```
+
 ## Run
 
 To run:
