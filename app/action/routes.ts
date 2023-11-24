@@ -20,7 +20,7 @@ const readDirRecursive = async (path: string): Promise<string[]> =>
 
 const routes: {[name: string]: any} = {}
 
-const path = import.meta.dir;
+const path = import.meta.dir
 readDirRecursive(path.substring(0, path.lastIndexOf('/')))
 	.then(entries => {
 		entries.forEach(entry => {

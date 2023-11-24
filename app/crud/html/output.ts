@@ -1,5 +1,5 @@
 import Action from '../../action/action'
-import dump from '../../debug/dump';
+import dump from '../../debug/dump'
 import need from '../../action/need'
 import Request from '../../action/request'
 

@@ -1,5 +1,5 @@
 import required from '../property/validate/required'
-import store from "../dao/store";
+import store from '../dao/store'
 
 @store()
 class Account

@@ -1,6 +1,6 @@
 import Account from './account'
 import email from '../property/validate/email'
-import required from "../property/validate/required";
+import required from '../property/validate/required'
 import store from '../dao/store'
 
 @store()

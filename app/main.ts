@@ -1,7 +1,7 @@
 import './builder/builder'
 import Action from './action/action'
 import Action_Request from './action/request'
-import Exception from './action/exception';
+import Exception from './action/exception'
 import { needOf } from './action/need'
 
 function execute(request: Action_Request): Promise<Response>|Response

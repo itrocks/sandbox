@@ -1,4 +1,4 @@
-import { decorate, decoratorOf } from "../decorator/class";
+import { decorate, decoratorOf } from '../decorator/class'
 
 const actions = (value: string[] = []) => decorate('actions', value)
 

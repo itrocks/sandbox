@@ -1,4 +1,4 @@
-import { decorate, decoratorOf } from "../decorator/class";
+import { decorate, decoratorOf } from '../decorator/class'
 import Type from '../class/type'
 
 type Needs = ''|'?object'|'object'|'objects'
