@@ -1,5 +1,5 @@
-import Required from '../property/validate/required'
 import Representative from '../view/class/representative'
+import Required from '../property/validate/required'
 import Store from '../dao/store'
 
 @Representative() @Store()
