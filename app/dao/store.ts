@@ -1,12 +1,12 @@
 import { decorateCallback, decoratorOf } from '../decorator/class'
 import Type from '../class/type'
 
-const store = (name: string = '') => decorateCallback(
+const Store = (name: string = '') => decorateCallback(
 	'store',
 	target => ((name === '') ? target.name.toLowerCase() : name)
 )
 
-const storeOf = (object: object|Type) => decoratorOf<false|string>(object, 'store', false)
+const storeOf = (target: object|Type) => decoratorOf<false|string>(target, 'store', false)
 
-export default store
-export { store, storeOf }
+export default Store
+export { Store, storeOf }

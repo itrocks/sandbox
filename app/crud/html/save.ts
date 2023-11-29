@@ -1,9 +1,9 @@
 import Action from '../../action/action'
 import dump from '../../debug/dump'
-import need from '../../action/need'
+import Need from '../../action/need'
 import Request from '../../action/request'
 
-@need('?object')
+@Need('?object')
 class Save extends Action
 {
 

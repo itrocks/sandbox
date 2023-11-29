@@ -1,9 +1,9 @@
-import required from '../property/validate/required'
+import Required from '../property/validate/required'
 
 class Active
 {
 
-	@required()
+	@Required()
 	active = false
 
 }

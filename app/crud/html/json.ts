@@ -1,9 +1,9 @@
 import Action from '../../action/action'
 import dao from '../../dao/dao'
-import need from '../../action/need'
+import Need from '../../action/need'
 import Request from '../../action/request'
 
-@need('objects')
+@Need('objects')
 class Output extends Action
 {
 

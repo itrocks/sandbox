@@ -5,7 +5,7 @@ function build(type: Type, mixins: Type[])
 {
 	mixins.forEach(mixin =>
 		Object.getOwnPropertyNames(mixin.prototype).forEach(name => {
-			Object.defineProperty(
+			(name === 'constructor') || Object.defineProperty(
 				type.prototype,
 				name,
 				Object.getOwnPropertyDescriptor(mixin.prototype, name) || Object.create(null)
@@ -25,14 +25,14 @@ function build(type: Type, mixins: Type[])
 	)
 }
 
-const uses = (...classes: Type[]) => {
+const Uses = (...classes: Type[]) => {
 	return (target: Type) => {
 		build(target, classes)
 		Reflect.defineMetadata('mixes', classes, target.prototype)
 	}
 }
 
-const usesOf = (object: object|Type) => decoratorOf<Type[]>(object, 'mixes', [])
+const usesOf = (target: object|Type) => decoratorOf<Type[]>(target, 'mixes', [])
 
-export default uses
-export { build, uses, usesOf }
+export default Uses
+export { build, Uses, usesOf }

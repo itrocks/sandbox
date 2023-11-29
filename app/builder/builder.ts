@@ -1,7 +1,8 @@
+import BuiltDecorator from './built'
 import config from '../config/builder'
 import path from 'path'
 import Type from '../class/type'
-import { uses, usesOf } from '../class/uses'
+import { Uses, usesOf } from '../class/uses'
 
 const replacements: {[p:string]:string|string[]} = Object.fromEntries(
 	Object.entries(config).map(([module, replacement]) => [
@@ -25,8 +26,8 @@ Module.prototype.require = function(file: string)
 	}
 	file = path.normalize(require.resolve(file))
 	// no replacement
-	let replacement_files = replacements[file]
-	if (!replacement_files) {
+	let replacementFiles = replacements[file]
+	if (!replacementFiles) {
 		return superRequire.apply(this, arguments)
 	}
 	// from cache
@@ -35,19 +36,20 @@ Module.prototype.require = function(file: string)
 	}
 	// string
 	const type = superRequire.apply(this, [file]).default
-	if (typeof replacement_files === 'string') {
+	if (typeof replacementFiles === 'string') {
 		// replace
-		const replacement_module = superRequire.apply(this, [replacement_files])
-		if (replacement_module.default.prototype instanceof type) {
-			return cache[file] = replacement_module
+		const replacementModule = superRequire.apply(this, [replacementFiles])
+		if (replacementModule.default.prototype instanceof type) {
+			return cache[file] = replacementModule
 		}
 		// compose
-		replacement_files = [replacement_files]
+		replacementFiles = [replacementFiles]
 	}
 	// compose
-	const replacement_types: Type[] = replacement_files.map(file => superRequire.apply(this, [file]).default)
+	const replacementTypes: Type[] = replacementFiles.map(file => superRequire.apply(this, [file]).default)
 
-	@uses(...replacement_types)
+	@BuiltDecorator()
+	@Uses(...replacementTypes)
 	class Built extends type {
 		constructor()
 		{

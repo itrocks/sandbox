@@ -38,7 +38,7 @@ export default class extends Request
 		return (route === routes) ? undefined : route
 	}
 
-	get object(): object
+	get object(): {[property:string]:any}
 	{
 		return this.objects[0]
 	}

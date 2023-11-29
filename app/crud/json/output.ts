@@ -1,8 +1,8 @@
 import Action from '../../action/action'
-import need from '../../action/need'
+import Need from '../../action/need'
 import Request from '../../action/request'
 
-@need('object')
+@Need('object')
 class Output extends Action
 {
 

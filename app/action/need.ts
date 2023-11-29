@@ -3,9 +3,9 @@ import Type from '../class/type'
 
 type Needs = ''|'?object'|'object'|'objects'
 
-const need = (value: Needs) => decorate('need', value)
+const Need = (value: Needs) => decorate('need', value)
 
-const needOf = (object: object|Type) => decoratorOf<Needs>(object, 'need', '')
+const needOf = (target: object|Type) => decoratorOf<Needs>(target, 'need', '')
 
-export default need
-export { need, needOf, Needs }
+export default Need
+export { Need, needOf, Needs }

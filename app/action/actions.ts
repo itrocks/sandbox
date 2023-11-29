@@ -1,12 +1,12 @@
 import { decorate, decoratorOf } from '../decorator/class'
 
-const actions = (value: string[] = []) => decorate('actions', value)
+const Actions = (value: string[] = []) => decorate('actions', value)
 
-const actionsOf = (object: any) => decoratorOf(
-	object,
+const actionsOf = (target: any) => decoratorOf(
+	target,
 	'actions',
 	['add', 'delete', 'edit', 'json', 'list', 'output', 'save']
 )
 
-export default actions
-export { actions, actionsOf }
+export default Actions
+export { Actions, actionsOf }

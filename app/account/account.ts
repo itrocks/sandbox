@@ -1,14 +1,14 @@
-import required from '../property/validate/required'
-import store from '../dao/store'
+import Required from '../property/validate/required'
+import Representative from '../view/class/representative'
+import Store from '../dao/store'
 
-@store()
+@Representative() @Store()
 class Account
 {
 
-    @required()
+    @Required()
     login = ''
 
-    @required()
     password = ''
 
 }
