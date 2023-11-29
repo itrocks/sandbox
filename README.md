@@ -62,7 +62,12 @@ export default
 To run:
 
 ```bash
-bun run app/main.ts
+bun app/main.ts
+```
+
+To debug:
+```bash
+bun --inspect --watch app/main.ts
 ```
 
 ## Access
@@ -87,3 +92,4 @@ To tests changes:
 - http://localhost:3000/nothing/output: Module nothing not found
 - http://localhost:3000/user/edit: Action edit needs an object
 - http://localhost:3000/user/output: Action output needs an object
+
