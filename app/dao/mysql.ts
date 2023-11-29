@@ -13,7 +13,7 @@ class Mysql implements Dao
 		mysql.createConnection(config).then(connection => this.connection = connection)
 	}
 
-	read = <T extends object>(type: new()=>T, id: number): Promise<T> =>
+	read<T extends object>(type: new()=>T, id: number): Promise<T>
 	{
 		return this.connection
 			? this.connection.execute('SELECT * FROM `' + storeOf(type) + '` WHERE id = ?', [id])
@@ -22,7 +22,7 @@ class Mysql implements Dao
 			: Promise.reject('not connected')
 	}
 
-	search = <T extends object>(type: new()=>T, search: object = {}): Promise<T[]> =>
+	search<T extends object>(type: new()=>T, search: object = {}): Promise<T[]>
 	{
 		let sql    = Object.keys(search).map(name => '`' + name + '` = ?').join(', ')
 		let values = Object.values(search)
