@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import Type from '../class/type'
+import { objectOf, Type } from '../class/type'
 
 function decorate(name: string, value: any)
 {
@@ -13,11 +13,17 @@ function decorateCallback(name: string, callback: (target:Type,property:string)=
 
 function decoratorOf<T>(target: object|Type, property: string, name: string, undefinedValue: T): T
 {
-	if (typeof target !== 'object') {
-		target = new target
-	}
-	const result = Reflect.getMetadata(name, target, property)
+	const result = Reflect.getMetadata(name, objectOf(target), property)
 	return (result === undefined) ? undefinedValue : result
 }
 
-export { decorate, decorateCallback, decoratorOf }
+function decoratorOfCallback<T>(
+	target: object|Type, property: string, name: string, undefinedCallback: (target:object,property:string)=>T
+): T
+{
+	target = objectOf(target)
+	const result = Reflect.getMetadata(name, target, property)
+	return (result === undefined) ? undefinedCallback(target, property) : result
+}
+
+export { decorate, decorateCallback, decoratorOf, decoratorOfCallback }
