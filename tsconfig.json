@@ -15,13 +15,10 @@
 		"moduleDetection": "force",
 		"moduleResolution": "bundler",
 		"noEmit": true,
-		"paths": {
-			"mapped": ["./tests/mappedReplacement"],
-		},
 		"skipLibCheck": true,
 		"strict": true,
 		"target": "esnext",
 		"types": [ "bun-types" ]
 	},
-	"include": ["app/**/*", "local/**/*"]
+	"include": ["app/**/*", "local/**/*", "tests/**/*"]
 }
