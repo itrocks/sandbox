@@ -1,10 +1,10 @@
 import './builder/builder'
 import Action from './action/action'
-import Action_Request from './action/request'
+import ActionRequest from './action/request'
 import Exception from './action/exception'
 import { needOf } from './action/need'
 
-function execute(request: Action_Request): Promise<Response>|Response
+function execute(request: ActionRequest): Promise<Response>|Response
 {
 	const accept  = request.headers.get('Accept')
 	const accepts = accept ? accept.replace(/ /g, '').split(',') : []
@@ -32,10 +32,10 @@ function execute(request: Action_Request): Promise<Response>|Response
 
 Bun.serve({
 
-	fetch(http_request: Request): Promise<Response> | Response
+	fetch(request: Request): Promise<Response>|Response
 	{
 		try {
-			return execute(new Action_Request(http_request))
+			return execute(new ActionRequest(request))
 		}
 		catch (exception) {
 			if (exception instanceof Exception) {
@@ -46,3 +46,5 @@ Bun.serve({
 	}
 
 })
+
+console.log('server is listening on http://localhost:3000')
