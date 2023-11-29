@@ -11,13 +11,22 @@ function decorateCallback(name: string, callback: (target:Type)=>any)
 	return (target: Type) => Reflect.defineMetadata(name, callback(target), target.prototype)
 }
 
-function decoratorOf<T>(target: object|Type, name: string, undefined_value: T): T
+function decoratorOf<T>(target: object|Type, name: string, undefinedValue: T): T
 {
 	if (typeof target !== 'object') {
 		target = new target
 	}
 	const result = Reflect.getMetadata(name, target)
-	return (result === undefined) ? undefined_value : result
+	return (result === undefined) ? undefinedValue : result
 }
 
-export { decorate, decorateCallback, decoratorOf }
+function decoratorOfCallback<T>(target: object|Type, name: string, undefinedValue: (target:object)=>T): T
+{
+	if (typeof target !== 'object') {
+		target = new target
+	}
+	const result = Reflect.getMetadata(name, target)
+	return (result === undefined) ? undefinedValue(target) : result
+}
+
+export { decorate, decorateCallback, decoratorOf, decoratorOfCallback }
