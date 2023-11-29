@@ -9,8 +9,8 @@ interface Dao
 
 }
 
-const { engine: _, ...dao_config } = config
-const dao: Dao = new (require('./' + config.engine).default)(dao_config)
+const { engine: _, ...daoConfig } = config
+const dao: Dao = new (require('./' + config.engine).default)(daoConfig)
 
 export default dao
 export { dao, Dao }

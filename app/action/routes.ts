@@ -51,7 +51,7 @@ readDirRecursive(path.substring(0, path.lastIndexOf('/')))
 			if (typeof route === 'string') {
 				return
 			}
-			Object.entries(route).forEach(([name, sub_routes]) => simplify(route, name, sub_routes))
+			Object.entries(route).forEach(([name, subRoutes]) => simplify(route, name, subRoutes))
 			if (Object.values(route).length === 1) {
 				routes[name] = Object.values(route)[0]
 				return

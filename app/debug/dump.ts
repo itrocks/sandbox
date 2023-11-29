@@ -8,10 +8,10 @@ function dump(variable: any, indent: number = 0): string
 		return variable + "\n"
 	}
 
-	const is_array = Array.isArray(variable)
-	const open     = is_array ? '[' : '{'
-	const close    = is_array ? ']' : '}'
-	let   out      = open + "\n"
+	const isArray = Array.isArray(variable)
+	const open    = isArray ? '[' : '{'
+	const close   = isArray ? ']' : '}'
+	let   out     = open + "\n"
 
 	indent += 2
 	for (let property in variable) {
