@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>{@output.ucFirst}</title>
+</head>
+<body>
+<!--BEGIN-->
+
+<article class="{@display} output" data-id="{id}">
+	<h2>{@output}</h2>
+	<ul class="general actions">
+		<li class="list"><a href="/(@route)/list">close</a></li>
+		<li class="edit"><a href="/(@route)/edit/(id)">edit</a></li>
+		<li class="delete"><a href="/(@route)/delete/(id)">delete</a></li>
+	</ul>
+	<table class="{@display} object">
+		<!--%properties-->
+		<tr class="{name}"><th>{@display}</th><td>{object.{name}}</td></tr>
+		<!--end-->
+	</table>
+</article>
+
+<!--END-->
+</body>
+</html>
