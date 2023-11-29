@@ -1,7 +1,7 @@
 import Action from '../../action/action'
 import { displayOf } from '../../view/class/display'
 import Need from '../../action/need'
-import { propertyNames } from '../../class/reflect';
+import { propertyNames } from '../../class/reflect'
 import { representativeValueOf } from '../../view/class/representative'
 import Request from '../../action/request'
 
@@ -22,9 +22,9 @@ class Output extends Action
 		const foot = '</article>'
 
 		const actionList = [
-			'<li class="edit"><a href="/' + request.route + '/list">close</a></li>',
+			'<li class="list"><a href="/' + request.route + '/list">close</a></li>',
 			'<li class="edit"><a href="/' + request.route + '/edit/' + object.id + '">edit</a></li>',
-			'<li class="edit"><a href="/' + request.route + '/delete/' + object.id + '">delete</a></li>'
+			'<li class="delete"><a href="/' + request.route + '/delete/' + object.id + '">delete</a></li>'
 		]
 		const actions = '<ul class="general actions">' + actionList.join('') + '</ul>'
 
