@@ -21,6 +21,7 @@ const superRequire = Module.prototype.require
 
 Module.prototype.require = function(file: string)
 {
+	// resolve and normalize
 	if (file.startsWith('.')) {
 		file = (this.path.substring(0, this.path.lastIndexOf('/')) + '/' + file)
 	}
@@ -35,7 +36,7 @@ Module.prototype.require = function(file: string)
 		return cache[file]
 	}
 	// string
-	const type = superRequire.apply(this, [file]).default
+	const type: Type = superRequire.apply(this, [file]).default
 	if (typeof replacementFiles === 'string') {
 		// replace
 		const replacementModule = superRequire.apply(this, [replacementFiles])
@@ -51,6 +52,7 @@ Module.prototype.require = function(file: string)
 	@BuiltDecorator()
 	@Uses(...replacementTypes)
 	class Built extends type {
+		[property:string]:any
 		constructor()
 		{
 			super()
