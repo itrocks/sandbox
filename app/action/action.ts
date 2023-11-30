@@ -6,7 +6,10 @@ class Action
 
 	protected htmlResponse(body: string)
 	{
-		return new Response('<!DOCTYPE HTML>' + body, { headers: [['Content-Type', 'text/html']] })
+		if (!body.startsWith('<!DOCTYPE html>')) {
+			body = '<!DOCTYPE html>' + body
+		}
+		return new Response(body, { headers: [['Content-Type', 'text/html']] })
 	}
 
 	protected jsonResponse(data: object)
