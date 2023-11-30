@@ -9,7 +9,7 @@ function build(type: Type, mixins: Type[])
 			&& Object.defineProperty(
 				type.prototype,
 				name,
-				Object.getOwnPropertyDescriptor(mixin.prototype, name) || Object.create(null)
+				Object.getOwnPropertyDescriptor(mixin.prototype, name) ?? Object.create(null)
 			)
 		})
 	)
