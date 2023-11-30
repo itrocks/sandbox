@@ -5,7 +5,8 @@ function build(type: Type, mixins: Type[])
 {
 	mixins.forEach(mixin =>
 		Object.getOwnPropertyNames(mixin.prototype).forEach(name => {
-			(name === 'constructor') || Object.defineProperty(
+			(name !== 'constructor')
+			&& Object.defineProperty(
 				type.prototype,
 				name,
 				Object.getOwnPropertyDescriptor(mixin.prototype, name) || Object.create(null)
