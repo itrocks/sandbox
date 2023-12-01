@@ -4,17 +4,27 @@ import { Type } from '../class/type'
 class ReflectProperty
 {
 
-	class: ReflectClass
+	#class: object|ReflectClass|Type
 
-	name: string
+	readonly name: string
 
 	constructor(object: object|ReflectClass|Type, name: string)
 	{
-		this.class = (object instanceof ReflectClass) ? object : new ReflectClass(object)
-		this.name  = name
+		this.#class = object
+		this.name   = name
 	}
 
-	get object() { return this.class.object }
+	get class() : ReflectClass
+	{
+		return (this.#class instanceof ReflectClass)
+			? this.#class
+			: this.#class = new ReflectClass(this.#class)
+	}
+
+	get object()
+	{
+		return this.class.object
+	}
 
 }
 
