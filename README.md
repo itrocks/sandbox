@@ -13,7 +13,7 @@ You need node v21+, npm, mysql, installed.
 To install:
 
 ```bash
-git clone git@crafter.fr:itrocks/sandbox
+git clone https://github.com/itrocks/sandbox
 cd sandbox
 npm install
 ```
