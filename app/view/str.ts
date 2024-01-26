@@ -1,6 +1,6 @@
 import { lcFirst, toClass, toDisplay, toRoute, toVar, ucFirst } from './rename'
 
-class Str extends String
+export default class Str extends String
 {
 
 	lcFirst()   { return lcFirst(this.toString()) }
@@ -11,5 +11,3 @@ class Str extends String
 	ucFirst()   { return ucFirst(this.toString()) }
 
 }
-
-export default Str

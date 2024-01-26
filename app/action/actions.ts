@@ -8,5 +8,6 @@ const actionsOf = (target: any) => decoratorOf(
 	['add', 'delete', 'edit', 'json', 'list', 'output', 'save']
 )
 
-export default Actions
 export { Actions, actionsOf }
+
+export default Actions

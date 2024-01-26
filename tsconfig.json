@@ -1,26 +1,15 @@
 {
 	"compilerOptions": {
-		"allowImportingTsExtensions": true,
-		"allowJs": true,
 		"allowSyntheticDefaultImports": true,
-		"alwaysStrict": true,
-		"composite": true,
-		"downlevelIteration": true,
-		"exactOptionalPropertyTypes": true,
+		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"forceConsistentCasingInFileNames": true,
-		"jsx": "react-jsx",
-		"lib": ["ESNext"],
-		"module": "esnext",
-		"moduleDetection": "force",
-		"moduleResolution": "bundler",
-		"noEmit": true,
-		"noErrorTruncation": true,
-		"noImplicitThis": true,
+		"module": "nodeNext",
+		"moduleResolution": "nodeNext",
+		"sourceMap": true,
 		"skipLibCheck": true,
 		"strict": true,
-		"target": "esnext",
-		"types": [ "bun-types" ]
+		"target": "esNext"
 	},
 	"include": ["app/**/*", "local/**/*", "tests/**/*"]
 }

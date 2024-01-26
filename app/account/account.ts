@@ -1,9 +1,9 @@
+import Store          from '../dao/store'
+import Required       from '../property/validate/required'
 import Representative from '../view/class/representative'
-import Required from '../property/validate/required'
-import Store from '../dao/store'
 
 @Representative() @Store()
-class Account
+export default class Account
 {
 
     @Required()
@@ -12,5 +12,3 @@ class Account
     password = ''
 
 }
-
-export default Account

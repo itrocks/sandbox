@@ -1,31 +1,31 @@
-import dao from '../dao/dao'
-import Exception from './exception'
-import routes from './routes'
-import Type from '../class/type'
+import Type          from '../class/type'
+import dao           from '../dao/dao'
+import ServerRequest from '../server/request'
+import Exception     from './exception'
+import routes        from './routes'
 
-export default class extends Request
+export default class Request
 {
 
 	action: string
 
-	ids: number[]
+	ids: string[]
 
 	objects: object[] = []
 
 	route: string
 
-	constructor(request: Request)
+	constructor(public request: ServerRequest)
 	{
-		super(request)
-		const [route, action, ids] = this.parseUrl()
+		const [route, action, ids] = this.parsePath()
 		this.route  = route
 		this.action = action
 		this.ids    = ids
 	}
 
-	get module(): object|string|undefined
+	getModule(): object|string|undefined
 	{
-		let route: {[name: string]: any} = routes
+		let route: { [name: string]: any } = routes
 		this.route.split('/').reverse().forEach(name => {
 			if (!route[name]) {
 				return false
@@ -38,42 +38,38 @@ export default class extends Request
 		return (route === routes) ? undefined : route
 	}
 
-	get object(): {[property:string]:any}
+	get object(): { [property: string]: any }
 	{
 		return this.objects[0]
 	}
 
-	get type(): Type
+	getType(): Type
 	{
-		if (!this.module) {
-			throw new Exception('Module ' + this.route + ' not found', 404)
+		const module = this.getModule()
+		if (!module) {
+			throw new Exception('Module ' + this.route + ' not found')
 		}
-		try {
-			return require('..' + this.module).default
-		}
-		catch {
-			throw new Exception('Module ' + this.route + ' not found', 404)
-		}
+		return require('..' + module).default
 	}
 
-	getObjects(): Promise<object[]>
+	async getObjects(): Promise<object[]>
 	{
 		this.objects = []
-		const type   = this.type
-		return Promise.all(this.ids.map(id => dao.read(type, id).then(object => {
+		const type = this.getType()
+		return Promise.all(this.ids.map(async id => {
+			const object = await dao.read(type, id)
 			this.objects.push(object)
 			return object
-		})))
+		}))
 	}
 
-	protected parseUrl(): [string, string, number[]]
+	protected parsePath(): [string, string, string[]]
 	{
-		const url = new URL(this.url)
-		const [route, action, ids] = this.splitPath(url.pathname)
+		const [route, action, ids] = this.splitPath(this.request.path)
 		return [
 			route.substring(1),
 			action.substring(1),
-			ids.split('/').slice(1).map<number>((ids: string) => parseInt(ids))
+			ids.split('/').slice(1)
 		]
 	}
 

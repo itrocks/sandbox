@@ -6,10 +6,7 @@ TypeScript business application development framework
 
 You need a debian/Ubuntu/Mint/etc. Linux operating system.
 
-```bash
-curl -fsSL https://bun.sh/install | bash
-sudo apt install mysql
-```
+You need node v21+, npm, mysql, installed.
 
 ## Install
 
@@ -18,7 +15,7 @@ To install:
 ```bash
 git clone git@crafter.fr:itrocks/sandbox
 cd sandbox
-bun install
+npm install
 ```
 
 ## Database
@@ -59,15 +56,16 @@ export default
 
 ## Run
 
+To build:
+
+```bash
+npm run build
+```
+
 To run:
 
 ```bash
-bun app/main.ts
-```
-
-To debug:
-```bash
-bun --inspect --watch app/main.ts
+npm start
 ```
 
 ## Access
@@ -77,6 +75,7 @@ To test outputs:
 - http://localhost:3000/user/add
 - http://localhost:3000/user/edit/1
 - http://localhost:3000/user/json/1
+- http://localhost:3000/user/json/1/2
 - http://localhost:3000/user/list
 - http://localhost:3000/user/output/1
 
@@ -87,9 +86,8 @@ To tests changes:
 
 ## Route errors
 
-- http://localhost:3000/nothing: Action is missing
+- http://localhost:3000/: Action is missing
 - http://localhost:3000/nothing/done: Action done not found
 - http://localhost:3000/nothing/output: Module nothing not found
 - http://localhost:3000/user/edit: Action edit needs an object
 - http://localhost:3000/user/output: Action output needs an object
-

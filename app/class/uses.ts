@@ -1,5 +1,5 @@
 import { decoratorOf } from '../decorator/class'
-import Type from './type'
+import Type            from './type'
 
 function build(type: Type, mixins: Type[])
 {
@@ -35,5 +35,6 @@ const Uses = (...classes: Type[]) => {
 
 const usesOf = (target: object|Type) => decoratorOf<Type[]>(target, 'mixes', [])
 
-export default Uses
 export { build, Uses, usesOf }
+
+export default Uses

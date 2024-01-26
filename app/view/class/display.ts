@@ -1,7 +1,7 @@
-import { builtOf } from '../../builder/built'
+import { builtOf }                               from '../../builder/built'
+import Type                                      from '../../class/type'
 import { decorateCallback, decoratorOfCallback } from '../../decorator/class'
-import { toDisplay } from '../rename'
-import Type from '../../class/type'
+import { toDisplay }                             from '../rename'
 
 const Display = (name: string = '') => decorateCallback(
 	'display',
@@ -14,5 +14,6 @@ const displayOf = (target: object|Type) => decoratorOfCallback<string>(
 	target => toDisplay((builtOf(target) ? Object.getPrototypeOf(target.constructor) : target.constructor).name)
 )
 
-export default Display
 export { Display, displayOf }
+
+export default Display

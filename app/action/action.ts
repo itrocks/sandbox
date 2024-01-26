@@ -1,20 +1,22 @@
-import dump from '../debug/dump'
-import Request from './request'
+import dump     from '../debug/dump'
+import Response from '../server/response'
+import Request  from './request'
 
-class Action
+export default class Action
 {
 
-	protected htmlResponse(body: string)
+	protected htmlResponse(body: string, statusCode: number = 200)
 	{
 		if (!body.startsWith('<!DOCTYPE html>')) {
-			body = '<!DOCTYPE html>' + body
+			body = '<!DOCTYPE html>' + "\n" + body
 		}
-		return new Response(body, { headers: [['Content-Type', 'text/html']] })
+		return new Response(body, statusCode, { 'Content-Type': 'text/html' })
 	}
 
-	protected jsonResponse(data: object)
+	protected jsonResponse(data: object, statusCode: number = 200)
 	{
-		return new Response(JSON.stringify(data), { headers: [['Content-Type', 'application/json']] })
+		const json = JSON.stringify(data, (_, value) => typeof value === 'bigint' ? value.toString() : value)
+		return new Response(json, statusCode, { 'Content-Type': 'application/json' })
 	}
 
 	run(request: Request): Promise<Response>|Response
@@ -23,5 +25,3 @@ class Action
 	}
 
 }
-
-export default Action

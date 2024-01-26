@@ -1,4 +1,4 @@
-import { ReflectProperty } from '../property/reflect'
+import { ReflectProperty }        from '../property/reflect'
 import { objectOf, Type, typeOf } from './type'
 
 const properties = (object: object|ReflectClass|Type) => propertyNames(object)
@@ -35,5 +35,6 @@ class ReflectClass
 
 }
 
-export default ReflectClass
 export { properties, propertyNames, ReflectClass }
+
+export default ReflectClass

@@ -1,7 +1,7 @@
 
-const config: {[p:string]:string|string[]} =
+const config: { [index:string]: string|string[] } =
 {
-	'/account/user': ['/account/active']
+	'/account/account': ['/account/active']
 }
 
 export default config

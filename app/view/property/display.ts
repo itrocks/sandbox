@@ -1,6 +1,6 @@
+import Type                                      from '../../class/type'
 import { decorateCallback, decoratorOfCallback } from '../../decorator/property'
-import { toDisplay } from '../rename'
-import Type from '../../class/type'
+import { toDisplay }                             from '../rename'
 
 const Display = (name: string = '') => decorateCallback(
 	'display',
@@ -14,5 +14,6 @@ const displayOf = (target: object|Type, property: string) => decoratorOfCallback
 	(_target, property) => toDisplay(property)
 )
 
-export default Display
 export { Display, displayOf }
+
+export default Display

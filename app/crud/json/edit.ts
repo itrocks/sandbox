@@ -1,9 +1,10 @@
-import Action from '../../action/action'
-import Need from '../../action/need'
-import Request from '../../action/request'
+import Action   from '../../action/action'
+import Need     from '../../action/need'
+import Request  from '../../action/request'
+import Response from '../../server/response'
 
 @Need('object')
-class Edit extends Action
+export default class Edit extends Action
 {
 
 	run(request: Request): Response
@@ -13,5 +14,3 @@ class Edit extends Action
 	}
 
 }
-
-export default Edit

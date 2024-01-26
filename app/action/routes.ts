@@ -1,4 +1,4 @@
-import { readdir } from 'fs/promises'
+import { readdir } from 'node:fs/promises'
 
 const walk = async (path: string): Promise<string[]> =>
 {
@@ -18,10 +18,9 @@ const readDirRecursive = async (path: string): Promise<string[]> =>
 	walk(path)
 	.then(entries => entries.map(entry => entry.substring(path.length)))
 
-const routes: {[name: string]: any} = {}
+const routes: { [name: string]: any } = {}
 
-const path = import.meta.dir
-readDirRecursive(path.substring(0, path.lastIndexOf('/')))
+readDirRecursive(__dirname.substring(0, __dirname.lastIndexOf('/')))
 	.then(entries => {
 		entries.forEach(entry => {
 			if (!entry.endsWith('.ts')) {
@@ -47,7 +46,11 @@ readDirRecursive(path.substring(0, path.lastIndexOf('/')))
 				route[name] = entry
 			}
 		})
-		const simplify = (routes: {[name: string]: any}, name: string, route: {[name: string]: any}|string) => {
+		const simplify = (
+			routes: { [name: string]: any },
+			name: string,
+			route: { [name: string]: any }|string
+		) => {
 			if (typeof route === 'string') {
 				return
 			}

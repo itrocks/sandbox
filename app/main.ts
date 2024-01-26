@@ -1,12 +1,17 @@
 import './builder/builder'
-import Action from './action/action'
-import ActionRequest from './action/request'
-import Exception from './action/exception'
-import { needOf } from './action/need'
+import 'reflect-metadata'
 
-function execute(request: ActionRequest): Promise<Response>|Response
+import fastify                             from 'fastify'
+import Action                              from './action/action'
+import Exception                           from './action/exception'
+import { needOf }                          from './action/need'
+import ActionRequest                       from './action/request'
+import { fastifyRequest, fastifyResponse } from './server/fastify'
+import Response                            from './server/response'
+
+async function execute(request: ActionRequest): Promise<Response>
 {
-	const accept  = request.headers.get('Accept')
+	const accept  = request.request.headers.accept
 	const accepts = accept ? accept.replace(/ /g, '').split(',') : []
 	const format  = (
 		[['html', 'text/html'], ['json', 'application/json']].find(([,mime]) => accepts.includes(mime))
@@ -22,29 +27,36 @@ function execute(request: ActionRequest): Promise<Response>|Response
 	catch {
 		throw new Exception('Action ' + request.action + ' not found')
 	}
-	return request.getObjects().then(objects => {
-		if ((needOf(action) === 'object') && !objects.length) {
-			return new Exception('Action ' + request.action + ' needs an object').response
-		}
-		return action.run(request)
-	})
+	const objects = await request.getObjects()
+	if ((needOf(action) === 'object') && !objects.length) {
+		return new Exception('Action ' + request.action + ' needs an object').response
+	}
+	return action.run(request)
 }
 
-Bun.serve({
+const server = fastify()
 
-	fetch(request: Request): Promise<Response>|Response
-	{
-		try {
-			return execute(new ActionRequest(request))
+server.get<{ Params: { [index: string]: string, '*': string } }>('/*', async (originRequest, finalResponse) =>
+{
+	const request = fastifyRequest(originRequest)
+	if (request.path === '/favicon.ico') return
+	let response: Response
+	try {
+		response = await execute(new ActionRequest(request))
+	}
+	catch(exception) {
+		console.error(request.path)
+		console.error(exception)
+		if (exception instanceof Exception) {
+			response = exception.response
 		}
-		catch (exception) {
-			if (exception instanceof Exception) {
-				return exception.response
-			}
+		else {
 			throw exception
 		}
 	}
-
+	return fastifyResponse(finalResponse, response)
 })
+
+server.listen({ port: 3000 }).then()
 
 console.log('server is listening on http://localhost:3000')

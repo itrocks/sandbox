@@ -1,5 +1,5 @@
 import { ReflectClass } from '../class/reflect'
-import { Type } from '../class/type'
+import { Type }         from '../class/type'
 
 class ReflectProperty
 {
@@ -28,5 +28,6 @@ class ReflectProperty
 
 }
 
-export default ReflectProperty
 export { ReflectProperty }
+
+export default ReflectProperty

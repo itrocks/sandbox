@@ -1,15 +1,13 @@
-import Account from './account'
-import Email from '../property/validate/email'
+import Store    from '../dao/store'
+import Email    from '../property/validate/email'
 import Required from '../property/validate/required'
-import Store from '../dao/store'
+import Account  from './account'
 
 @Store()
-class User extends Account
+export default class User extends Account
 {
 
     @Email() @Required()
     email = ''
 
 }
-
-export default User

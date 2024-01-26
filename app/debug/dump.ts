@@ -1,5 +1,5 @@
 
-function dump(variable: any, indent: number = 0): string
+export default function dump(variable: any, indent: number = 0): string
 {
 	if (typeof variable === 'string') {
 		return '"' + variable.replace('"', '\\"') + '"' + "\n"
@@ -21,5 +21,3 @@ function dump(variable: any, indent: number = 0): string
 
 	return out + ' '.repeat(indent) + close + "\n"
 }
-
-export default dump

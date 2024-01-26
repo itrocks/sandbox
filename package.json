@@ -1,18 +1,19 @@
 {
-	"name": "sandbox",
-	"module": "server.ts",
-	"type": "module",
-	"devDependencies": {
-		"bun-types": "latest",
-		"typescript": "5.2"
-	},
-	"peerDependencies": {
-		"typescript": "^5.2.0"
-	},
+	"author": "Baptiste Pillot",
 	"dependencies": {
-		"class-validator": "^0.14.0",
-		"eslint": "^8.53.0",
-		"mysql2": "^3.6.3",
-		"zod": "^3.22.4"
+		"class-validator": "^0.14.1",
+		"fastify": "^4.25.2",
+		"mariadb": "^3.2.3"
+	},
+	"devDependencies": {
+		"@types/node": "^20.11.7",
+		"reflect-metadata": "^0.1.13",
+		"typescript": "5.3"
+	},
+	"name": "sandbox",
+	"scripts": {
+		"build": "tsc",
+		"build:watch": "tsc -w",
+		"start": "node ./app/main"
 	}
 }

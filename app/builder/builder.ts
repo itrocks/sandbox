@@ -1,10 +1,10 @@
-import BuiltDecorator from './built'
-import config from '../config/builder'
-import path from 'path'
-import Type from '../class/type'
+import Type             from '../class/type'
 import { Uses, usesOf } from '../class/uses'
+import config           from '../config/builder'
+import BuiltDecorator   from './built'
+import path             from 'path'
 
-const replacements: {[p:string]:string|string[]} = Object.fromEntries(
+const replacements: { [p: string]: string|string[] } = Object.fromEntries(
 	Object.entries(config).map(([module, replacement]) => [
 		path.normalize(require.resolve('..' + module)),
 		(typeof replacement === 'string')
@@ -13,17 +13,15 @@ const replacements: {[p:string]:string|string[]} = Object.fromEntries(
 	])
 )
 
-const cache: {[type:string]:any} = {}
-
+const cache: { [type: string]: any } = {}
 const Module = require('module')
-
-const superRequire = Module.prototype.require
+const superRequire: (...args: any) => any = Module.prototype.require
 
 Module.prototype.require = function(file: string)
 {
 	// resolve and normalize
 	if (file.startsWith('.')) {
-		file = (this.path.substring(0, this.path.lastIndexOf('/')) + '/' + file)
+		file = this.path + (this.path.endsWith('/') ? '' : '/') + file
 	}
 	file = path.normalize(require.resolve(file))
 	// no replacement
@@ -36,7 +34,7 @@ Module.prototype.require = function(file: string)
 		return cache[file]
 	}
 	// string
-	const type: Type = superRequire.apply(this, [file]).default
+	const type: Type = superRequire.apply(this, arguments).default
 	if (typeof replacementFiles === 'string') {
 		// replace
 		const replacementModule = superRequire.apply(this, [replacementFiles])
@@ -60,5 +58,5 @@ Module.prototype.require = function(file: string)
 		}
 	}
 
-	return cache[file] = { default: Built }
+	return cache[file] = { __esModule: true, default: Built }
 }

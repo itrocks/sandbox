@@ -1,17 +1,16 @@
+import Response from '../server/response'
 
-class Exception extends Error
+export default class Exception extends Error
 {
 
 	response: Response
 
-	constructor(response: Response|string, status: number = 404)
+	constructor(response: Response|string, statusCode: number = 404)
 	{
 		super()
 		this.response = (typeof response === 'string')
-			? new Response(response, { status: status })
+			? new Response(response, statusCode)
 			: response
 	}
 
 }
-
-export default Exception

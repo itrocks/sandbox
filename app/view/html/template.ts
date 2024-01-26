@@ -1,14 +1,15 @@
-import { displayOf as classDisplayOf } from '../class/display'
-import { displayOf } from '../property/display'
-import outputOf from '../class/output'
-import { properties } from '../../class/reflect'
-import ReflectProperty from '../../property/reflect'
-import Str from '../str.ts'
+import { readFile }                       from 'node:fs/promises'
+import { properties }                     from '../../class/reflect'
+import ReflectProperty                    from '../../property/reflect'
+import { displayOf as classDisplayOf }    from '../class/display'
+import { outputOf }                       from '../class/output'
+import { displayOf as propertyDisplayOf } from '../property/display'
+import Str                                from '../str'
 
 type BlockStack = Array<{ blockStart: number, collection: any[], data: any, iteration: number, iterations: number }>
 type Stack      = Array<{ close: string, target: string }>
 
-class Template
+export default class Template
 {
 
 	data: any
@@ -36,7 +37,7 @@ class Template
 
 	async parseFile(): Promise<string>
 	{
-		return Bun.file(this.file).text().then(source => this.parseBuffer(source))
+		return await readFile(this.file, 'utf-8')
 	}
 
 	protected parseVariable(variable: string, data: any)
@@ -48,7 +49,7 @@ class Template
 				return 'titre'
 			case '@display':
 				return (data instanceof ReflectProperty)
-					? displayOf(data.class.object ?? data.class.type, data.name)
+					? propertyDisplayOf(data.class.object ?? data.class.type, data.name)
 					: classDisplayOf(data)
 			case '@output':
 				return outputOf(data)
@@ -69,19 +70,19 @@ class Template
 
 	protected parseVars(source: string)
 	{
-		const length = source.length
 		let   acceptParenthesis = false
 		let   acceptTag = true
 		const blockStack: BlockStack = []
 		let   blockStart = 0
 		let   close = ''
 		let   collection: any[] = []
-		let   data  = this.data
+		let   data = this.data
 		let   index = 0
-		let   iteration  = 0
+		let   iteration = 0
 		let   iterations = 0
+		const length = source.length
 		const stack: Stack = []
-		let   start  = 0
+		let   start = 0
 		let   target = ''
 
 		while (index < length) {
@@ -203,5 +204,3 @@ class Template
 	}
 
 }
-
-export default Template
