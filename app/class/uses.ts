@@ -1,16 +1,12 @@
-import { decoratorOf } from '../decorator/class'
-import Type            from './type'
+import { decorate, decoratorOf } from '../decorator/class'
+import Type                      from './type'
 
 function build(type: Type, mixins: Type[])
 {
 	mixins.forEach(mixin =>
-		Object.getOwnPropertyNames(mixin.prototype).forEach(name => {
-			(name !== 'constructor')
-			&& Object.defineProperty(
-				type.prototype,
-				name,
-				Object.getOwnPropertyDescriptor(mixin.prototype, name) ?? Object.create(null)
-			)
+		Object.entries(Object.getOwnPropertyDescriptors(mixin.prototype)).forEach(([name, descriptor]) => {
+			if (name === 'constructor') return
+			Object.defineProperty(type.prototype, name, descriptor)
 		})
 	)
 	mixins.forEach(mixin =>
@@ -18,7 +14,7 @@ function build(type: Type, mixins: Type[])
 			type.prototype,
 			mixin.name,
 			{
-				value: function(...args:any[]) {
+				value: function(...args: any[]) {
 					Object.entries(new mixin(...args)).forEach(([name, value]: [string, any]) => this[name] = value)
 				}
 			}
@@ -26,14 +22,14 @@ function build(type: Type, mixins: Type[])
 	)
 }
 
-const Uses = (...classes: Type[]) => {
-	return (target: Type) => {
-		build(target, classes)
-		Reflect.defineMetadata('mixes', classes, target.prototype)
-	}
+const USES = Symbol('uses')
+
+const Uses = (...classes: Type[]) => (target: Type) => {
+	build(target, classes)
+	return decorate<Type[]>(USES, classes)(target)
 }
 
-const usesOf = (target: object|Type) => decoratorOf<Type[]>(target, 'mixes', [])
+const usesOf = (target: object|Type) => decoratorOf<Type[]>(target, USES, [])
 
 export { build, Uses, usesOf }
 

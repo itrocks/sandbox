@@ -7,7 +7,7 @@ import Account  from './account'
 export default class User extends Account
 {
 
-    @Email() @Required()
-    email = ''
+	@Email() @Required()
+	email = ''
 
 }

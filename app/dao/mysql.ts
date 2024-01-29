@@ -7,7 +7,7 @@ export default class Mysql implements Dao
 
 	connection?: Connection
 
-	constructor(config: { host:string, user: string, password: string, database: string })
+	constructor(config: { host: string, user: string, password: string, database: string })
 	{
 		createConnection(config).then(connection => this.connection = connection)
 	}

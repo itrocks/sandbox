@@ -1,9 +1,11 @@
 import Type                      from '../../class/type'
 import { decorate, decoratorOf } from '../../decorator/property'
 
-const Required = (value: boolean = true) => decorate('required', value)
+const REQUIRED = Symbol('required')
 
-const requiredOf = (target: object|Type, property: string) => decoratorOf(target, property, 'required', false)
+const Required = (value: boolean = true) => decorate<boolean>(REQUIRED, value)
+
+const requiredOf = (target: object|Type, property: string) => decoratorOf<boolean>(target, property, REQUIRED, false)
 
 export { Required, requiredOf }
 

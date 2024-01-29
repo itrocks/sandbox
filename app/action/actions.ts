@@ -1,10 +1,13 @@
 import { decorate, decoratorOf } from '../decorator/class'
+import Type from '../class/type'
 
-const Actions = (value: string[] = []) => decorate('actions', value)
+const ACTIONS = Symbol('actions')
 
-const actionsOf = (target: any) => decoratorOf(
+const Actions = (value: string[] = []) => decorate<string[]>(ACTIONS, value)
+
+const actionsOf = (target: Type) => decoratorOf<string[]>(
 	target,
-	'actions',
+	ACTIONS,
 	['add', 'delete', 'edit', 'json', 'list', 'output', 'save']
 )
 

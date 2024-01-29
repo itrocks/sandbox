@@ -1,23 +1,23 @@
 import { objectOf, Type } from '../class/type'
 
-function decorate(name: string, value: any)
+function decorate<T>(name: Symbol, value: T)
 {
 	return (target: object, property: string) => Reflect.defineMetadata(name, value, target, property)
 }
 
-function decorateCallback(name: string, callback: (target: Type, property: string) => any)
+function decorateCallback<T>(name: Symbol, callback: (target: Type, property: string) => T)
 {
 	return (target: Type, property: string) => Reflect.defineMetadata(name, callback(target, property), target, property)
 }
 
-function decoratorOf<T>(target: object|Type, property: string, name: string, undefinedValue: T): T
+function decoratorOf<T>(target: object|Type, property: string, name: Symbol, undefinedValue: T): T
 {
 	const result = Reflect.getMetadata(name, objectOf(target), property)
 	return (result === undefined) ? undefinedValue : result
 }
 
 function decoratorOfCallback<T>(
-	target: object|Type, property: string, name: string, undefinedCallback: (target: object, property: string) => T
+	target: object|Type, property: string, name: Symbol, undefinedCallback: (target: object, property: string) => T
 ): T
 {
 	target = objectOf(target)

@@ -1,9 +1,11 @@
 import Type                      from '../../class/type'
 import { decorate, decoratorOf } from '../../decorator/property'
 
-const Email = (value: boolean = true) => decorate('email', value)
+const EMAIL = Symbol('email')
 
-const emailOf = (target: object|Type, property: string) => decoratorOf(target, property, 'email', false)
+const Email = (value: boolean = true) => decorate<boolean>(EMAIL, value)
+
+const emailOf = (target: object|Type, property: string) => decoratorOf<boolean>(target, property, EMAIL, false)
 
 export { Email, emailOf }
 

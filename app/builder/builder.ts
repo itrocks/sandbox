@@ -1,8 +1,8 @@
-import Type             from '../class/type'
-import { Uses, usesOf } from '../class/uses'
-import config           from '../config/builder'
-import BuiltDecorator   from './built'
-import path             from 'path'
+import Type           from '../class/type'
+import Uses           from '../class/uses'
+import config         from '../config/builder'
+import BuiltDecorator from './built'
+import path           from 'path'
 
 const replacements: { [p: string]: string|string[] } = Object.fromEntries(
 	Object.entries(config).map(([module, replacement]) => [
@@ -33,30 +33,24 @@ Module.prototype.require = function(file: string)
 	if (cache[file]) {
 		return cache[file]
 	}
-	// string
-	const type: Type = superRequire.apply(this, arguments).default
+	// require parent
+	const module: { __esModule: true, default?: Type } = { __esModule: true }
+	cache[file] = module
+	const parentModule = superRequire.apply(this, arguments)
+	// compose
 	if (typeof replacementFiles === 'string') {
-		// replace
-		const replacementModule = superRequire.apply(this, [replacementFiles])
-		if (replacementModule.default.prototype instanceof type) {
-			return cache[file] = replacementModule
-		}
-		// compose
 		replacementFiles = [replacementFiles]
 	}
-	// compose
-	const replacementTypes: Type[] = replacementFiles.map(file => superRequire.apply(this, [file]).default)
+	const replacementTypes: Type[] = replacementFiles.map(file => superRequire.call(this, file).default)
 
-	@BuiltDecorator()
-	@Uses(...replacementTypes)
-	class Built extends type {
-		[property:string]:any
-		constructor()
-		{
+	module.default = class Built extends parentModule.default {
+		constructor() {
 			super()
-			usesOf(this).forEach(type => this[type.name]())
+			replacementTypes.forEach(type => this[type.name]())
 		}
 	}
+	BuiltDecorator()(module.default)
+	Uses(...replacementTypes)(module.default)
 
-	return cache[file] = { __esModule: true, default: Built }
+	return module
 }

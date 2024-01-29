@@ -3,9 +3,11 @@ import { decorate, decoratorOf } from '../decorator/class'
 
 type Needs = ''|'?object'|'object'|'objects'
 
-const Need = (value: Needs) => decorate('need', value)
+const NEED = Symbol('need')
 
-const needOf = (target: object|Type) => decoratorOf<Needs>(target, 'need', '')
+const Need = (value: Needs) => decorate<Needs>(NEED, value)
+
+const needOf = (target: object|Type) => decoratorOf<Needs>(target, NEED, '')
 
 export { Need, needOf, type Needs }
 

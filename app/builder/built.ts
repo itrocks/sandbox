@@ -1,9 +1,11 @@
 import Type                      from '../class/type'
 import { decorate, decoratorOf } from '../decorator/class'
 
-const Built = (value: boolean = true) => decorate('built', value)
+const BUILT = Symbol('built')
 
-const builtOf = (target: object|Type) => decoratorOf<boolean>(target, 'built', false)
+const Built = (value: boolean = true) => decorate<boolean>(BUILT, value)
+
+const builtOf = (target: object|Type) => decoratorOf<boolean>(target, BUILT, false)
 
 export { Built, builtOf }
 

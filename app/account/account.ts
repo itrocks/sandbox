@@ -6,9 +6,9 @@ import Representative from '../view/class/representative'
 export default class Account
 {
 
-    @Required()
-    login = ''
+	@Required()
+	login = ''
 
-    password = ''
+	password = ''
 
 }

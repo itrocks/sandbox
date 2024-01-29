@@ -82,6 +82,7 @@ To test outputs:
 To tests changes:
 
 - http://localhost:3000/user/save/1
+- http://localhost:3000/user/delete/1
 - http://localhost:3000/user/delete/1/2
 
 ## Route errors
