@@ -1,8 +1,7 @@
-import Type           from '../class/type'
-import Uses           from '../class/uses'
-import config         from '../config/builder'
-import BuiltDecorator from './built'
-import path           from 'path'
+import path     from 'path'
+import Type     from '../class/type'
+import config   from '../config/builder'
+import { uses } from './uses'
 
 const replacements: { [p: string]: string|string[] } = Object.fromEntries(
 	Object.entries(config).map(([module, replacement]) => [
@@ -42,15 +41,6 @@ Module.prototype.require = function(file: string)
 		replacementFiles = [replacementFiles]
 	}
 	const replacementTypes: Type[] = replacementFiles.map(file => superRequire.call(this, file).default)
-
-	module.default = class Built extends parentModule.default {
-		constructor() {
-			super()
-			replacementTypes.forEach(type => this[type.name]())
-		}
-	}
-	BuiltDecorator()(module.default)
-	Uses(...replacementTypes)(module.default)
-
+	module.default = uses(parentModule.default, replacementTypes)
 	return module
 }

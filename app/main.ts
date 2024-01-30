@@ -1,4 +1,4 @@
-import './builder/builder'
+import './class/compose'
 import 'reflect-metadata'
 
 import fastify                             from 'fastify'
