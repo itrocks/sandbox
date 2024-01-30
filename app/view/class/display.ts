@@ -1,4 +1,3 @@
-import { builtOf }                               from '../../builder/built'
 import Type                                      from '../../class/type'
 import { decorateCallback, decoratorOfCallback } from '../../decorator/class'
 import { toDisplay }                             from '../rename'
@@ -10,11 +9,14 @@ const Display = (name: string = '') => decorateCallback<string>(
 	target => toDisplay((name === '') ? target.name : name)
 )
 
-const displayOf = (target: object|Type) => decoratorOfCallback<string>(
-	target,
-	DISPLAY,
-	target => toDisplay((builtOf(target) ? Object.getPrototypeOf(target.constructor) : target.constructor).name)
-)
+const displayOf = (target: object|Type) => decoratorOfCallback<string>(target, DISPLAY, target =>
+{
+	let constr = target.constructor
+	while ((constr.name === '') || (constr.name === 'builtClass')) {
+		constr = Object.getPrototypeOf(constr)
+	}
+	return toDisplay(constr.name)
+})
 
 export { Display, displayOf }
 
