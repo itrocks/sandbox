@@ -3,7 +3,7 @@ import { decorate, decoratorOf } from '../../decorator/property'
 
 const REQUIRED = Symbol('required')
 
-const Required = (value: boolean = true) => decorate<boolean>(REQUIRED, value)
+const Required = (value: boolean = true) => decorate(REQUIRED, value)
 
 const requiredOf = (target: object|Type, property: string) => decoratorOf<boolean>(target, property, REQUIRED, false)
 

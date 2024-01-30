@@ -5,7 +5,7 @@ type Needs = ''|'?object'|'object'|'objects'
 
 const NEED = Symbol('need')
 
-const Need = (value: Needs) => decorate<Needs>(NEED, value)
+const Need = (value: Needs) => decorate(NEED, value)
 
 const needOf = (target: object|Type) => decoratorOf<Needs>(target, NEED, '')
 
