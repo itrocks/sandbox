@@ -21,7 +21,7 @@ export default class Mysql implements Dao
 			'SELECT * FROM `' + storeOf(type) + '` WHERE id = ?',
 			[id]
 		)
-		return Object.assign(new type(), rows[0])
+		return Object.assign(new type, rows[0])
 	}
 
 	async search<T extends object>(type: new() => T, search: object = {}): Promise<T[]>
@@ -38,7 +38,7 @@ export default class Mysql implements Dao
 			'SELECT * FROM `' + storeOf(type) + '`' + sql,
 			searchValues
 		)
-		return rows.map(row => Object.assign(new type(), row))
+		return rows.map(row => Object.assign(new type, row))
 	}
 
 }
