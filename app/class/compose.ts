@@ -1,6 +1,6 @@
 import path     from 'path'
-import Type     from '../class/type'
-import config   from '../config/builder'
+import config   from '../config/compose'
+import Type     from './type'
 import { uses } from './uses'
 
 const replacements: { [p: string]: string|string[] } = Object.fromEntries(

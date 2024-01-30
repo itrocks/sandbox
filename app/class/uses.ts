@@ -1,7 +1,22 @@
 import { decorate, decoratorOf } from '../decorator/class'
 import Type                      from './type'
 
-function uses<T extends Type>(target: T, mixins: Type[]): T
+export function Super<T extends object>(self: object): T
+{
+	return Object.getPrototypeOf(Object.getPrototypeOf(self)) as T
+}
+
+/*
+export function Super<T extends object>(): T
+{
+	// this does not work because of strict mode "use strict":
+	return Super.caller as T
+	// this does not work because of strict mode "use strict":
+	return require('caller').default() as T
+}
+*/
+
+export function uses<T extends Type>(target: T, mixins: Type[]): T
 {
 	const builtClass = class extends target {
 		[index: string]: any
@@ -37,14 +52,12 @@ function uses<T extends Type>(target: T, mixins: Type[]): T
 
 const USES = Symbol('uses')
 
-const Uses = (...mixins: Type[]) => <T extends Type>(target: T): T =>
+export const Uses = (...mixins: Type[]) => <T extends Type>(target: T): T =>
 {
 	decorate(USES, mixins)(target)
 	return uses(target, mixins)
 }
 
-const usesOf = (target: object|Type) => decoratorOf<Type[]>(target, USES, [])
-
-export { uses, Uses, usesOf }
+export const usesOf = (target: object|Type) => decoratorOf<Type[]>(target, USES, [])
 
 export default Uses

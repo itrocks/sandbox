@@ -5,6 +5,7 @@ node_modules
 /local
 
 /app/**/*.js
+!/app/class/caller.js
 /tests/**/*.js
 /app/**/*.map
 /tests/**/*.map
