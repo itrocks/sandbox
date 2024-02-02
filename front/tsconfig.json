@@ -1,0 +1,9 @@
+{
+	"compilerOptions": {
+		"composite": true,
+		"lib": ["dom", "esnext"],
+		"module": "esnext",
+		"strict": true,
+		"target": "es2022"
+	}
+}

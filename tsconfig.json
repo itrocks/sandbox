@@ -11,5 +11,6 @@
 		"strict": true,
 		"target": "esNext"
 	},
-	"include": ["app/**/*", "local/**/*", "tests/**/*"]
+	"include": ["app/**/*", "local/**/*", "tests/**/*"],
+	"references": [{ "path": "./front" }]
 }

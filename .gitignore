@@ -1,11 +1,10 @@
 .idea
-.vscode
 node_modules
 
 /local
 
-/app/**/*.js
+*.d.ts
+*.js
+*.js.map
 !/app/class/caller.js
-/tests/**/*.js
-/app/**/*.map
-/tests/**/*.map
+!/jest.config.js
