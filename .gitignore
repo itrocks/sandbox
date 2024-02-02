@@ -3,8 +3,10 @@ node_modules
 
 /local
 
+*.css.map
 *.d.ts
 *.js
 *.js.map
+*.scssc
 !/app/class/caller.js
 !/jest.config.js

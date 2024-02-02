@@ -1,0 +1,102 @@
+
+// apply background to each cell
+table.itrocks > * > tr > * {
+	background: var(--background);
+}
+
+// apply border that will work with fixed columns and rows
+table.itrocks {
+	border: var(--border-width) var(--border-style) var(--border-color);
+	border-spacing: 0;
+
+	> * > tr > * {
+		border-right: var(--border-width) var(--border-style) var(--border-color);
+		border-top: var(--border-width) var(--border-style) var(--border-color);
+
+		&:last-child {
+			border-right: 0;
+		}
+	}
+
+	> tbody, > thead {
+		> tr:first-child > * {
+			border-top: 0;
+		}
+	}
+
+	> thead > tr:last-child > * {
+		border-bottom: var(--border-width) var(--border-style) var(--border-color);
+	}
+}
+
+// fix first column position
+table.itrocks {
+	> * > tr > :first-child {
+		left: 0;
+	}
+
+	> tbody > tr > :first-child {
+		position: sticky;
+		z-index: 2;
+	}
+
+	> tfoot, > thead {
+		> tr > :first-child {
+			z-index: 3;
+		}
+	}
+}
+
+// fix last column position
+table.itrocks {
+	> * > tr {
+		> :last-child {
+			border-left: var(--border-width) var(--border-style) var(--border-color);
+			right: 0;
+		}
+
+		> :nth-last-child(2) {
+			border-right: none;
+		}
+	}
+
+	> tbody > tr > :last-child {
+		position: sticky;
+		z-index: 2;
+	}
+
+	> tfoot, > thead {
+		> tr > :last-child {
+			z-index: 3;
+		}
+	}
+}
+
+// fix thead/tfoot rows position
+table.itrocks {
+	> tfoot, > thead {
+		> tr > * {
+			position: sticky;
+			z-index: 1;
+		}
+	}
+
+	> tfoot > tr:last-child > * {
+		bottom: 0;
+	}
+
+	> thead > tr:first-child > * {
+		top: 0;
+	}
+}
+
+// scroll
+table.itrocks {
+	border-collapse: separate;
+	display: inline-block;
+	overflow: scroll;
+
+	> * > tr > * {
+		white-space: nowrap;
+	}
+}

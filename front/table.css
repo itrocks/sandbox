@@ -1,0 +1,51 @@
+table.itrocks > * > tr > * {
+  background: var(--background); }
+
+table.itrocks {
+  border: var(--border-width) var(--border-style) var(--border-color);
+  border-spacing: 0; }
+  table.itrocks > * > tr > * {
+    border-right: var(--border-width) var(--border-style) var(--border-color);
+    border-top: var(--border-width) var(--border-style) var(--border-color); }
+    table.itrocks > * > tr > *:last-child {
+      border-right: 0; }
+  table.itrocks > tbody > tr:first-child > *, table.itrocks > thead > tr:first-child > * {
+    border-top: 0; }
+  table.itrocks > thead > tr:last-child > * {
+    border-bottom: var(--border-width) var(--border-style) var(--border-color); }
+
+table.itrocks > * > tr > :first-child {
+  left: 0; }
+table.itrocks > tbody > tr > :first-child {
+  position: sticky;
+  z-index: 2; }
+table.itrocks > tfoot > tr > :first-child, table.itrocks > thead > tr > :first-child {
+  z-index: 3; }
+
+table.itrocks > * > tr > :last-child {
+  border-left: var(--border-width) var(--border-style) var(--border-color);
+  right: 0; }
+table.itrocks > * > tr > :nth-last-child(2) {
+  border-right: none; }
+table.itrocks > tbody > tr > :last-child {
+  position: sticky;
+  z-index: 2; }
+table.itrocks > tfoot > tr > :last-child, table.itrocks > thead > tr > :last-child {
+  z-index: 3; }
+
+table.itrocks > tfoot > tr > *, table.itrocks > thead > tr > * {
+  position: sticky;
+  z-index: 1; }
+table.itrocks > tfoot > tr:last-child > * {
+  bottom: 0; }
+table.itrocks > thead > tr:first-child > * {
+  top: 0; }
+
+table.itrocks {
+  border-collapse: separate;
+  display: inline-block;
+  overflow: scroll; }
+  table.itrocks > * > tr > * {
+    white-space: nowrap; }
+
+/*# sourceMappingURL=table.css.map */
