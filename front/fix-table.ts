@@ -1,8 +1,5 @@
-import loadCss from './load-css.js'
 
-await loadCss(import.meta.url)
-
-type HTMLTableFixElement = HTMLTableCellElement|HTMLTableColElement
+type HTMLTableFixElement = HTMLTableCellElement | HTMLTableColElement
 
 let tables: FixTable[] = []
 
@@ -18,7 +15,7 @@ export function fixTableElement(element: HTMLTableElement)
 	return new FixTable(element)
 }
 
-export function fixTableElements(elements: Array<HTMLTableElement>|NodeListOf<HTMLTableElement>)
+export function fixTableElements(elements: Array<HTMLTableElement> | NodeListOf<HTMLTableElement>)
 {
 	return Array.from(elements).map(element => fixTableElement(element))
 }
@@ -42,6 +39,12 @@ export function getTables()
 export class FixTable
 {
 
+	public readonly columns: NodeListOf<HTMLTableFixElement>
+
+	public readonly fixColumnLeftCount: number
+
+	public readonly fixColumnRightCount: number
+
 	public readonly id: number
 
 	public readonly selector: string
@@ -61,26 +64,32 @@ export class FixTable
 
 		element.classList.add('itrocks')
 		element.setAttribute('data-table-id', tablesCounter.toString())
-		let elements: NodeListOf<HTMLTableFixElement>
-		elements = element.querySelectorAll<HTMLTableColElement>(':scope > colgroup > col')
-		if (!elements.length) {
-			elements = element.querySelectorAll<HTMLTableColElement>(':scope > thead > tr:first-child > *')
-			if (!elements.length) {
-				elements = element.querySelectorAll<HTMLTableColElement>(':scope > tbody > tr:first-child > *')
+		this.columns = element.querySelectorAll<HTMLTableColElement>(':scope > colgroup > col')
+		if (!this.columns.length) {
+			this.columns = element.querySelectorAll<HTMLTableColElement>(':scope > thead > tr:first-child > *')
+			if (!this.columns.length) {
+				this.columns = element.querySelectorAll<HTMLTableColElement>(':scope > tbody > tr:first-child > *')
 			}
 		}
-		this.fixColumns(elements)
+		[this.fixColumnLeftCount, this.fixColumnRightCount] = this.countColumns()
+		if (this.fixColumnLeftCount)  this.fixColumnLeft()
+		if (this.fixColumnRightCount) this.fixColumnRight()
 		this.fixRows(element)
+		this.styleSheet.insertRule(`
+			${this.selector} {
+				border-collapse: separate;
+			}
+		`)
 		document.adoptedStyleSheets.push(this.styleSheet)
 	}
 
-	protected countColumns(cols: NodeListOf<HTMLTableFixElement>)
+	protected countColumns()
 	{
 		let counter = 0
 		let count = { first: 0, last: 0 }
-		let doing: 'first'|'last' = 'first'
+		let doing: 'first' | 'last' = 'first'
 		let fix = true
-		cols.forEach(col =>
+		this.columns.forEach(col =>
 		{
 			counter ++
 			if (fix) {
@@ -102,7 +111,7 @@ export class FixTable
 				count[doing]++
 			}
 		})
-		return count
+		return [count.first, count.last]
 	}
 
 	disableStyleSheet()
@@ -117,25 +126,19 @@ export class FixTable
 		}
 	}
 
-	protected fixColumns(cols: NodeListOf<HTMLTableFixElement>)
-	{
-		const { first, last } = this.countColumns(cols)
-		if (first) this.fixFirstColumns(cols, first)
-		if (last)  this.fixLastColumns(cols, last)
-	}
-
-	protected fixFirstColumns(cols: NodeListOf<HTMLTableFixElement>, count: number)
+	protected fixColumnLeft()
 	{
 		const bodySel: string[] = []
 		const footSel: string[] = []
 		const headSel: string[] = []
 		let counter = 1, position = .0, width = .0
-		Array.from(cols).toSpliced(count).forEach(col => {
+		Array.from(this.columns).toSpliced(this.fixColumnLeftCount).forEach(col => {
 			position += width
 			width = col.getBoundingClientRect().width
+			const left = position ? `calc(${position}px + var(--border-width))` : `${position}px`
 			this.styleSheet.insertRule(`
 				${this.selector} > * > tr > :nth-child(${counter}) {
-					left: ${position}px;
+					left: ${left};
 				}
 			`)
 			bodySel.push(`${this.selector} > tbody > tr > :nth-child(${counter})`)
@@ -156,15 +159,13 @@ export class FixTable
 		`)
 	}
 
-	protected fixLastColumns(cols: NodeListOf<HTMLTableFixElement>, count: number)
+	protected fixColumnRight()
 	{
-		const all1Sel: string[] = []
-		const all2Sel: string[] = []
 		const bodySel: string[] = []
 		const footSel: string[] = []
 		const headSel: string[] = []
 		let counter = 1, position = .0, width = .0
-		Array.from(cols).reverse().toSpliced(count).forEach(col => {
+		Array.from(this.columns).reverse().toSpliced(this.fixColumnRightCount).forEach(col => {
 			position += width
 			width = col.getBoundingClientRect().width
 			const right = position ? `calc(${position}px + var(--border-width))` : `${position}px`
@@ -173,23 +174,11 @@ export class FixTable
 					right: ${right};
 				}
 			`)
-			all1Sel.push(`${this.selector} > * > tr > :nth-last-child(${counter})`)
-			all2Sel.push(`${this.selector} > * > tr > :nth-last-child(${counter+1})`)
 			bodySel.push(`${this.selector} > tbody > tr > :nth-last-child(${counter})`)
 			footSel.push(`${this.selector} > tfoot > tr > :nth-last-child(${counter})`)
 			headSel.push(`${this.selector} > thead > tr > :nth-last-child(${counter})`)
 			counter ++
 		})
-		this.styleSheet.insertRule(`
-			${all1Sel.join(', ')} {
-				border-left: var(--border-width) var(--border-style) var(--border-color);
-			}
-		`)
-		this.styleSheet.insertRule(`
-			${all2Sel.join(', ')} {
-				border-right: none;
-			}
-		`)
 		this.styleSheet.insertRule(`
 			${bodySel.join(', ')} {
 				position: sticky;
@@ -214,22 +203,26 @@ export class FixTable
 		}
 		Object.entries(sections).forEach(([section, rows]) =>
 		{
-			const [increment, style] = (section === 'tfoot') ? [-1, 'bottom'] : [1, 'top']
-			let counter = 2, height = .0, position = .0
+			const [side, style] = (section === 'tfoot') ? ['-last', 'bottom'] : ['', 'top']
+			let counter = 1, height = .0, position = .0
 			rows.forEach(row =>
 			{
 				position += height
 				height = row.getBoundingClientRect().height
-				if (!position) {
-					return
-				}
+				const pos = (counter > 2) ? `calc(${position}px + var(--border-width))` : `${position}px`
 				this.styleSheet.insertRule(`
-					${this.selector} > ${section} > tr:nth-child(${counter}) > * {
-						${style}: ${position}px;
+					${this.selector} > ${section} > tr:nth${side}-child(${counter}) > * {
+						${style}: ${pos};
 					}
 				`)
-				counter += increment
+				counter ++
 			})
+			this.styleSheet.insertRule(`
+				${this.selector} > ${section} > tr > * {
+					position: sticky;
+					z-index: 1;
+				}		
+			`)
 		})
 	}
 

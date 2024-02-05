@@ -1,7 +1,12 @@
+body {
+  margin: 0; }
+
 table.itrocks {
   --background: white;
   --border-color: #800;
   --border-style: solid;
   --border-width: 1px; }
+  table.itrocks > * > tr > * {
+    white-space: nowrap; }
 
 /*# sourceMappingURL=table.css.map */
