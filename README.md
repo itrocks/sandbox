@@ -230,5 +230,6 @@ Allow From 127.0.0.1
 
 Then, you may play with these front scripts. Example:
 - http://localhost/itrocks/sandbox/front/demo/form-fetch.html
+- http://localhost/itrocks/sandbox/front/demo/table.html
 
-Look at your browser console: demos give you information about what they do.
+Look at your browser console: some of these demos may give you information about what they do.
