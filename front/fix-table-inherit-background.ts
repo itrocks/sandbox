@@ -1,9 +1,9 @@
 import { FixTable } from './fix-table.js'
 
-class InheritBackground extends FixTable
+export default class InheritBackground extends FixTable
 {
 
-	styleInheritBackground()
+	InheritBackground()
 	{
 		this.styleSheet.push(`
 			${this.selector} > * > tr > * {
@@ -13,14 +13,4 @@ class InheritBackground extends FixTable
 		return this
 	}
 
-}
-
-export default function inheritBackground(table: FixTable)
-{
-	Object.defineProperty(
-		FixTable.prototype,
-		'styleInheritBackground',
-		Object.getOwnPropertyDescriptor(InheritBackground.prototype, 'styleInheritBackground') as PropertyDescriptor
-	);
-	(table as InheritBackground).styleInheritBackground()
 }

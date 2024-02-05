@@ -1,11 +1,7 @@
-import { applyStyleSheets, fixTableBySelector } from '../fix-table.js'
-import inheritBackground from '../fix-table-inherit-background.js'
-import inheritBorder from '../fix-table-inherit-border.js'
+import { fixTableBySelector } from '../fix-table.js'
+import InheritBackground from '../fix-table-inherit-background.js'
+import InheritBorder from '../fix-table-inherit-border.js'
 
-const initTable = () => fixTableBySelector('table').forEach(table => {
-	inheritBackground(table)
-	inheritBorder(table)
-	applyStyleSheets()
-})
+const initTable = () => fixTableBySelector('table', { plugins: [InheritBackground, InheritBorder] })
 addEventListener('resize', initTable)
 initTable()

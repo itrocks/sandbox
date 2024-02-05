@@ -1,9 +1,18 @@
 import { FixTable } from './fix-table.js'
 
-class InheritBorder extends FixTable
+export default class InheritBorder extends FixTable
 {
 
-	styleInheritBorder()
+	position(position: number, counter?: number)
+	{
+		const result = ((counter === undefined) ? position : (counter > 2))
+			? `calc(${position}px + var(--border-width))`
+			: `${position}px`
+		console.log(position, counter, result)
+		return result
+	}
+
+	InheritBorder()
 	{
 		[`
 			${this.selector} {
@@ -48,14 +57,4 @@ class InheritBorder extends FixTable
 		return this
 	}
 
-}
-
-export default function inheritBackground(table: FixTable)
-{
-	Object.defineProperty(
-		FixTable.prototype,
-		'styleInheritBorder',
-		Object.getOwnPropertyDescriptor(InheritBorder.prototype, 'styleInheritBorder') as PropertyDescriptor
-	);
-	(table as InheritBorder).styleInheritBorder()
 }

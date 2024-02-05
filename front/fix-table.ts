@@ -13,19 +13,19 @@ export function applyStyleSheets()
 	styleSheets.replaceSync(tables.map(table => table.styleSheet.join(`\n`)).join(`\n`))
 }
 
-export function fixTableBySelector(selector: string)
+export function fixTableBySelector(selector: string, options?: Options)
 {
-	return fixTableElements(document.body.querySelectorAll<HTMLTableElement>(selector))
+	return fixTableElements(document.body.querySelectorAll<HTMLTableElement>(selector), options)
 }
 
-export function fixTableElement(element: HTMLTableElement)
+export function fixTableElement(element: HTMLTableElement, options?: Options)
 {
-	return new FixTable(element)
+	return new FixTable(element, options)
 }
 
-export function fixTableElements(elements: Array<HTMLTableElement> | NodeListOf<HTMLTableElement>)
+export function fixTableElements(elements: Array<HTMLTableElement> | NodeListOf<HTMLTableElement>, options?: Options)
 {
-	return Array.from(elements).map(element => fixTableElement(element))
+	return Array.from(elements).map(element => fixTableElement(element, options))
 }
 
 export function garbageCollector()
@@ -49,12 +49,23 @@ export class FixTable
 
 	public readonly id: number
 
+	public readonly plugins: (typeof FixTable)[] = []
+
 	public readonly selector: string
 
 	public readonly styleSheet: string[] = []
 
-	constructor(public readonly element: HTMLTableElement)
+	constructor(public readonly element: HTMLTableElement, options?: Options)
 	{
+		if (options?.plugins) {
+			this.plugins = options.plugins
+			options.plugins.forEach(plugin => {
+				Object.entries(Object.getOwnPropertyDescriptors(plugin.prototype)).forEach(([name, descriptor]) => {
+					Object.defineProperty(FixTable.prototype, name, descriptor)
+				})
+			})
+		}
+
 		tables.push(this)
 		tablesCounter ++
 		if (tablesCounter > 999999999) {
@@ -84,6 +95,15 @@ export class FixTable
 				border-collapse: separate;
 			}
 		`)
+
+		this.plugins.forEach(plugin => {
+			const pluginFunction: () => void = (this as any)[plugin.name]
+			if (pluginFunction && (typeof pluginFunction === 'function')) {
+				pluginFunction.call(this)
+			}
+		})
+
+		applyStyleSheets()
 	}
 
 	protected countColumns()
@@ -126,10 +146,9 @@ export class FixTable
 		Array.from(this.columns).toSpliced(this.fixColumnLeftCount).forEach(col => {
 			position += width
 			width = col.getBoundingClientRect().width
-			const left = position ? `calc(${position}px + var(--border-width))` : `${position}px`
 			this.styleSheet.push(`
 				${this.selector} > * > tr > :nth-child(${counter}) {
-					left: ${left};
+					left: ${this.position(position)};
 				}
 			`)
 			bodySel.push(`${this.selector} > tbody > tr > :nth-child(${counter})`)
@@ -159,10 +178,9 @@ export class FixTable
 		Array.from(this.columns).reverse().toSpliced(this.fixColumnRightCount).forEach(col => {
 			position += width
 			width = col.getBoundingClientRect().width
-			const right = position ? `calc(${position}px + var(--border-width))` : `${position}px`
 			this.styleSheet.push(`
 				${this.selector} > * > tr > :nth-last-child(${counter}) {
-					right: ${right};
+					right: ${this.position(position)};
 				}
 			`)
 			bodySel.push(`${this.selector} > tbody > tr > :nth-last-child(${counter})`)
@@ -200,10 +218,9 @@ export class FixTable
 			{
 				position += height
 				height = row.getBoundingClientRect().height
-				const pos = (counter > 2) ? `calc(${position}px + var(--border-width))` : `${position}px`
 				this.styleSheet.push(`
 					${this.selector} > ${section} > tr:nth${side}-child(${counter}) > * {
-						${style}: ${pos};
+						${style}: ${this.position(position, counter)};
 					}
 				`)
 				counter ++
@@ -217,4 +234,14 @@ export class FixTable
 		})
 	}
 
+	position(position: number, _counter?: number)
+	{
+		return `${position}px`
+	}
+
+}
+
+interface Options
+{
+	plugins?: (typeof FixTable)[]
 }
