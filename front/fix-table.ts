@@ -1,9 +1,17 @@
 
 type HTMLTableFixElement = HTMLTableCellElement | HTMLTableColElement
 
+const styleSheets = new CSSStyleSheet
+document.adoptedStyleSheets.push(styleSheets)
+
 let tables: FixTable[] = []
 
 let tablesCounter = 0
+
+export function applyStyleSheets()
+{
+	styleSheets.replaceSync(tables.map(table => table.styleSheet.join(`\n`)).join(`\n`))
+}
 
 export function fixTableBySelector(selector: string)
 {
@@ -22,13 +30,7 @@ export function fixTableElements(elements: Array<HTMLTableElement> | NodeListOf<
 
 export function garbageCollector()
 {
-	tables = tables.filter(table => {
-		if (document.body.querySelectorAll<HTMLTableElement>(table.selector).length) {
-			return true
-		}
-		table.disableStyleSheet()
-		return false
-	})
+	tables = tables.filter(table => document.body.querySelectorAll<HTMLTableElement>(table.selector).length)
 }
 
 export function getTables()
@@ -49,11 +51,10 @@ export class FixTable
 
 	public readonly selector: string
 
-	public readonly styleSheet = new CSSStyleSheet
+	public readonly styleSheet: string[] = []
 
 	constructor(public readonly element: HTMLTableElement)
 	{
-		garbageCollector()
 		tables.push(this)
 		tablesCounter ++
 		if (tablesCounter > 999999999) {
@@ -64,6 +65,9 @@ export class FixTable
 
 		element.classList.add('itrocks')
 		element.setAttribute('data-table-id', tablesCounter.toString())
+
+		garbageCollector()
+
 		this.columns = element.querySelectorAll<HTMLTableColElement>(':scope > colgroup > col')
 		if (!this.columns.length) {
 			this.columns = element.querySelectorAll<HTMLTableColElement>(':scope > thead > tr:first-child > *')
@@ -75,12 +79,11 @@ export class FixTable
 		if (this.fixColumnLeftCount)  this.fixColumnLeft()
 		if (this.fixColumnRightCount) this.fixColumnRight()
 		this.fixRows(element)
-		this.styleSheet.insertRule(`
+		this.styleSheet.push(`
 			${this.selector} {
 				border-collapse: separate;
 			}
 		`)
-		document.adoptedStyleSheets.push(this.styleSheet)
 	}
 
 	protected countColumns()
@@ -114,18 +117,6 @@ export class FixTable
 		return [count.first, count.last]
 	}
 
-	disableStyleSheet()
-	{
-		document.adoptedStyleSheets = document.adoptedStyleSheets.filter(styleSheet => styleSheet !== this.styleSheet)
-	}
-
-	enableStyleSheet()
-	{
-		if (!document.adoptedStyleSheets.find(stylesheet => stylesheet === this.styleSheet)) {
-			document.adoptedStyleSheets.push(this.styleSheet)
-		}
-	}
-
 	protected fixColumnLeft()
 	{
 		const bodySel: string[] = []
@@ -136,7 +127,7 @@ export class FixTable
 			position += width
 			width = col.getBoundingClientRect().width
 			const left = position ? `calc(${position}px + var(--border-width))` : `${position}px`
-			this.styleSheet.insertRule(`
+			this.styleSheet.push(`
 				${this.selector} > * > tr > :nth-child(${counter}) {
 					left: ${left};
 				}
@@ -146,13 +137,13 @@ export class FixTable
 			headSel.push(`${this.selector} > thead > tr > :nth-child(${counter})`)
 			counter ++
 		})
-		this.styleSheet.insertRule(`
+		this.styleSheet.push(`
 			${bodySel.join(', ')} {
 				position: sticky;
 				z-index: 2;
 			}
 		`)
-		this.styleSheet.insertRule(`
+		this.styleSheet.push(`
 			${footSel.join(', ')}, ${headSel.join(', ')} {
 				z-index: 3;
 			}
@@ -169,7 +160,7 @@ export class FixTable
 			position += width
 			width = col.getBoundingClientRect().width
 			const right = position ? `calc(${position}px + var(--border-width))` : `${position}px`
-			this.styleSheet.insertRule(`
+			this.styleSheet.push(`
 				${this.selector} > * > tr > :nth-last-child(${counter}) {
 					right: ${right};
 				}
@@ -179,13 +170,13 @@ export class FixTable
 			headSel.push(`${this.selector} > thead > tr > :nth-last-child(${counter})`)
 			counter ++
 		})
-		this.styleSheet.insertRule(`
+		this.styleSheet.push(`
 			${bodySel.join(', ')} {
 				position: sticky;
 				z-index: 2;
 			}
 		`)
-		this.styleSheet.insertRule(`
+		this.styleSheet.push(`
 			${footSel.join(', ')}, ${headSel.join(', ')} {
 				z-index: 3;
 			}
@@ -210,14 +201,14 @@ export class FixTable
 				position += height
 				height = row.getBoundingClientRect().height
 				const pos = (counter > 2) ? `calc(${position}px + var(--border-width))` : `${position}px`
-				this.styleSheet.insertRule(`
+				this.styleSheet.push(`
 					${this.selector} > ${section} > tr:nth${side}-child(${counter}) > * {
 						${style}: ${pos};
 					}
 				`)
 				counter ++
 			})
-			this.styleSheet.insertRule(`
+			this.styleSheet.push(`
 				${this.selector} > ${section} > tr > * {
 					position: sticky;
 					z-index: 1;

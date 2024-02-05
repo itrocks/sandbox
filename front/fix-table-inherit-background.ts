@@ -5,7 +5,7 @@ class InheritBackground extends FixTable
 
 	styleInheritBackground()
 	{
-		this.styleSheet.insertRule(`
+		this.styleSheet.push(`
 			${this.selector} > * > tr > * {
 				background: var(--background);
 			}

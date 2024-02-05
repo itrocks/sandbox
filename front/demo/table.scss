@@ -8,8 +8,4 @@ table.itrocks {
 	--border-color: #800;
 	--border-style: solid;
 	--border-width: 1px;
-
-	> * > tr > * {
-		white-space: nowrap;
-	}
 }
