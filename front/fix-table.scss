@@ -50,8 +50,6 @@ table.itrocks {
 // scroll
 table.itrocks {
 	border-collapse: separate;
-	display: inline-block;
-	overflow: scroll;
 
 	> * > tr > * {
 		white-space: nowrap;

@@ -23,9 +23,7 @@ table.itrocks > thead > tr:first-child > * {
   top: 0; }
 
 table.itrocks {
-  border-collapse: separate;
-  display: inline-block;
-  overflow: scroll; }
+  border-collapse: separate; }
   table.itrocks > * > tr > * {
     white-space: nowrap; }
 
