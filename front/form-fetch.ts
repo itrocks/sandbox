@@ -8,8 +8,6 @@ export default (form: HTMLFormElement, callback: (response: Response) => void) =
 		const url          = new URL(form.action)
 		const fetchOptions: RequestInit = { method: form.method }
 
-		console.log(event)
-
 		if (form.method.toLowerCase() === 'post') {
 			if (form.enctype.toLowerCase() === 'multipart/form-data') {
 				fetchOptions.body = formData

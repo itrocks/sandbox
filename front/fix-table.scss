@@ -29,49 +29,6 @@ table.itrocks {
 	}
 }
 
-// fix first column position
-table.itrocks {
-	> * > tr > :first-child {
-		left: 0;
-	}
-
-	> tbody > tr > :first-child {
-		position: sticky;
-		z-index: 2;
-	}
-
-	> tfoot, > thead {
-		> tr > :first-child {
-			z-index: 3;
-		}
-	}
-}
-
-// fix last column position
-table.itrocks {
-	> * > tr {
-		> :last-child {
-			border-left: var(--border-width) var(--border-style) var(--border-color);
-			right: 0;
-		}
-
-		> :nth-last-child(2) {
-			border-right: none;
-		}
-	}
-
-	> tbody > tr > :last-child {
-		position: sticky;
-		z-index: 2;
-	}
-
-	> tfoot, > thead {
-		> tr > :last-child {
-			z-index: 3;
-		}
-	}
-}
-
 // fix thead/tfoot rows position
 table.itrocks {
 	> tfoot, > thead {

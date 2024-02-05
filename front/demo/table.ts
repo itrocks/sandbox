@@ -1,3 +1,3 @@
-import Table from '../table.js'
+import { fixTableBySelector } from '../fix-table.js'
 
-Table('table')
+fixTableBySelector('table')
