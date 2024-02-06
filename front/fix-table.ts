@@ -1,88 +1,22 @@
+import { HTMLTableFixElement, Options as TableOptions, Table } from './table.js'
 
-export type HTMLTableFixElement = HTMLTableCellElement | HTMLTableColElement
-
-const styleSheets = new CSSStyleSheet
-document.adoptedStyleSheets.push(styleSheets)
-
-let tableCounter = 0
-
-let tables: FixTable[] = []
-
-export function applyStyleSheets()
-{
-	styleSheets.replaceSync(tables.map(table => table.styleSheet.join(`\n`)).join(`\n`))
-}
-
-export function fixTableBySelector(selector: string, options: Options = {})
-{
-	return fixTableElements(document.body.querySelectorAll<HTMLTableElement>(selector), options)
-}
-
-export function fixTableElement(element: HTMLTableElement, options: Options = {})
-{
-	return new FixTable(element, options)
-}
-
-export function fixTableElements(
-	elements: Array<HTMLTableElement> | NodeListOf<HTMLTableElement>, options: Options = {}
-) {
-	return Array.from(elements).map(element => fixTableElement(element, options))
-}
-
-export function garbageCollector()
-{
-	const length = tables.length
-	tables = tables.filter(table => document.body.querySelectorAll<HTMLTableElement>(table.selector).length)
-	if (tables.length < length) {
-		applyStyleSheets()
-	}
-}
-
-export function getTables()
-{
-	return tables
-}
-
-function nextTableId(table: FixTable)
-{
-	tables.push(table)
-	tableCounter ++
-	if (tableCounter > 999999999) {
-		tableCounter = 1
-	}
-	return tableCounter
-}
-
-export class FixTable
+export default class FixTable extends Table
 {
 
-	public readonly borderCollapse: 0|1
+	public borderCollapse: 0|1 = 0
+	public columns: NodeListOf<HTMLTableFixElement>
+	public leftColumnCount: number = 0
+	public options = new Options
+	public rightColumnCount: number = 0
 
-	public readonly columns: NodeListOf<HTMLTableFixElement>
-
-	public readonly id: number
-
-	public readonly leftColumnCount: number
-
-	public readonly options = new DefaultOptions
-
-	public readonly rightColumnCount: number
-
-	public readonly selector: string
-
-	public readonly styleSheet: string[] = []
-
-	constructor(public readonly element: HTMLTableElement, options: Options = {})
+	constructor(element: HTMLTableElement)
 	{
-		Object.assign(this.options, options)
+		super(element)
+		this.columns = this.getColumns()
+	}
 
-		this.applyPlugins()
-
-		this.id       = nextTableId(this)
-		this.selector = `table.itrocks[data-table-id="${this.id}"]`
-		this.element.classList.add('itrocks')
-		this.element.setAttribute('data-table-id', this.id.toString())
-		garbageCollector()
+	FixTable()
+	{
 		this.borderCollapse = (getComputedStyle(this.element).borderCollapse === 'collapse') ? 1 : 0
 		this.commonStyle()
 
@@ -93,19 +27,6 @@ export class FixTable
 		this.fixHeadRows()
 		this.fixLeftColumns()
 		this.fixRightColumns()
-
-		this.executePluginConstructors()
-
-		applyStyleSheets()
-	}
-
-	protected applyPlugins()
-	{
-		this.options.plugins.forEach(plugin => {
-			Object.entries(Object.getOwnPropertyDescriptors(plugin.prototype)).forEach(([name, descriptor]) => {
-				Object.defineProperty(FixTable.prototype, name, descriptor)
-			})
-		})
 	}
 
 	protected commonStyle()
@@ -135,16 +56,6 @@ export class FixTable
 			count --
 		}
 		return this.columns.length - 1 - count
-	}
-
-	protected executePluginConstructors()
-	{
-		this.options.plugins.forEach(plugin => {
-			const pluginFunction: () => void = (this as any)[plugin.name]
-			if (pluginFunction && (typeof pluginFunction === 'function')) {
-				pluginFunction.call(this)
-			}
-		})
 	}
 
 	protected fixFootRows()
@@ -280,20 +191,9 @@ export class FixTable
 
 }
 
-interface Options
-{
-	colIndex?:    number
-	cornerIndex?: number
-	plugins?:     (typeof FixTable)[]
-	rowIndex?:    number
-}
-
-class DefaultOptions implements Options
+class Options extends TableOptions
 {
 	colIndex:    number = 2
 	cornerIndex: number = 3
-	plugins:     (typeof FixTable)[] = []
 	rowIndex:    number = 1
 }
-
-export default FixTable

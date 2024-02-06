@@ -1,4 +1,5 @@
-import FixTable, {HTMLTableFixElement} from './fix-table.js'
+import FixTable                from './fix-table.js'
+import { HTMLTableFixElement } from './table.js'
 
 /**
  * This plugin has no use and no effect if your table has border-collapse: separate (default)
