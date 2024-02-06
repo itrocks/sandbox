@@ -1,5 +1,8 @@
 import FixTable, {HTMLTableFixElement} from './fix-table.js'
 
+/**
+ * This plugin has no use and no effect if your table has border-collapse: separate (default)
+ */
 export default class InheritBorder extends FixTable
 {
 

@@ -1,14 +1,18 @@
 import FixTable from './fix-table.js'
 
+/**
+ * This plugin has no use and no effect if your table has border-collapse: collapse
+ */
 export default class InheritBackground extends FixTable
 {
 
 	protected InheritBackground()
 	{
+		if (this.borderCollapse) return
 		const tableStyle = getComputedStyle(this.element)
-		if (tableStyle.background === 'none') return
+		if (tableStyle.backgroundColor.replaceAll(' ', '').endsWith(',0)')) return
 		const borderSpacing = parseFloat(tableStyle.borderSpacing)
-		if (this.borderCollapse || !borderSpacing) return
+		if (!borderSpacing) return
 
 		let selectors = []
 		for (let child = 1; child <= this.leftColumnCount; child ++) {

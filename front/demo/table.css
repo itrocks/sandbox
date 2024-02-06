@@ -2,14 +2,14 @@ body {
   margin: 0; }
 
 table {
-  background: lightgray;
   border-collapse: collapse;
   height: 100%;
   width: 100%; }
-  table > :not(tbody) > tr > * {
-    white-space: nowrap; }
   table > * > tr > * {
-    background: white;
     border: 1px solid #800; }
+  table > tfoot > tr > *,
+  table > thead > tr > * {
+    background: white;
+    white-space: nowrap; }
 
 /*# sourceMappingURL=table.css.map */

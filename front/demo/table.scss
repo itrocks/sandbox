@@ -4,17 +4,18 @@ body {
 }
 
 table {
-	background: lightgray;
 	border-collapse: collapse;
 	height: 100%;
 	width: 100%;
 
-	> :not(tbody) > tr > * {
-		white-space: nowrap;
-	}
-
 	> * > tr > * {
-		background: white;
 		border: 1px solid #800;
 	}
+
+	> tfoot > tr > *,
+	> thead > tr > * {
+		background: white;
+		white-space: nowrap;
+	}
 }
+
