@@ -1,7 +1,19 @@
 
-table.itrocks {
-	--background: white;
-	--border-color: #800;
-	--border-style: solid;
-	--border-width: 1px;
+body {
+	margin: 0;
+}
+
+table {
+	background: lightgray;
+	height: 100%;
+	width: 100%;
+
+	> :not(tbody) > tr > * {
+		white-space: nowrap;
+	}
+
+	> * > tr > * {
+		background: white;
+		border: 1px solid #800;
+	}
 }

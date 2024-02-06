@@ -1,36 +1,41 @@
 
-type HTMLTableFixElement = HTMLTableCellElement | HTMLTableColElement
+export type HTMLTableFixElement = HTMLTableCellElement | HTMLTableColElement
 
 const styleSheets = new CSSStyleSheet
 document.adoptedStyleSheets.push(styleSheets)
 
-let tables: FixTable[] = []
+let tableCounter = 0
 
-let tablesCounter = 0
+let tables: FixTable[] = []
 
 export function applyStyleSheets()
 {
 	styleSheets.replaceSync(tables.map(table => table.styleSheet.join(`\n`)).join(`\n`))
 }
 
-export function fixTableBySelector(selector: string, options?: Options)
+export function fixTableBySelector(selector: string, options: Options = {})
 {
 	return fixTableElements(document.body.querySelectorAll<HTMLTableElement>(selector), options)
 }
 
-export function fixTableElement(element: HTMLTableElement, options?: Options)
+export function fixTableElement(element: HTMLTableElement, options: Options = {})
 {
 	return new FixTable(element, options)
 }
 
-export function fixTableElements(elements: Array<HTMLTableElement> | NodeListOf<HTMLTableElement>, options?: Options)
-{
+export function fixTableElements(
+	elements: Array<HTMLTableElement> | NodeListOf<HTMLTableElement>, options: Options = {}
+) {
 	return Array.from(elements).map(element => fixTableElement(element, options))
 }
 
 export function garbageCollector()
 {
+	const length = tables.length
 	tables = tables.filter(table => document.body.querySelectorAll<HTMLTableElement>(table.selector).length)
+	if (tables.length < length) {
+		applyStyleSheets()
+	}
 }
 
 export function getTables()
@@ -38,117 +43,170 @@ export function getTables()
 	return tables
 }
 
+function nextTableId(table: FixTable)
+{
+	tables.push(table)
+	tableCounter ++
+	if (tableCounter > 999999999) {
+		tableCounter = 1
+	}
+	return tableCounter
+}
+
 export class FixTable
 {
 
+	public readonly borderCollapse: 0|1
+
 	public readonly columns: NodeListOf<HTMLTableFixElement>
-
-	public readonly fixColumnLeftCount: number
-
-	public readonly fixColumnRightCount: number
 
 	public readonly id: number
 
-	public readonly plugins: (typeof FixTable)[] = []
+	public readonly leftColumnCount: number
+
+	public readonly options = new DefaultOptions
+
+	public readonly rightColumnCount: number
 
 	public readonly selector: string
 
 	public readonly styleSheet: string[] = []
 
-	constructor(public readonly element: HTMLTableElement, options?: Options)
+	constructor(public readonly element: HTMLTableElement, options: Options = {})
 	{
-		if (options?.plugins) {
-			this.plugins = options.plugins
-			options.plugins.forEach(plugin => {
-				Object.entries(Object.getOwnPropertyDescriptors(plugin.prototype)).forEach(([name, descriptor]) => {
-					Object.defineProperty(FixTable.prototype, name, descriptor)
-				})
-			})
-		}
+		Object.assign(this.options, options)
 
-		tables.push(this)
-		tablesCounter ++
-		if (tablesCounter > 999999999) {
-			tablesCounter = 1
-		}
-		this.id       = tablesCounter
+		this.applyPlugins()
+
+		this.id       = nextTableId(this)
 		this.selector = `table.itrocks[data-table-id="${this.id}"]`
-
-		element.classList.add('itrocks')
-		element.setAttribute('data-table-id', tablesCounter.toString())
-
+		this.element.classList.add('itrocks')
+		this.element.setAttribute('data-table-id', this.id.toString())
 		garbageCollector()
+		this.borderCollapse = (getComputedStyle(this.element).borderCollapse === 'collapse') ? 1 : 0
+		this.commonStyle()
 
-		this.columns = element.querySelectorAll<HTMLTableColElement>(':scope > colgroup > col')
-		if (!this.columns.length) {
-			this.columns = element.querySelectorAll<HTMLTableColElement>(':scope > thead > tr:first-child > *')
-			if (!this.columns.length) {
-				this.columns = element.querySelectorAll<HTMLTableColElement>(':scope > tbody > tr:first-child > *')
-			}
-		}
-		[this.fixColumnLeftCount, this.fixColumnRightCount] = this.countColumns()
-		if (this.fixColumnLeftCount)  this.fixColumnLeft()
-		if (this.fixColumnRightCount) this.fixColumnRight()
-		this.fixRows(element)
+		this.columns          = this.getColumns()
+		this.leftColumnCount  = this.countLeftColumns()
+		this.rightColumnCount = this.countRightColumns()
+		this.fixFootRows()
+		this.fixHeadRows()
+		this.fixLeftColumns()
+		this.fixRightColumns()
+
+		this.executePluginConstructors()
+
+		applyStyleSheets()
+	}
+
+	protected applyPlugins()
+	{
+		this.options.plugins.forEach(plugin => {
+			Object.entries(Object.getOwnPropertyDescriptors(plugin.prototype)).forEach(([name, descriptor]) => {
+				Object.defineProperty(FixTable.prototype, name, descriptor)
+			})
+		})
+	}
+
+	protected commonStyle()
+	{
+		if (!this.borderCollapse) return
 		this.styleSheet.push(`
 			${this.selector} {
 				border-collapse: separate;
+				border-spacing: 0;
 			}
 		`)
+	}
 
-		this.plugins.forEach(plugin => {
+	protected countLeftColumns()
+	{
+		let count = 0
+		while ((count < this.columns.length - 1) && (this.columns[count].dataset.fix !== undefined)) {
+			count ++
+		}
+		return count
+	}
+
+	protected countRightColumns()
+	{
+		let count = this.columns.length - 1
+		while ((count > 0) && (this.columns[count].dataset.fix !== undefined)) {
+			count --
+		}
+		return this.columns.length - 1 - count
+	}
+
+	protected executePluginConstructors()
+	{
+		this.options.plugins.forEach(plugin => {
 			const pluginFunction: () => void = (this as any)[plugin.name]
 			if (pluginFunction && (typeof pluginFunction === 'function')) {
 				pluginFunction.call(this)
 			}
 		})
-
-		applyStyleSheets()
 	}
 
-	protected countColumns()
+	protected fixFootRows()
 	{
-		let counter = 0
-		let count = { first: 0, last: 0 }
-		let doing: 'first' | 'last' = 'first'
-		let fix = true
-		this.columns.forEach(col =>
-		{
-			counter ++
-			if (fix) {
-				if (col.dataset.fix === undefined) {
-					if (doing === 'last') {
-						throw new Error(
-							`${this.selector}: column ${counter-1} is data-fix but isolated on the middle of the table;`
-							+ ' it should stick the left or the right, directly or through other data-fix columns.'
-						)
-					}
-					fix = false
+		if (!this.element.tFoot) return
+		let counter = 1, bottom = .0, previousBottom = this.element.getBoundingClientRect().bottom
+		Array.from(this.element.tFoot.querySelectorAll<HTMLTableRowElement>(':scope > tr')).reverse().forEach(row => {
+			const actualBottom = row.getBoundingClientRect().bottom
+			bottom += previousBottom - actualBottom
+			previousBottom = actualBottom
+			this.styleSheet.push(`
+				${this.selector} > tfoot > tr:nth-last-child(${counter}) > * {
+					bottom: ${this.position(bottom, counter, row.firstElementChild as HTMLTableCellElement, 'bottom')};
 				}
-			}
-			else if (col.dataset.fix !== undefined) {
-				doing = 'last'
-				fix = true
-			}
-			if (fix) {
-				count[doing]++
-			}
+			`)
+			counter ++
 		})
-		return [count.first, count.last]
+		this.styleSheet.push(`
+			${this.selector} > tfoot > tr > * {
+				position: sticky;
+				z-index: ${this.options.rowIndex};
+			}		
+		`)
 	}
 
-	protected fixColumnLeft()
+	protected fixHeadRows()
 	{
+		if (!this.element.tHead) return
+		let counter = 1, top = .0, previousTop = this.element.getBoundingClientRect().top
+		this.element.tHead.querySelectorAll<HTMLTableRowElement>(':scope > tr').forEach(row => {
+			const actualTop = row.getBoundingClientRect().top
+			top += actualTop - previousTop
+			previousTop = actualTop
+			this.styleSheet.push(`
+				${this.selector} > thead > tr:nth-child(${counter}) > * {
+					top: ${this.position(top, counter, row.firstElementChild as HTMLTableCellElement, 'top')};
+				}
+			`)
+			counter ++
+		})
+		this.styleSheet.push(`
+			${this.selector} > thead > tr > * {
+				position: sticky;
+				z-index: ${this.options.rowIndex};
+			}		
+		`)
+	}
+
+	protected fixLeftColumns()
+	{
+		if (!this.leftColumnCount) return
 		const bodySel: string[] = []
 		const footSel: string[] = []
 		const headSel: string[] = []
-		let counter = 1, position = .0, width = .0
-		Array.from(this.columns).toSpliced(this.fixColumnLeftCount).forEach(col => {
-			position += width
-			width = col.getBoundingClientRect().width
+		let counter = 1, left = .0, previousLeft = this.element.getBoundingClientRect().left
+		Array.from(this.columns).toSpliced(this.leftColumnCount).forEach(col => {
+			const actualLeft = col.getBoundingClientRect().left
+			left += actualLeft - previousLeft
+			previousLeft = actualLeft
 			this.styleSheet.push(`
 				${this.selector} > * > tr > :nth-child(${counter}) {
-					left: ${this.position(position)};
+					left: ${this.position(left, counter, col, 'left')};
 				}
 			`)
 			bodySel.push(`${this.selector} > tbody > tr > :nth-child(${counter})`)
@@ -159,28 +217,28 @@ export class FixTable
 		this.styleSheet.push(`
 			${bodySel.join(', ')} {
 				position: sticky;
-				z-index: 2;
+				z-index: ${this.options.colIndex};
 			}
-		`)
-		this.styleSheet.push(`
 			${footSel.join(', ')}, ${headSel.join(', ')} {
-				z-index: 3;
+				z-index: ${this.options.cornerIndex};
 			}
 		`)
 	}
 
-	protected fixColumnRight()
+	protected fixRightColumns()
 	{
+		if (!this.rightColumnCount) return
 		const bodySel: string[] = []
 		const footSel: string[] = []
 		const headSel: string[] = []
-		let counter = 1, position = .0, width = .0
-		Array.from(this.columns).reverse().toSpliced(this.fixColumnRightCount).forEach(col => {
-			position += width
-			width = col.getBoundingClientRect().width
+		let counter = 1, right = .0, previousRight = this.element.getBoundingClientRect().right
+		Array.from(this.columns).reverse().toSpliced(this.rightColumnCount).forEach(col => {
+			const actualRight = col.getBoundingClientRect().right
+			right += previousRight - actualRight
+			previousRight = actualRight
 			this.styleSheet.push(`
 				${this.selector} > * > tr > :nth-last-child(${counter}) {
-					right: ${this.position(position)};
+					right: ${this.position(right, counter, col, 'right')};
 				}
 			`)
 			bodySel.push(`${this.selector} > tbody > tr > :nth-last-child(${counter})`)
@@ -191,51 +249,32 @@ export class FixTable
 		this.styleSheet.push(`
 			${bodySel.join(', ')} {
 				position: sticky;
-				z-index: 2;
+				z-index: ${this.options.colIndex};
 			}
-		`)
-		this.styleSheet.push(`
 			${footSel.join(', ')}, ${headSel.join(', ')} {
-				z-index: 3;
+				z-index: ${this.options.cornerIndex};
 			}
 		`)
 	}
 
-	protected fixRows(table: HTMLTableElement)
+	protected getColumns()
 	{
-		const sections: { tfoot?: HTMLTableRowElement[], thead?: NodeListOf<HTMLTableRowElement> } = {}
-		if (table.tFoot) {
-			sections.tfoot = Array.from(table.querySelectorAll<HTMLTableRowElement>(':scope > tfoot > tr')).reverse()
+		let columns = this.element.querySelectorAll<HTMLTableColElement>(':scope > colgroup > col')
+		if (!columns.length) {
+			columns = this.element.querySelectorAll<HTMLTableColElement>(':scope > thead > tr:first-child > *')
+			if (!columns.length) {
+				columns = this.element.querySelectorAll<HTMLTableColElement>(':scope > tbody > tr:first-child > *')
+			}
 		}
-		if (table.tHead) {
-			sections.thead = table.querySelectorAll<HTMLTableRowElement>(':scope > thead > tr')
-		}
-		Object.entries(sections).forEach(([section, rows]) =>
-		{
-			const [side, style] = (section === 'tfoot') ? ['-last', 'bottom'] : ['', 'top']
-			let counter = 1, height = .0, position = .0
-			rows.forEach(row =>
-			{
-				position += height
-				height = row.getBoundingClientRect().height
-				this.styleSheet.push(`
-					${this.selector} > ${section} > tr:nth${side}-child(${counter}) > * {
-						${style}: ${this.position(position, counter)};
-					}
-				`)
-				counter ++
-			})
-			this.styleSheet.push(`
-				${this.selector} > ${section} > tr > * {
-					position: sticky;
-					z-index: 1;
-				}		
-			`)
-		})
+		return columns
 	}
 
-	position(position: number, _counter?: number)
-	{
+	protected position(
+		position: number,
+		_counter: number,
+		_row: HTMLTableFixElement,
+		_side: 'bottom' | 'left' | 'right' | 'top'
+	) {
 		return `${position}px`
 	}
 
@@ -243,5 +282,18 @@ export class FixTable
 
 interface Options
 {
-	plugins?: (typeof FixTable)[]
+	colIndex?:    number
+	cornerIndex?: number
+	plugins?:     (typeof FixTable)[]
+	rowIndex?:    number
 }
+
+class DefaultOptions implements Options
+{
+	colIndex:    number = 2
+	cornerIndex: number = 3
+	plugins:     (typeof FixTable)[] = []
+	rowIndex:    number = 1
+}
+
+export default FixTable
