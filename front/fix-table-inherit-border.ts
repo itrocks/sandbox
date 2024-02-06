@@ -38,11 +38,14 @@ export default class InheritBorder extends FixTable
 		`)
 	}
 
-	position(position: number, counter: number, row: HTMLTableFixElement)
+	position(position: number, counter: number, row: HTMLTableFixElement, side: 'bottom' | 'left' | 'right' | 'top')
 	{
 		if (this.borderCollapse) {
 			const width = parseFloat(getComputedStyle(row).borderWidth) / 2
-			position += (counter > 1) ? width : -width
+			const shift = (counter > 1) ? width : -width
+			position += ((side === 'bottom') || (side === 'right'))
+				? Math.ceil(shift)
+				: Math.floor(shift)
 		}
 		return `${position}px`
 	}

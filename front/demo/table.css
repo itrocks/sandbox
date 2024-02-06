@@ -3,6 +3,7 @@ body {
 
 table {
   background: lightgray;
+  border-collapse: collapse;
   height: 100%;
   width: 100%; }
   table > :not(tbody) > tr > * {
