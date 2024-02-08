@@ -13,6 +13,7 @@ export default class FixTable extends Table
 	{
 		super(element)
 		this.columns = this.getColumns()
+		throw 'Plugins should not be instantiated'
 	}
 
 	FixTable()
@@ -56,6 +57,11 @@ export default class FixTable extends Table
 			count --
 		}
 		return this.columns.length - 1 - count
+	}
+
+	public static defaultOptions()
+	{
+		return new Options
 	}
 
 	protected fixFootRows()
@@ -170,6 +176,7 @@ export default class FixTable extends Table
 
 	protected getColumns()
 	{
+		if (this.columns) return this.columns
 		let columns = this.element.querySelectorAll<HTMLTableColElement>(':scope > colgroup > col')
 		if (!columns.length) {
 			columns = this.element.querySelectorAll<HTMLTableColElement>(':scope > thead > tr:first-child > *')

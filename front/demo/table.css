@@ -7,9 +7,10 @@ table {
   width: 100%; }
   table > * > tr > * {
     border: 1px solid #800; }
-  table > tfoot > tr > *,
-  table > thead > tr > * {
+  table > * > tr > * {
     background: white;
     white-space: nowrap; }
+  table > thead > tr:first-child > * {
+    user-select: none; }
 
 /*# sourceMappingURL=table.css.map */

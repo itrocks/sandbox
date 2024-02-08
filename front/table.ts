@@ -70,7 +70,7 @@ export class Table
 	protected applyPlugins()
 	{
 		this.options.plugins.forEach(plugin => {
-			Object.entries(new plugin(this.element).options).forEach(([index, value]) => {
+			Object.entries(plugin.defaultOptions()).forEach(([index, value]) => {
 				if (!this.options.hasOwnProperty(index)) {
 					this.options[index] = value
 				}
@@ -79,6 +79,10 @@ export class Table
 				Object.defineProperty(Table.prototype, name, descriptor)
 			})
 		})
+	}
+	public static defaultOptions()
+	{
+		return new Options
 	}
 
 	protected executePluginConstructors()
