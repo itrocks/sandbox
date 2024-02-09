@@ -3,10 +3,7 @@ import { decorate, decoratorOf } from '../../decorator/property'
 
 const EMAIL = Symbol('email')
 
-const Email = (value: boolean = true) => decorate(EMAIL, value)
-
-const emailOf = (target: object|Type, property: string) => decoratorOf<boolean>(target, property, EMAIL, false)
-
-export { Email, emailOf }
-
+export const Email = (value: boolean = true) => decorate(EMAIL, value)
 export default Email
+
+export const emailOf = (target: object|Type, property: string) => decoratorOf<boolean>(target, property, EMAIL, false)

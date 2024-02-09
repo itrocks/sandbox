@@ -4,12 +4,13 @@ import { toDisplay }                             from '../rename'
 
 const DISPLAY = Symbol('display')
 
-const Display = (name: string = '') => decorateCallback<string>(
+export const Display = (name: string = '') => decorateCallback<string>(
 	DISPLAY,
 	target => toDisplay((name === '') ? target.name : name)
 )
+export default Display
 
-const displayOf = (target: object|Type) => decoratorOfCallback<string>(target, DISPLAY, target =>
+export const displayOf = (target: object|Type) => decoratorOfCallback<string>(target, DISPLAY, target =>
 {
 	let constr = target.constructor
 	while ((constr.name === '') || (constr.name === 'builtClass')) {
@@ -17,7 +18,3 @@ const displayOf = (target: object|Type) => decoratorOfCallback<string>(target, D
 	}
 	return toDisplay(constr.name)
 })
-
-export { Display, displayOf }
-
-export default Display

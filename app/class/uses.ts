@@ -57,7 +57,6 @@ export const Uses = (...mixins: Type[]) => <T extends Type>(target: T): T =>
 	decorate(USES, mixins)(target)
 	return uses(target, mixins)
 }
+export default Uses
 
 export const usesOf = (target: object|Type) => decoratorOf<Type[]>(target, USES, [])
-
-export default Uses

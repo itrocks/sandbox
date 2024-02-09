@@ -96,6 +96,7 @@ export class Table
 	}
 
 }
+export default Table
 
 export function tableBySelector(selector: string, options: Partial<Options> = {})
 {
@@ -112,5 +113,3 @@ export function tableElements(
 ) {
 	return Array.from(elements).map(element => tableElement(element, options))
 }
-
-export default Table

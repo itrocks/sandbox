@@ -18,49 +18,47 @@ const readDirRecursive = async (path: string): Promise<string[]> =>
 	walk(path)
 	.then(entries => entries.map(entry => entry.substring(path.length)))
 
-const routes: { [name: string]: any } = {}
-
-readDirRecursive(__dirname.substring(0, __dirname.lastIndexOf('/')))
-	.then(entries => {
-		entries.forEach(entry => {
-			if (!entry.endsWith('.ts')) {
-				return
-			}
-			entry = entry.substring(0, entry.length - 3)
-			let route = routes
-			const names = entry.split('/').slice(1).reverse()
-			names.slice(0, names.length - 1).forEach(name => {
-				if (!route[name]) {
-					route[name] = {}
-				}
-				if (typeof route[name] === 'string') {
-					route[name] = { ':': route[name] }
-				}
-				route = route[name]
-			})
-			let name = names[names.length - 1]
-			if (route[name]) {
-				route[name][':'] = entry
-			}
-			else {
-				route[name] = entry
-			}
-		})
-		const simplify = (
-			routes: { [name: string]: any },
-			name: string,
-			route: { [name: string]: any }|string
-		) => {
-			if (typeof route === 'string') {
-				return
-			}
-			Object.entries(route).forEach(([name, subRoutes]) => simplify(route, name, subRoutes))
-			if (Object.values(route).length === 1) {
-				routes[name] = Object.values(route)[0]
-				return
-			}
-		}
-		Object.entries(routes).forEach(([name, route]) => simplify(routes, name, route))
-	})
-
+export const routes: { [name: string]: any } = {}
 export default routes
+
+readDirRecursive(__dirname.substring(0, __dirname.lastIndexOf('/'))).then(entries => {
+	entries.forEach(entry => {
+		if (!entry.endsWith('.ts')) {
+			return
+		}
+		entry = entry.substring(0, entry.length - 3)
+		let route = routes
+		const names = entry.split('/').slice(1).reverse()
+		names.slice(0, names.length - 1).forEach(name => {
+			if (!route[name]) {
+				route[name] = {}
+			}
+			if (typeof route[name] === 'string') {
+				route[name] = { ':': route[name] }
+			}
+			route = route[name]
+		})
+		let name = names[names.length - 1]
+		if (route[name]) {
+			route[name][':'] = entry
+		}
+		else {
+			route[name] = entry
+		}
+	})
+	const simplify = (
+		routes: { [name: string]: any },
+		name: string,
+		route: { [name: string]: any }|string
+	) => {
+		if (typeof route === 'string') {
+			return
+		}
+		Object.entries(route).forEach(([name, subRoutes]) => simplify(route, name, subRoutes))
+		if (Object.values(route).length === 1) {
+			routes[name] = Object.values(route)[0]
+			return
+		}
+	}
+	Object.entries(routes).forEach(([name, route]) => simplify(routes, name, route))
+})

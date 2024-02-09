@@ -1,13 +1,13 @@
 import { ReflectProperty }        from '../property/reflect'
 import { objectOf, Type, typeOf } from './type'
 
-const properties = (object: object|ReflectClass|Type) => propertyNames(object)
+export const properties = (object: object|ReflectClass|Type) => propertyNames(object)
 	.map(propertyName => new ReflectProperty(object, propertyName))
 
-const propertyNames = (object: object|ReflectClass|Type) => Object
+export const propertyNames = (object: object|ReflectClass|Type) => Object
 	.getOwnPropertyNames((object instanceof ReflectClass) ? new (object.type) : objectOf(object))
 
-class ReflectClass
+export class ReflectClass
 {
 
 	name: string
@@ -34,7 +34,4 @@ class ReflectClass
 	}
 
 }
-
-export { properties, propertyNames, ReflectClass }
-
 export default ReflectClass

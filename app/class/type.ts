@@ -1,14 +1,11 @@
 
-const objectOf = (target: object|Type): object => (typeof target === 'object')
+export const objectOf = (target: object|Type): object => (typeof target === 'object')
 	? target
 	: new target
 
-type Type = new(...args: any[]) => object
+export type Type = new(...args: any[]) => object
+export default Type
 
-const typeOf = (target: object|Type): Type => (typeof target === 'object')
+export const typeOf = (target: object|Type): Type => (typeof target === 'object')
 	? Object.getPrototypeOf(target).constructor
 	: target
-
-export { objectOf, type Type, typeOf }
-
-export default Type

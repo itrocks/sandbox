@@ -1,7 +1,7 @@
 import { ReflectClass } from '../class/reflect'
 import { Type }         from '../class/type'
 
-class ReflectProperty
+export class ReflectProperty
 {
 
 	#class: object|ReflectClass|Type
@@ -27,7 +27,4 @@ class ReflectProperty
 	}
 
 }
-
-export { ReflectProperty }
-
 export default ReflectProperty

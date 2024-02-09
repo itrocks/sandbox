@@ -1,6 +1,6 @@
 import config from '../../local/dao'
 
-interface Dao
+export interface Dao
 {
 
 	read<T extends object>(type: new() => T, id: bigint|string): Promise<T>
@@ -10,8 +10,5 @@ interface Dao
 }
 
 const {engine: _, ...daoConfig} = config
-const dao: Dao = new (require('./' + config.engine).default)(daoConfig)
-
-export { dao, Dao }
-
+export const dao: Dao = new (require('./' + config.engine).default)(daoConfig)
 export default dao
