@@ -1,4 +1,4 @@
-import Table, {HTMLTableFixElement} from './table.js'
+import { HTMLTableFixElement, Table } from './table.js'
 
 export default class ColumnReorderTable extends Table
 {

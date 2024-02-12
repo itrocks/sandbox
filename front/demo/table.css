@@ -6,11 +6,16 @@ table {
   height: 100%;
   width: 100%; }
   table > * > tr > * {
-    border: 1px solid #800; }
+    border: 1px solid #800;
+    padding: 2px; }
   table > * > tr > * {
     background: white;
     white-space: nowrap; }
   table > thead > tr:first-child > * {
     user-select: none; }
+
+table > * > tr > [contenteditable] {
+  background-color: lightblue;
+  outline: 0; }
 
 /*# sourceMappingURL=table.css.map */

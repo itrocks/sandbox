@@ -95,21 +95,26 @@ export class Table
 		})
 	}
 
+	public reset()
+	{
+		tableByElement(this.element, this.options)
+	}
+
 }
 export default Table
 
 export function tableBySelector(selector: string, options: Partial<Options> = {})
 {
-	return tableElements(document.body.querySelectorAll<HTMLTableElement>(selector), options)
+	return tableByElements(document.body.querySelectorAll<HTMLTableElement>(selector), options)
 }
 
-export function tableElement(element: HTMLTableElement, options: Partial<Options> = {})
+export function tableByElement(element: HTMLTableElement, options: Partial<Options> = {})
 {
 	return new Table(element, options)
 }
 
-export function tableElements(
+export function tableByElements(
 	elements: Array<HTMLTableElement> | NodeListOf<HTMLTableElement>, options: Partial<Options> = {}
 ) {
-	return Array.from(elements).map(element => tableElement(element, options))
+	return Array.from(elements).map(element => tableByElement(element, options))
 }
