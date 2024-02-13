@@ -5,11 +5,12 @@ import InheritBorder       from '../fix-table-inherit-border.js'
 import { tableBySelector } from '../table.js'
 import TableEdit           from '../table-edit.js'
 
-addEventListener('resize', () => tableBySelector('table', { plugins: [
+let tables = tableBySelector('table', { plugins: [
 	ColumnReorderTable,
 	FixTable,
 	InheritBackground,
 	InheritBorder,
 	TableEdit
-]}))
-dispatchEvent(new Event('resize'))
+]})
+
+addEventListener('resize', () => { tables = tables.map(table => table.reset()) })
