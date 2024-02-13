@@ -3,31 +3,61 @@ body {
 	margin: 0;
 }
 
+$fix-background: #f7f7f7;
+$fix-border: #888;
+
 table {
 	border-collapse: collapse;
 	height: 100%;
 	width: 100%;
 
+	> :not(tbody) > tr > * {
+		background: $fix-background;
+	}
+
 	> * > tr {
 
 		[contenteditable] {
-			background-color: #eee;
+			background: white;
 			outline: 0;
 		}
 
 		> * {
 			background: white;
-			border: 1px solid #ddd;
+			border: 1px solid #ccc;
 			cursor: text;
 			line-height: 1.8em;
 			padding: 0 .5em;
 		}
 
+		> :first-child, > :last-child {
+			background: $fix-background;
+		}
+
+		> :last-child {
+			border-left-color: $fix-border;
+		}
+
+		> :nth-child(2) {
+			border-right-color: $fix-border;
+		}
+
 		> .editing > [contenteditable] {
-			border: 1px solid #888;
-			margin: -1px;
+			outline: 2px solid $fix-border;
 			position: relative;
 			z-index: 5;
 		}
+	}
+
+	> tfoot > tr:first-child > * {
+		border-top-color: $fix-border;
+	}
+
+	> thead > tr:first-child { > :first-child, > :last-child {
+		width: 0;
+	}}
+
+	> thead > tr:last-child > * {
+		border-bottom-color: $fix-border;
 	}
 }

@@ -5,19 +5,32 @@ table {
   border-collapse: collapse;
   height: 100%;
   width: 100%; }
+  table > :not(tbody) > tr > * {
+    background: #f7f7f7; }
   table > * > tr [contenteditable] {
-    background-color: #eee;
+    background: white;
     outline: 0; }
   table > * > tr > * {
     background: white;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     cursor: text;
     line-height: 1.8em;
     padding: 0 .5em; }
+  table > * > tr > :first-child, table > * > tr > :last-child {
+    background: #f7f7f7; }
+  table > * > tr > :last-child {
+    border-left-color: #888; }
+  table > * > tr > :nth-child(2) {
+    border-right-color: #888; }
   table > * > tr > .editing > [contenteditable] {
-    border: 1px solid #888;
-    margin: -1px;
+    outline: 2px solid #888;
     position: relative;
     z-index: 5; }
+  table > tfoot > tr:first-child > * {
+    border-top-color: #888; }
+  table > thead > tr:first-child > :first-child, table > thead > tr:first-child > :last-child {
+    width: 0; }
+  table > thead > tr:last-child > * {
+    border-bottom-color: #888; }
 
 /*# sourceMappingURL=table.css.map */
