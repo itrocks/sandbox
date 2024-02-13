@@ -21,13 +21,13 @@ export default class ColumnReorderTable extends Table
 		let mouse     = new DOMRect()
 		let mouseFrom = new DOMRect()
 		Array.from(this.reorderCells).forEach(cell => {
-			cell.addEventListener('mousedown', event => {
+			this.addEventListener(cell, 'mousedown', event => {
 				console.log('mousedown', event.target)
 				downed    = event.target as HTMLTableCellElement
 				mouseFrom = new DOMRect(mouse.x, mouse.y)
 			})
 		})
-		document.addEventListener('mousemove', event => {
+		this.addEventListener(document, 'mousemove', event => {
 			Object.assign(mouse, { x: event.pageX, y: event.pageY })
 			if (downed && (Math.sqrt(Math.abs(mouse.x - mouseFrom.x) * Math.abs(mouse.y - mouseFrom.y)) > 10)) {
 				dragging = downed
@@ -39,7 +39,7 @@ export default class ColumnReorderTable extends Table
 				console.log('dragging', dragging)
 			}
 		})
-		document.addEventListener('mouseup', () => {
+		this.addEventListener(document, 'mouseup', () => {
 			if (dragging) {
 				console.log('drop', dragging)
 			}

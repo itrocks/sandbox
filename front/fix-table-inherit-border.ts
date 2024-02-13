@@ -10,6 +10,7 @@ export default class InheritBorder extends FixTable
 	InheritBorder()
 	{
 		if (!this.borderCollapse) return
+
 		// columns
 		let rightSelector = '';
 		if (this.rightColumnCount) {
@@ -51,7 +52,7 @@ export default class InheritBorder extends FixTable
 				? Math.ceil(shift)
 				: Math.floor(shift)
 		}
-		return `${position}px`
+		return super.position(position, counter, row, side)
 	}
 
 }

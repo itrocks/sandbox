@@ -19,7 +19,7 @@ export default class FixTable extends Table
 	FixTable()
 	{
 		this.borderCollapse = (getComputedStyle(this.element).borderCollapse === 'collapse') ? 1 : 0
-		this.commonStyle()
+		this.fixCommonStyle()
 
 		this.columns          = this.getColumns()
 		this.leftColumnCount  = this.countLeftColumns()
@@ -28,17 +28,6 @@ export default class FixTable extends Table
 		this.fixHeadRows()
 		this.fixLeftColumns()
 		this.fixRightColumns()
-	}
-
-	protected commonStyle()
-	{
-		if (!this.borderCollapse) return
-		this.styleSheet.push(`
-			${this.selector} {
-				border-collapse: separate;
-				border-spacing: 0;
-			}
-		`)
 	}
 
 	protected countLeftColumns()
@@ -62,6 +51,18 @@ export default class FixTable extends Table
 	public static defaultOptions()
 	{
 		return new Options
+	}
+
+	protected fixCommonStyle()
+	{
+		if (!this.borderCollapse) return
+
+		this.styleSheet.push(`
+			${this.selector} {
+				border-collapse: separate;
+				border-spacing: 0;
+			}
+		`)
 	}
 
 	protected fixFootRows()

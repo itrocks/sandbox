@@ -47,6 +47,7 @@ export class Table
 {
 
 	public readonly id: number
+	public readonly onReset: (() => void)[] = []
 	public readonly options = new Options
 	public readonly selector: string
 	public readonly styleSheet: string[] = []
@@ -67,8 +68,19 @@ export class Table
 		applyStyleSheets()
 	}
 
+	public addEventListener<T extends keyof GlobalEventHandlersEventMap>(
+		element:  Document|Element,
+		type:     T,
+		listener: (this: Element, ev: GlobalEventHandlersEventMap[T]) => any,
+		options?: boolean | AddEventListenerOptions
+	) {
+		element.addEventListener(type as string, listener as () => any, options)
+		this.onReset.push(() => element.removeEventListener(type as string, listener as () => any, options))
+	}
+
 	protected applyPlugins()
 	{
+		const alreadyDefined: { [index: string]: typeof Table } = {}
 		this.options.plugins.forEach(plugin => {
 			Object.entries(plugin.defaultOptions()).forEach(([index, value]) => {
 				if (!this.options.hasOwnProperty(index)) {
@@ -76,10 +88,27 @@ export class Table
 				}
 			})
 			Object.entries(Object.getOwnPropertyDescriptors(plugin.prototype)).forEach(([name, descriptor]) => {
+				if (name === 'constructor') return
+				let found  = false
+				let parent = plugin
+				while (parent.constructor !== Object) {
+					parent = Object.getPrototypeOf(parent)
+					if (parent === alreadyDefined[name]) {
+						found = true
+						break
+					}
+				}
+				if (alreadyDefined[name] && !found) {
+					throw 'Function collision: ' + name
+						+ ' defined into ' + plugin.name
+						+ ' has already be defined into ' + alreadyDefined[name].name
+				}
+				alreadyDefined[name] = plugin
 				Object.defineProperty(Table.prototype, name, descriptor)
 			})
 		})
 	}
+
 	public static defaultOptions()
 	{
 		return new Options
@@ -97,7 +126,8 @@ export class Table
 
 	public reset()
 	{
-		tableByElement(this.element, this.options)
+		this.onReset.forEach(onReset => onReset())
+		return tableByElement(this.element, this.options)
 	}
 
 }
