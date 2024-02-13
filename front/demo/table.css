@@ -5,17 +5,19 @@ table {
   border-collapse: collapse;
   height: 100%;
   width: 100%; }
-  table > * > tr > * {
-    border: 1px solid #800;
-    padding: 2px; }
+  table > * > tr [contenteditable] {
+    background-color: #eee;
+    outline: 0; }
   table > * > tr > * {
     background: white;
-    white-space: nowrap; }
-  table > thead > tr:first-child > * {
-    user-select: none; }
-
-table > * > tr > [contenteditable] {
-  background-color: lightblue;
-  outline: 0; }
+    border: 1px solid #ddd;
+    cursor: text;
+    line-height: 1.8em;
+    padding: 0 .5em; }
+  table > * > tr > .editing > [contenteditable] {
+    border: 1px solid #888;
+    margin: -1px;
+    position: relative;
+    z-index: 5; }
 
 /*# sourceMappingURL=table.css.map */

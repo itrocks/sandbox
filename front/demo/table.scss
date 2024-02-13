@@ -8,22 +8,26 @@ table {
 	height: 100%;
 	width: 100%;
 
-	> * > tr > * {
-		border: 1px solid #800;
-		padding: 2px;
-	}
+	> * > tr {
 
-	> * > tr > * {
-		background: white;
-		white-space: nowrap;
-	}
+		[contenteditable] {
+			background-color: #eee;
+			outline: 0;
+		}
 
-	> thead > tr:first-child > * {
-		user-select: none;
-	}
-}
+		> * {
+			background: white;
+			border: 1px solid #ddd;
+			cursor: text;
+			line-height: 1.8em;
+			padding: 0 .5em;
+		}
 
-table > * > tr > [contenteditable] {
-	background-color: lightblue;
-	outline: 0;
+		> .editing > [contenteditable] {
+			border: 1px solid #888;
+			margin: -1px;
+			position: relative;
+			z-index: 5;
+		}
+	}
 }
