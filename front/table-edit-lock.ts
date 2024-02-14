@@ -24,7 +24,7 @@ function colCell(cell: HTMLTableCellElement)
 	}
 	const sections: NodeListOf<HTMLTableSectionElement>
 		= table.querySelectorAll(':scope > tbody, :scope > tfoot, :scope > thead')
-	const cellTr = cell.closest('TR')
+	const cellTr = cell.closest('tr')
 	let foreignRow: HTMLTableRowElement|undefined
 	sections.forEach(section => {
 		if (foreignRow) return
@@ -44,28 +44,28 @@ export class TableEditLock extends TableEdit
 
 	options = new Options
 
-	static defaultOptions()
+	closestEditableCell(target: any)
 	{
-		return new Options
-	}
-
-	editable(target: any)
-	{
-		let editable = super.editable(target)
+		let editable = super.closestEditableCell(target)
 		Object.entries(this.options.nonEditableConditions).forEach(([index, value]) => {
-			if (!editable) return
+			if (!editable) return null
 			switch (index) {
 				case 'closest':
-					editable = editable.closest(value) ? undefined : editable
+					editable = editable.closest(value) ? null : editable
 					break
 				case 'col':
-					editable = colCell(editable).matches(value) ? undefined : editable
+					editable = colCell(editable).matches(value) ? null : editable
 					break
 				default:
-					editable = (getComputedStyle(editable)[index as keyof CSSStyleDeclaration] === value) ? undefined : editable
+					editable = (getComputedStyle(editable)[index as keyof CSSStyleDeclaration] === value) ? null : editable
 			}
 		})
 		return editable
+	}
+
+	static defaultOptions()
+	{
+		return new Options
 	}
 
 }

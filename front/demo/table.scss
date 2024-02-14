@@ -35,7 +35,7 @@ table {
 			outline: 0;
 		}
 
-		> .editing > [contenteditable] {
+		> .editing > div[contenteditable] {
 			background: white;
 			outline: 2px solid #777;
 		}
