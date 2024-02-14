@@ -66,6 +66,12 @@ function unselectCell(table: TableEdit)
 export default class TableEdit extends Table
 {
 
+	editable(target: any)
+	{
+		if (!(target instanceof Element)) return
+		return target.closest('td, th') as HTMLTableCellElement|undefined
+	}
+
 	TableEdit()
 	{
 		this.styleSheet.push(`
@@ -76,8 +82,9 @@ export default class TableEdit extends Table
 			}
 		`)
 		this.addEventListener(this.element, 'mousedown', event => {
-			if (!(event.target instanceof Element)) return
-			selectCell(this, event.target.closest('td, th') as HTMLTableCellElement|undefined)
+			const cell = this.editable(event.target)
+			if (!cell) return
+			selectCell(this, cell)
 		})
 	}
 
