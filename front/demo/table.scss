@@ -3,61 +3,90 @@ body {
 	margin: 0;
 }
 
-$fix-background: #f7f7f7;
-$fix-border: #888;
-
 table {
+
+	// table commons
+
 	border-collapse: collapse;
+	cursor: text;
 	height: 100%;
 	width: 100%;
 
-	> :not(tbody) > tr > * {
-		background: $fix-background;
+	// cell commons
+
+	> * > tr > * {
+		background: white;
+		border: 1px solid #ccc;
+		padding: .3em;
 	}
+
+	// technical col width
+
+	> thead > tr:first-child > :first-child,
+	> thead > tr:first-child > :last-child {
+		width: 0;
+	}
+
+	// editing zone
 
 	> * > tr {
 
-		[contenteditable] {
-			background: white;
+		> [contenteditable] {
 			outline: 0;
 		}
 
-		> * {
-			background: white;
-			border: 1px solid #ccc;
-			cursor: text;
-			line-height: 1.8em;
-			padding: 0 .5em;
-		}
-
-		> :first-child, > :last-child {
-			background: $fix-background;
-		}
-
-		> :last-child {
-			border-left-color: $fix-border;
-		}
-
-		> :nth-child(2) {
-			border-right-color: $fix-border;
-		}
-
 		> .editing > [contenteditable] {
-			outline: 2px solid $fix-border;
-			position: relative;
-			z-index: 5;
+			background: white;
+			outline: 2px solid #777;
 		}
 	}
 
-	> tfoot > tr:first-child > * {
+	// non-data col / row background
+
+	$fix-background: #f7f7f7;
+
+	> :not(tbody) > tr > *,
+	> tbody > tr > :first-child,
+	> tbody > tr > :last-child {
+		background: $fix-background;
+	}
+
+	// fix col / row section border
+
+	$fix-border: #888;
+
+	> * > tr > :first-child,
+	> * > tr > :last-child,
+	> * > tr > :nth-child(2) {
+		border-left-color: $fix-border;
+		border-right-color: $fix-border;
+	}
+
+	> tfoot > tr:first-child > *,
+	> thead > tr:first-child > * {
 		border-top-color: $fix-border;
 	}
 
-	> thead > tr:first-child { > :first-child, > :last-child {
-		width: 0;
-	}}
-
+	> tfoot > tr:last-child > *,
 	> thead > tr:last-child > * {
 		border-bottom-color: $fix-border;
 	}
+
+	// line counter
+
+	counter-reset: line;
+
+	> tbody > tr > :first-child {
+		counter-increment: line;
+		font-weight: normal;
+
+		&:before {
+			content: counter(line);
+		}
+
+		> input {
+			display: none;
+		}
+	}
+
 }
