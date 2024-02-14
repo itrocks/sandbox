@@ -3,7 +3,7 @@ import { HTMLTableFixElement, Table } from './table.js'
 export default class ColumnReorderTable extends Table
 {
 
-	public reorderCells: NodeListOf<HTMLTableFixElement>
+	reorderCells: NodeListOf<HTMLTableFixElement>
 
 	constructor(element: HTMLTableElement)
 	{

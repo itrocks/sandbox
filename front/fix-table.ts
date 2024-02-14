@@ -1,13 +1,13 @@
-import { HTMLTableFixElement, Options as TableOptions, Table } from './table.js'
+import { HTMLTableFixElement, Table, TableOptions } from './table.js'
 
-export default class FixTable extends Table
+export class FixTable extends Table
 {
 
-	public borderCollapse: 0|1 = 0
-	public columns: NodeListOf<HTMLTableFixElement>
-	public leftColumnCount: number = 0
-	public options = new Options
-	public rightColumnCount: number = 0
+	borderCollapse: 0|1 = 0
+	columns: NodeListOf<HTMLTableFixElement>
+	leftColumnCount: number = 0
+	options = new Options
+	rightColumnCount: number = 0
 
 	constructor(element: HTMLTableElement)
 	{
@@ -48,7 +48,7 @@ export default class FixTable extends Table
 		return this.columns.length - 1 - count
 	}
 
-	public static defaultOptions()
+	static defaultOptions()
 	{
 		return new Options
 	}
@@ -198,10 +198,18 @@ export default class FixTable extends Table
 	}
 
 }
+export default FixTable
 
-class Options extends TableOptions
+export interface FixTableOptions
 {
-	colIndex:    number = 2
-	cornerIndex: number = 3
-	rowIndex:    number = 1
+	colIndex:    number
+	cornerIndex: number
+	rowIndex:    number
+}
+
+class Options extends TableOptions implements FixTableOptions
+{
+	colIndex    = 2
+	cornerIndex = 3
+	rowIndex    = 1
 }

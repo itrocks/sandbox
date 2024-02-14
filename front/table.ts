@@ -13,7 +13,7 @@ export function applyStyleSheets()
 	styleSheets.replaceSync(tables.map(table => table.styleSheet.join(`\n`)).join(`\n`))
 }
 
-export class Options
+export class TableOptions
 {
 	[index: string]: any
 	plugins: (typeof Table)[] = []
@@ -46,13 +46,13 @@ function nextTableId(table: Table)
 export class Table
 {
 
-	public readonly id: number
-	public readonly onReset: (() => void)[] = []
-	public readonly options = new Options
-	public readonly selector: string
-	public readonly styleSheet: string[] = []
+	readonly id: number
+	readonly onReset: (() => void)[] = []
+	readonly options = new TableOptions
+	readonly selector: string
+	readonly styleSheet: string[] = []
 
-	constructor(public readonly element: HTMLTableElement, options: Partial<Options> = {})
+	constructor(public readonly element: HTMLTableElement, options: Partial<TableOptions> = {})
 	{
 		Object.assign(this.options, options)
 
@@ -68,7 +68,7 @@ export class Table
 		applyStyleSheets()
 	}
 
-	public addEventListener<T extends keyof GlobalEventHandlersEventMap>(
+	addEventListener<T extends keyof GlobalEventHandlersEventMap>(
 		element:  Document|Element,
 		type:     T,
 		listener: (this: Element, ev: GlobalEventHandlersEventMap[T]) => any,
@@ -109,9 +109,9 @@ export class Table
 		})
 	}
 
-	public static defaultOptions()
+	static defaultOptions()
 	{
-		return new Options
+		return new TableOptions
 	}
 
 	protected executePluginConstructors()
@@ -124,7 +124,7 @@ export class Table
 		})
 	}
 
-	public reset()
+	reset()
 	{
 		this.onReset.forEach(onReset => onReset())
 		return tableByElement(this.element, this.options)
@@ -133,18 +133,18 @@ export class Table
 }
 export default Table
 
-export function tableBySelector(selector: string, options: Partial<Options> = {})
+export function tableBySelector(selector: string, options: Partial<TableOptions> = {})
 {
 	return tableByElements(document.body.querySelectorAll<HTMLTableElement>(selector), options)
 }
 
-export function tableByElement(element: HTMLTableElement, options: Partial<Options> = {})
+export function tableByElement(element: HTMLTableElement, options: Partial<TableOptions> = {})
 {
 	return new Table(element, options)
 }
 
 export function tableByElements(
-	elements: Array<HTMLTableElement> | NodeListOf<HTMLTableElement>, options: Partial<Options> = {}
+	elements: Array<HTMLTableElement> | NodeListOf<HTMLTableElement>, options: Partial<TableOptions> = {}
 ) {
 	return Array.from(elements).map(element => tableByElement(element, options))
 }
