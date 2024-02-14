@@ -24,15 +24,14 @@ function selectCell(table: TableEdit, cell: HTMLTableCellElement|undefined)
 		if (computedStyle.verticalAlign === 'middle') {
 			editable.style.lineHeight = computedStyle.height
 		}
-		editable.style.boxSizing         = 'border-box'
-		editable.style.paddingBottom     = computedStyle.paddingBottom
-		editable.style.paddingLeft       = computedStyle.paddingLeft
-		editable.style.paddingRight      = computedStyle.paddingRight
-		editable.style.paddingTop        = computedStyle.paddingTop
-		editable.style.scrollPaddingLeft = computedStyle.paddingLeft
+		editable.style.paddingBottom = computedStyle.paddingBottom
+		editable.style.paddingLeft   = computedStyle.paddingLeft
+		editable.style.paddingRight  = computedStyle.paddingRight
+		editable.style.paddingTop    = computedStyle.paddingTop
 
 		selected.classList.add('editing')
 		selected.style.padding = '0'
+		selected.style.zIndex  = '5'
 
 		const range = document.createRange()
 		if (editable.firstChild && offset) {
@@ -69,6 +68,13 @@ export default class TableEdit extends Table
 
 	TableEdit()
 	{
+		this.styleSheet.push(`
+			${this.selector} > * > tr > * > [contenteditable] {
+				box-sizing: border-box;
+				position: relative;
+				z-index: 5;
+			}
+		`)
 		this.addEventListener(this.element, 'mousedown', event => {
 			if (!(event.target instanceof Element)) return
 			selectCell(this, event.target.closest('td, th') as HTMLTableCellElement|undefined)
