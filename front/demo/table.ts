@@ -5,6 +5,7 @@ import FixTableInheritBorder                   from '../fix-table-inherit-border
 import { tableBySelector, TableOptions }       from '../table.js'
 import TableEdit                               from '../table-edit.js'
 import { TableEditLock, TableEditLockOptions } from '../table-edit-lock.js'
+import TableEditMove                           from '../table-edit-move.js'
 
 const options: Partial<FixTableOptions&TableEditLockOptions&TableOptions> = {
 	plugins: [
@@ -13,7 +14,8 @@ const options: Partial<FixTableOptions&TableEditLockOptions&TableOptions> = {
 		FixTableInheritBackground,
 		FixTableInheritBorder,
 		TableEdit,
-		TableEditLock
+		TableEditLock,
+		TableEditMove
 	]
 }
 
