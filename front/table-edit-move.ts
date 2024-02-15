@@ -19,8 +19,8 @@ function nextSiblingTextContent(range: Range)
 	if ((container instanceof Element) && container.hasAttribute('contenteditable')) {
 		return ''
 	}
-	let   node      = container.nextSibling
-	let   text      = container.textContent ? container.textContent.substring(range.endOffset) : ''
+	let   node = container.nextSibling
+	let   text = container.textContent ? container.textContent.substring(range.endOffset) : ''
 	while (node) {
 		if (node.textContent) {
 			text += node.textContent
@@ -121,7 +121,6 @@ export class TableEditMove extends TableEdit
 			if (selection?.rangeCount !== 1) {
 				throw 'Should have range'
 			}
-			// startOffset, endOffset, startContainer, endContainer, commonAncestorContainer
 			switch (event.key) {
 				case 'ArrowDown':
 					if (nextSiblingTextContent(selection.getRangeAt(0)).includes("\n")) return

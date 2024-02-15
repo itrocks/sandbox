@@ -10,7 +10,8 @@ table {
   table > * > tr > * {
     background: white;
     border: 1px solid #ccc;
-    padding: .3em; }
+    padding: .3em;
+    white-space: nowrap; }
   table > thead > tr:first-child > :first-child,
   table > thead > tr:first-child > :last-child {
     width: 0; }

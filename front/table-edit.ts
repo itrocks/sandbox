@@ -46,6 +46,14 @@ export default class TableEdit extends Table
 		selected     = cell
 		selectedText = cell.innerHTML
 
+		const rect = selected.getBoundingClientRect()
+		if (
+			(document.elementFromPoint(rect.left + 1, rect.top + 1) !== selected)
+			|| (document.elementFromPoint(rect.right - 1, rect.bottom - 1) !== selected)
+		) {
+			this.scrollToCell(cell)
+		}
+
 		const computedStyle = getComputedStyle(selected)
 		selectedStyle       = selected.getAttribute('style') ?? ''
 
@@ -91,6 +99,11 @@ export default class TableEdit extends Table
 		return selected
 	}
 
+	scrollToCell(cell: HTMLTableCellElement)
+	{
+
+	}
+
 	TableEdit()
 	{
 		this.styleSheet.push(`
@@ -116,6 +129,9 @@ export default class TableEdit extends Table
 		}
 		selected.innerHTML = innerHTML.replaceAll('<div>', '').replaceAll('</div>', '')
 		selected.classList.remove('editing')
+		if (!selected.classList.length) {
+			selected.removeAttribute('class')
+		}
 		selectedStyle.length
 			? selected.setAttribute('style', selectedStyle)
 			: selected.removeAttribute('style')
