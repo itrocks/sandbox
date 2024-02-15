@@ -2,6 +2,7 @@ import Table from './table.js'
 
 let selected:      HTMLTableCellElement|null = null
 let selectedStyle: string = ''
+let selectedText:  string = ''
 
 export default class TableEdit extends Table
 {
@@ -42,7 +43,8 @@ export default class TableEdit extends Table
 		if (cell === selected) return
 		this.unselectCell()
 		if (!cell) return
-		selected = cell
+		selected     = cell
+		selectedText = cell.innerHTML
 
 		const computedStyle = getComputedStyle(selected)
 		selectedStyle       = selected.getAttribute('style') ?? ''
@@ -73,9 +75,15 @@ export default class TableEdit extends Table
 			getSelection()?.removeAllRanges()
 			getSelection()?.addRange(range)
 
-			editable.addEventListener('keyup', () => this.reset())
-			this.reset()
+			editable.addEventListener('keyup', event => this.selectText((event.target as HTMLDivElement)?.innerHTML ?? ''))
 		})
+	}
+
+	selectText(newText: string)
+	{
+		if (newText === selectedText) return
+		selectedText = newText
+		this.reset()
 	}
 
 	selected()
@@ -106,13 +114,13 @@ export default class TableEdit extends Table
 		if (innerHTML.endsWith('<br>')) {
 			innerHTML = innerHTML.substring(0, innerHTML.length - 4)
 		}
+		selected.innerHTML = innerHTML.replaceAll('<div>', '').replaceAll('</div>', '')
 		selected.classList.remove('editing')
-		selected.innerHTML = innerHTML
 		selectedStyle.length
 			? selected.setAttribute('style', selectedStyle)
 			: selected.removeAttribute('style')
+		this.selectText(selected.innerHTML)
 		selected = null
-		this.reset()
 	}
 
 }
