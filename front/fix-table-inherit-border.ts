@@ -50,20 +50,29 @@ export default class InheritBorder extends FixTable
 			}
 		`)
 		// rows
-		this.styleSheet.push(`
-			${this.selector} > tbody > tr > * {
-				border-top-width: 0;
-			}
-			${this.selector} > tbody > tr:last-child > * {
-				border-bottom-width: 0;
-			}
-			${this.selector} > tfoot > tr:not(:last-child) > * {
-				border-bottom-width: 0;
-			}
-			${this.selector} > thead > tr:not(:first-child) > * {
-				border-top-width: 0;
-			}
-		`)
+		if (this.element.tHead?.rows.length) {
+			this.styleSheet.push(`
+				${this.selector} > tbody > tr > *,
+				${this.selector} > thead > tr:not(:first-child) > * {
+					border-top-width: 0;
+				}
+			`)
+		}
+		else {
+			this.styleSheet.push(`
+				${this.selector} > tbody > tr:not(:first-child) > * {
+					border-top-width: 0;
+				}
+			`)
+		}
+		if (this.element.tFoot?.rows.length) {
+			this.styleSheet.push(`
+				${this.selector} > tbody > tr:last-child > *,
+				${this.selector} > tfoot > tr:not(:last-child) > * { 
+					border-bottom-width: 0;
+				}
+			`)
+		}
 	}
 
 	position(position: number, counter: number, row: HTMLTableFixElement, side: 'bottom' | 'left' | 'right' | 'top')

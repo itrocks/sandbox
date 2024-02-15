@@ -44,7 +44,7 @@ export class FixTable extends Table
 
 	protected fixFootRows()
 	{
-		if (!this.element.tFoot) return
+		if (!this.element.tFoot?.rows.length) return
 		let counter = 1, bottom = .0, previousBottom = this.element.getBoundingClientRect().bottom
 		Array.from(this.element.tFoot.querySelectorAll<HTMLTableRowElement>(':scope > tr')).reverse().forEach(row => {
 			const actualBottom = row.getBoundingClientRect().bottom
@@ -66,7 +66,7 @@ export class FixTable extends Table
 
 	protected fixHeadRows()
 	{
-		if (!this.element.tHead) return
+		if (!this.element.tHead?.rows.length) return
 		let counter = 1, top = .0, previousTop = this.element.getBoundingClientRect().top
 		this.element.tHead.querySelectorAll<HTMLTableRowElement>(':scope > tr').forEach(row => {
 			const actualTop = row.getBoundingClientRect().top
@@ -102,7 +102,8 @@ export class FixTable extends Table
 				}
 			`)
 			bodySel.push(`${this.selector} > tbody > tr > :nth-child(${counter})`)
-			headSel.push(`${this.selector} > :not(tbody) > tr > :nth-child(${counter})`)
+			headSel.push(`${this.selector} > tfoot > tr > :nth-child(${counter})`)
+			headSel.push(`${this.selector} > thead > tr > :nth-child(${counter})`)
 			counter ++
 		})
 		this.styleSheet.push(`

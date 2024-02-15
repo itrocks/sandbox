@@ -34,10 +34,10 @@ export default class InheritBackground extends FixTable
 		for (let child = 1; child <= this.rightColumnCount; child ++) {
 			selectors.push(`${this.selector} > tbody > tr > :nth-last-child(${child})`)
 		}
-		if (this.element.tFoot) {
+		if (this.element.tFoot?.rows.length) {
 			selectors.push(`${this.selector} > tfoot > tr > *`)
 		}
-		if (this.element.tHead) {
+		if (this.element.tHead?.rows.length) {
 			selectors.push(`${this.selector} > thead > tr > *`)
 		}
 

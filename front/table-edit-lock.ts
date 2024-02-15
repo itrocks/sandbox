@@ -51,13 +51,13 @@ export class TableEditLock extends TableEdit
 			if (!editable) return null
 			switch (index) {
 				case 'closest':
-					editable = editable.closest(value) ? null : editable
+					if (editable.closest(value)) editable = null
 					break
 				case 'col':
-					editable = colCell(editable).matches(value) ? null : editable
+					if (colCell(editable).matches(value)) editable = null
 					break
 				default:
-					editable = (getComputedStyle(editable)[index as keyof CSSStyleDeclaration] === value) ? null : editable
+					if (getComputedStyle(editable)[index as keyof CSSStyleDeclaration] === value) editable = null
 			}
 		})
 		return editable
@@ -79,7 +79,7 @@ export interface TableEditLockOptions
 class Options extends TableOptions implements TableEditLockOptions
 {
 	nonEditableConditions = {
-		'closest': '[data-lock]',
+		'closest': 'tfoot, thead, [data-lock]',
 		'col':     '[data-lock]'
 	}
 }
