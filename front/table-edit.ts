@@ -22,9 +22,7 @@ export default class TableEdit extends Table
 		editable.setAttribute('contenteditable', '')
 		editable.innerHTML = selected.innerHTML
 
-		if (computedStyle.verticalAlign === 'middle') {
-			editable.style.lineHeight = computedStyle.height
-		}
+		editable.style.minHeight     = computedStyle.height
 		editable.style.paddingBottom = computedStyle.paddingBottom
 		editable.style.paddingLeft   = computedStyle.paddingLeft
 		editable.style.paddingRight  = computedStyle.paddingRight
@@ -68,9 +66,10 @@ export default class TableEdit extends Table
 			const editable = this.createEditable(computedStyle) as HTMLDivElement
 			selected.replaceChildren(editable)
 
-			selected.classList.add('editing')
 			selected.style.padding = '0'
-			selected.style.zIndex  = '5'
+			if (computedStyle.position === 'sticky') {
+				selected.style.zIndex = '2'
+			}
 
 			const range = document.createRange()
 			if (editable.firstChild && offset) {
@@ -108,9 +107,8 @@ export default class TableEdit extends Table
 	{
 		this.styleSheet.push(`
 			${this.selector} > * > tr > * > div[contenteditable] {
-				box-sizing: border-box;
 				position: relative;
-				z-index: 5;
+				z-index: 1;
 			}
 		`)
 		this.addEventListener(this.element, 'mousedown', event => {
@@ -124,14 +122,11 @@ export default class TableEdit extends Table
 	{
 		if (!selected) return
 		let innerHTML = (selected.firstElementChild as HTMLDivElement).innerHTML
+		innerHTML = innerHTML.replaceAll('<div>', '').replaceAll('</div>', '<br>')
 		if (innerHTML.endsWith('<br>')) {
 			innerHTML = innerHTML.substring(0, innerHTML.length - 4)
 		}
-		selected.innerHTML = innerHTML.replaceAll('<div>', '').replaceAll('</div>', '')
-		selected.classList.remove('editing')
-		if (!selected.classList.length) {
-			selected.removeAttribute('class')
-		}
+		selected.innerHTML = innerHTML
 		selectedStyle.length
 			? selected.setAttribute('style', selectedStyle)
 			: selected.removeAttribute('style')

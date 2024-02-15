@@ -15,9 +15,7 @@ table {
   table > thead > tr:first-child > :first-child,
   table > thead > tr:first-child > :last-child {
     width: 0; }
-  table > * > tr > [contenteditable] {
-    outline: 0; }
-  table > * > tr > .editing > div[contenteditable] {
+  table > * > tr > * > div[contenteditable] {
     background: white;
     outline: 2px solid #777; }
   table > :not(tbody) > tr > *,

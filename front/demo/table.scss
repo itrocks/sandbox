@@ -28,18 +28,11 @@ table {
 		width: 0;
 	}
 
-	// editing zone
+	// edit zone
 
-	> * > tr {
-
-		> [contenteditable] {
-			outline: 0;
-		}
-
-		> .editing > div[contenteditable] {
-			background: white;
-			outline: 2px solid #777;
-		}
+	> * > tr > * > div[contenteditable] {
+		background: white;
+		outline: 2px solid #777;
 	}
 
 	// non-data col / row background
