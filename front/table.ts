@@ -64,7 +64,8 @@ export class Table
 		this.element.setAttribute('data-table-id', this.id.toString())
 
 		garbageCollector()
-		this.executePluginConstructors()
+		this.executePlugins('Init')
+		this.executePlugins()
 		applyStyleSheets()
 	}
 
@@ -114,10 +115,10 @@ export class Table
 		return new TableOptions
 	}
 
-	protected executePluginConstructors()
+	protected executePlugins(methodSuffix = '')
 	{
 		this.options.plugins.forEach(plugin => {
-			const pluginFunction: () => void = (this as any)[plugin.name]
+			const pluginFunction: () => void = (this as any)[plugin.name + methodSuffix]
 			if (pluginFunction && (typeof pluginFunction === 'function')) {
 				pluginFunction.call(this)
 			}
