@@ -15,17 +15,17 @@ export default class InheritBorder extends FixTable
 		throw 'Plugin should not be instantiated'
 	}
 
-	protected InheritBorderInit()
+	InheritBorderInit()
 	{
 		this.tableStyle = getComputedStyle(this.element)
+		if (this.tableStyle.borderCollapse !== 'collapse') {
+			this.position = super.position
+		}
 	}
 
 	InheritBorder()
 	{
-		if (this.tableStyle.borderCollapse !== 'collapse') {
-			this.position = super.position
-			return
-		}
+		if (this.tableStyle.borderCollapse !== 'collapse') return
 
 		// table
 		this.styleSheet.push(`

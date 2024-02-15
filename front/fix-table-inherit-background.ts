@@ -14,12 +14,12 @@ export default class InheritBackground extends FixTable
 		throw 'Plugin should not be instantiated'
 	}
 
-	protected InheritBackgroundInit()
+	InheritBackgroundInit()
 	{
 		this.tableStyle = getComputedStyle(this.element)
 	}
 
-	protected InheritBackground()
+	InheritBackground()
 	{
 		if (this.tableStyle.borderCollapse !== 'separate') return
 
