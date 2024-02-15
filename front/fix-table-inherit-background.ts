@@ -6,12 +6,25 @@ import FixTable from './fix-table.js'
 export default class InheritBackground extends FixTable
 {
 
+	protected tableStyle: CSSStyleDeclaration
+
+	constructor(element: HTMLTableElement)
+	{
+		super(element)
+		throw 'Plugin should not be instantiated'
+	}
+
+	protected InheritBackgroundInit()
+	{
+		this.tableStyle = getComputedStyle(this.element)
+	}
+
 	protected InheritBackground()
 	{
-		if (this.borderCollapse) return
-		const tableStyle = getComputedStyle(this.element)
-		if (tableStyle.backgroundColor.replaceAll(' ', '').endsWith(',0)')) return
-		const borderSpacing = parseFloat(tableStyle.borderSpacing)
+		if (this.tableStyle.borderCollapse !== 'separate') return
+
+		if (this.tableStyle.backgroundColor.replaceAll(' ', '').endsWith(',0)')) return
+		const borderSpacing = parseFloat(this.tableStyle.borderSpacing)
 		if (!borderSpacing) return
 
 		let selectors = []
@@ -27,9 +40,11 @@ export default class InheritBackground extends FixTable
 		if (this.element.tHead) {
 			selectors.push(`${this.selector} > thead > tr > *`)
 		}
+
+		if (!selectors.length) return
 		this.styleSheet.push(`
 			${selectors.join(', ')} {
-				box-shadow: 0 0 0 ${borderSpacing}px ${tableStyle.backgroundColor};
+				box-shadow: 0 0 0 ${borderSpacing}px ${this.tableStyle.backgroundColor};
 			}
 		`)
 	}

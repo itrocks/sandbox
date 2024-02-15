@@ -8,8 +8,7 @@ export default class ColumnReorderTable extends Table
 	constructor(element: HTMLTableElement)
 	{
 		super(element)
-		this.reorderCells = this.getReorderCells()
-		throw 'Plugins should not be instantiated'
+		throw 'Plugin should not be instantiated'
 	}
 
 	ColumnReorderTable()

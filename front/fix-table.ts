@@ -1,26 +1,20 @@
-import { HTMLTableFixElement, Table, TableOptions } from './table.js'
+import { HTMLTableFixElement, Table } from './table.js'
 
 export class FixTable extends Table
 {
 
-	borderCollapse: 0|1 = 0
 	columns: NodeListOf<HTMLTableFixElement>
 	leftColumnCount: number = 0
-	options = new Options
 	rightColumnCount: number = 0
 
 	constructor(element: HTMLTableElement)
 	{
 		super(element)
-		this.columns = this.getColumns()
-		throw 'Plugins should not be instantiated'
+		throw 'Plugin should not be instantiated'
 	}
 
 	FixTable()
 	{
-		this.borderCollapse = (getComputedStyle(this.element).borderCollapse === 'collapse') ? 1 : 0
-		this.fixCommonStyle()
-
 		this.columns          = this.getColumns()
 		this.leftColumnCount  = this.countLeftColumns()
 		this.rightColumnCount = this.countRightColumns()
@@ -48,23 +42,6 @@ export class FixTable extends Table
 		return this.columns.length - 1 - count
 	}
 
-	static defaultOptions()
-	{
-		return new Options
-	}
-
-	protected fixCommonStyle()
-	{
-		if (!this.borderCollapse) return
-
-		this.styleSheet.push(`
-			${this.selector} {
-				border-collapse: separate;
-				border-spacing: 0;
-			}
-		`)
-	}
-
 	protected fixFootRows()
 	{
 		if (!this.element.tFoot) return
@@ -83,7 +60,6 @@ export class FixTable extends Table
 		this.styleSheet.push(`
 			${this.selector} > tfoot > tr > * {
 				position: sticky;
-				z-index: ${this.options.rowIndex};
 			}		
 		`)
 	}
@@ -106,7 +82,6 @@ export class FixTable extends Table
 		this.styleSheet.push(`
 			${this.selector} > thead > tr > * {
 				position: sticky;
-				z-index: ${this.options.rowIndex};
 			}		
 		`)
 	}
@@ -115,7 +90,6 @@ export class FixTable extends Table
 	{
 		if (!this.leftColumnCount) return
 		const bodySel: string[] = []
-		const footSel: string[] = []
 		const headSel: string[] = []
 		let counter = 1, left = .0, previousLeft = this.element.getBoundingClientRect().left
 		Array.from(this.columns).toSpliced(this.leftColumnCount).forEach(col => {
@@ -128,17 +102,15 @@ export class FixTable extends Table
 				}
 			`)
 			bodySel.push(`${this.selector} > tbody > tr > :nth-child(${counter})`)
-			footSel.push(`${this.selector} > tfoot > tr > :nth-child(${counter})`)
-			headSel.push(`${this.selector} > thead > tr > :nth-child(${counter})`)
+			headSel.push(`${this.selector} > :not(tbody) > tr > :nth-child(${counter})`)
 			counter ++
 		})
 		this.styleSheet.push(`
 			${bodySel.join(', ')} {
 				position: sticky;
-				z-index: ${this.options.colIndex};
 			}
-			${footSel.join(', ')}, ${headSel.join(', ')} {
-				z-index: ${this.options.cornerIndex};
+			${headSel.join(', ')} {
+				z-index: 1;
 			}
 		`)
 	}
@@ -147,7 +119,6 @@ export class FixTable extends Table
 	{
 		if (!this.rightColumnCount) return
 		const bodySel: string[] = []
-		const footSel: string[] = []
 		const headSel: string[] = []
 		let counter = 1, right = .0, previousRight = this.element.getBoundingClientRect().right
 		Array.from(this.columns).reverse().toSpliced(this.rightColumnCount).forEach(col => {
@@ -160,17 +131,15 @@ export class FixTable extends Table
 				}
 			`)
 			bodySel.push(`${this.selector} > tbody > tr > :nth-last-child(${counter})`)
-			footSel.push(`${this.selector} > tfoot > tr > :nth-last-child(${counter})`)
 			headSel.push(`${this.selector} > thead > tr > :nth-last-child(${counter})`)
 			counter ++
 		})
 		this.styleSheet.push(`
 			${bodySel.join(', ')} {
 				position: sticky;
-				z-index: ${this.options.colIndex};
 			}
-			${footSel.join(', ')}, ${headSel.join(', ')} {
-				z-index: ${this.options.cornerIndex};
+			${headSel.join(', ')} {
+				z-index: 1;
 			}
 		`)
 	}
@@ -199,17 +168,3 @@ export class FixTable extends Table
 
 }
 export default FixTable
-
-export interface FixTableOptions
-{
-	colIndex:    number
-	cornerIndex: number
-	rowIndex:    number
-}
-
-class Options extends TableOptions implements FixTableOptions
-{
-	colIndex    = 2
-	cornerIndex = 3
-	rowIndex    = 1
-}

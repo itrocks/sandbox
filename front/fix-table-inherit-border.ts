@@ -7,10 +7,33 @@ import { HTMLTableFixElement } from './table.js'
 export default class InheritBorder extends FixTable
 {
 
+	protected tableStyle: CSSStyleDeclaration
+
+	constructor(element: HTMLTableElement)
+	{
+		super(element)
+		throw 'Plugin should not be instantiated'
+	}
+
+	protected InheritBorderInit()
+	{
+		this.tableStyle = getComputedStyle(this.element)
+	}
+
 	InheritBorder()
 	{
-		if (!this.borderCollapse) return
+		if (this.tableStyle.borderCollapse !== 'collapse') {
+			this.position = super.position
+			return
+		}
 
+		// table
+		this.styleSheet.push(`
+			${this.selector} {
+				border-collapse: separate;
+				border-spacing: 0;
+			}
+		`)
 		// columns
 		let rightSelector = '';
 		if (this.rightColumnCount) {
@@ -45,13 +68,11 @@ export default class InheritBorder extends FixTable
 
 	position(position: number, counter: number, row: HTMLTableFixElement, side: 'bottom' | 'left' | 'right' | 'top')
 	{
-		if (this.borderCollapse) {
-			const width = parseFloat(getComputedStyle(row).borderWidth) / 2
-			const shift = (counter > 1) ? width : -width
-			position += ((side === 'bottom') || (side === 'right'))
-				? Math.ceil(shift)
-				: Math.floor(shift)
-		}
+		const width = parseFloat(getComputedStyle(row).borderWidth) / 2
+		const shift = (counter > 1) ? width : -width
+		position += ((side === 'bottom') || (side === 'right'))
+			? Math.ceil(shift)
+			: Math.floor(shift)
 		return super.position(position, counter, row, side)
 	}
 
