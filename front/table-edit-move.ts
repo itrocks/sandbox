@@ -115,6 +115,7 @@ export class TableEditMove extends TableEdit
 	{
 		const editable = super.createEditable(computedStyle)
 		if (!editable) return null
+
 		editable.addEventListener('keydown', event => {
 			if (event.altKey || event.ctrlKey || event.shiftKey) return
 			const selection = getSelection()

@@ -1,8 +1,17 @@
 import Table from './table.js'
 
+let editable:      HTMLDivElement|null = null
 let selected:      HTMLTableCellElement|null = null
 let selectedStyle: string = ''
 let selectedText:  string = ''
+
+export type RangeSelection = {
+	cell:        HTMLTableCellElement|null
+	endNode:     Node
+	endOffset:   number
+	startNode:   Node
+	startOffset: number
+}
 
 export default class TableEdit extends Table
 {
@@ -20,7 +29,6 @@ export default class TableEdit extends Table
 
 		const editable = document.createElement('div') as HTMLDivElement
 		editable.setAttribute('contenteditable', '')
-		editable.innerHTML = selected.innerHTML
 
 		editable.style.minHeight     = computedStyle.height
 		editable.style.paddingBottom = computedStyle.paddingBottom
@@ -33,7 +41,12 @@ export default class TableEdit extends Table
 
 	editable()
 	{
-		return selected?.firstElementChild as HTMLDivElement ?? null
+		return editable
+	}
+
+	scrollToCell(cell: HTMLTableCellElement)
+	{
+
 	}
 
 	selectCell(cell: HTMLTableCellElement)
@@ -61,9 +74,13 @@ export default class TableEdit extends Table
 				console.error('cell:', cell)
 				throw 'Unexpected failure: cell was unselected before contenteditable was set'
 			}
-			const offset = getSelection()?.anchorOffset
+			const range = this.selectedRange()
+
 			selected.removeAttribute('contenteditable')
-			const editable = this.createEditable(computedStyle) as HTMLDivElement
+			editable = this.createEditable(computedStyle) as HTMLDivElement
+			while (selected.childNodes.length) {
+				editable.appendChild(selected.childNodes[0])
+			}
 			selected.replaceChildren(editable)
 
 			selected.style.padding = '0'
@@ -71,26 +88,30 @@ export default class TableEdit extends Table
 				selected.style.zIndex = '2'
 			}
 
-			const range = document.createRange()
-			if (editable.firstChild && offset) {
-				range.setStart(editable.firstChild, offset)
-				range.setEnd(editable.firstChild, offset)
-			}
-			else {
-				range.selectNodeContents(editable)
-			}
-			getSelection()?.removeAllRanges()
-			getSelection()?.addRange(range)
+			this.selectRange(range)
 
-			editable.addEventListener('keyup', event => this.selectText((event.target as HTMLDivElement)?.innerHTML ?? ''))
+			editable.addEventListener(
+				'keyup', event => this.setSelectedText((event.target as HTMLDivElement)?.innerHTML ?? '')
+			)
 		})
 	}
 
-	selectText(newText: string)
+	selectRange(range: RangeSelection|null)
 	{
-		if (newText === selectedText) return
-		selectedText = newText
-		this.reset()
+		const selection = getSelection()
+		if (!selection) return
+		const newRange = document.createRange()
+		if (newRange && range && (range.cell === selected)) {
+			newRange.setStart(range.startNode, range.startOffset)
+			newRange.setEnd(range.endNode, range.endOffset)
+		}
+		else {
+			const editable = this.editable()
+			if (!editable) return
+			newRange.selectNodeContents(editable)
+		}
+		selection.removeAllRanges()
+		selection.addRange(newRange)
 	}
 
 	selected()
@@ -98,9 +119,31 @@ export default class TableEdit extends Table
 		return selected
 	}
 
-	scrollToCell(cell: HTMLTableCellElement)
+	selectedRange(): RangeSelection|null
 	{
+		const selection = getSelection()
+		if (!selection) return null
+		const range  = selection.getRangeAt(0)
+		if (!range) return null
+		const cell = (range.commonAncestorContainer instanceof Element)
+			? range.commonAncestorContainer.closest('td')
+			: range.commonAncestorContainer.parentElement?.closest('td') ?? null
+		if (cell !== selected) return null
 
+		return {
+			cell,
+			endNode:     range.endContainer,
+			endOffset:   range.endOffset,
+			startNode:   range.startContainer,
+			startOffset: range.startOffset
+		}
+	}
+
+	setSelectedText(newText: string)
+	{
+		if (newText === selectedText) return
+		selectedText = newText
+		this.reset()
 	}
 
 	TableEdit()
@@ -120,17 +163,16 @@ export default class TableEdit extends Table
 
 	unselectCell()
 	{
-		if (!selected) return
-		let innerHTML = (selected.firstElementChild as HTMLDivElement).innerHTML
-		innerHTML = innerHTML.replaceAll('<div>', '').replaceAll('</div>', '<br>')
-		if (innerHTML.endsWith('<br>')) {
-			innerHTML = innerHTML.substring(0, innerHTML.length - 4)
+		if (!editable || !selected) return
+		while (editable.childNodes.length) {
+			selected.appendChild(editable.childNodes[0])
 		}
-		selected.innerHTML = innerHTML
+		editable.remove()
 		selectedStyle.length
 			? selected.setAttribute('style', selectedStyle)
 			: selected.removeAttribute('style')
-		this.selectText(selected.innerHTML)
+		this.setSelectedText(selected.innerHTML)
+		editable = null
 		selected = null
 	}
 
