@@ -22,7 +22,7 @@ function nextSiblingTextContent(range: Range)
 	let   node = container.nextSibling
 	let   text = container.textContent ? container.textContent.substring(range.endOffset) : ''
 	while (node) {
-		if (node.textContent) {
+		if (node.textContent?.length) {
 			text += node.textContent
 		}
 		node = node.nextSibling
@@ -38,7 +38,7 @@ function previousSiblingTextContent(range: Range)
 	let   node      = container.previousSibling
 	let   text      = container.textContent ? container.textContent.substring(0, range.startOffset) : ''
 	while (node) {
-		if (node.textContent) {
+		if (node.textContent?.length) {
 			text = node.textContent + text
 		}
 		node = node.previousSibling

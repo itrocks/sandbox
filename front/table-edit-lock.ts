@@ -46,6 +46,7 @@ export class TableEditLock extends TableEdit
 
 	closestEditableCell(target: any)
 	{
+		let style: CSSStyleDeclaration
 		let editable = super.closestEditableCell(target)
 		Object.entries(this.options.nonEditableConditions).forEach(([index, value]) => {
 			if (!editable) return null
@@ -57,7 +58,8 @@ export class TableEditLock extends TableEdit
 					if (colCell(editable).matches(value)) editable = null
 					break
 				default:
-					if (getComputedStyle(editable)[index as keyof CSSStyleDeclaration] === value) editable = null
+					if (!style) style = getComputedStyle(editable)
+					if (style[index as keyof CSSStyleDeclaration] === value) editable = null
 			}
 		})
 		return editable
