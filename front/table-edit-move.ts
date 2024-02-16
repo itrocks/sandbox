@@ -13,37 +13,56 @@ function cellPosition(cell: HTMLTableCellElement)
 	return count
 }
 
+function nextNode(node: Node): Node|null
+{
+	return node.nextSibling ?? (
+		node.parentElement?.hasAttribute('contenteditable') ? null : (node.parentNode?.nextSibling ?? null)
+	)
+}
+
 function nextSiblingTextContent(range: Range)
 {
 	const container = range.endContainer
 	if ((container instanceof Element) && container.hasAttribute('contenteditable')) {
 		return ''
 	}
-	let   node = container.nextSibling
-	let   text = container.textContent ? container.textContent.substring(range.endOffset) : ''
+	let node = nextNode(container)
+	let text = container.textContent ? container.textContent.substring(range.endOffset) : ''
 	while (node) {
 		if (node.textContent?.length) {
 			text += node.textContent
 		}
-		node = node.nextSibling
-			? node.nextSibling
-			: (node.parentElement?.hasAttribute('contenteditable') ? node.parentElement.nextSibling : null)
+		if (['BR', 'DIV'].includes(node.nodeName)) {
+			text += "\n"
+		}
+		node = nextNode(node)
 	}
 	return text
+}
+
+function previousNode(node: Node): Node|null
+{
+	return node.previousSibling ?? (
+		node.parentElement?.hasAttribute('contenteditable') ? null : (node.parentNode?.previousSibling ?? null)
+	)
 }
 
 function previousSiblingTextContent(range: Range)
 {
 	const container = range.startContainer
-	let   node      = container.previousSibling
-	let   text      = container.textContent ? container.textContent.substring(0, range.startOffset) : ''
+	if ((container instanceof Element) && container.hasAttribute('contenteditable')) {
+		return ''
+	}
+	let node = previousNode(container)
+	let text = container.textContent ? container.textContent.substring(0, range.startOffset) : ''
 	while (node) {
+		if (['BR', 'DIV'].includes(node.nodeName)) {
+			text = "\n" + text
+		}
 		if (node.textContent?.length) {
 			text = node.textContent + text
 		}
-		node = node.previousSibling
-			? node.previousSibling
-			: (node.parentElement?.hasAttribute('contenteditable') ? node.parentElement.previousSibling : null)
+		node = previousNode(node)
 	}
 	return text
 }
