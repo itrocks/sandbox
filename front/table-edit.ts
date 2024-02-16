@@ -164,6 +164,16 @@ export class TableEdit extends Table
 		if (!shiftLeft && !shiftTop) {
 			return false
 		}
+
+		if (getComputedStyle(cell).position === 'sticky') {
+			if ((getComputedStyle(cell).left !== 'auto') || (getComputedStyle(cell).right !== 'auto')) {
+				shiftLeft = 0
+			}
+			if ((getComputedStyle(cell).top !== 'auto') || (getComputedStyle(cell).bottom !== 'auto')) {
+				shiftTop = 0
+			}
+		}
+
 		scrollable.scrollBy(shiftLeft, shiftTop)
 		return true
 	}
