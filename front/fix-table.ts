@@ -172,7 +172,7 @@ export class FixTable extends Table
 		const parent = this.element.getBoundingClientRect()
 		const rect   = new DOMRect()
 		rect.x = this.leftColumnCount
-			? this.columns[this.leftColumnCount].getBoundingClientRect().right
+			? this.columns[this.leftColumnCount - 1].getBoundingClientRect().right
 			: parent.left
 		rect.y = this.element.tHead?.lastElementChild?.firstElementChild
 			? this.element.tHead.lastElementChild.firstElementChild.getBoundingClientRect().bottom
