@@ -1,5 +1,10 @@
 body {
-  margin: 0; }
+  background: #efe;
+  margin: 10px; }
+  body > main {
+    height: calc(100vh - 20px);
+    overflow: auto;
+    width: calc(100vw - 20px); }
 
 table {
   border-collapse: collapse;

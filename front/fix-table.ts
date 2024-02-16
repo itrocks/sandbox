@@ -167,5 +167,28 @@ export class FixTable extends Table
 		return `${position}px`
 	}
 
+	visibleInnerRect()
+	{
+		const parent = this.element.getBoundingClientRect()
+		const rect   = new DOMRect()
+		rect.x = this.leftColumnCount
+			? this.columns[this.leftColumnCount].getBoundingClientRect().right
+			: parent.left
+		rect.y = this.element.tHead?.lastElementChild?.firstElementChild
+			? this.element.tHead.lastElementChild.firstElementChild.getBoundingClientRect().bottom
+			: parent.bottom
+		rect.width = 1 - rect.x + (
+			this.rightColumnCount
+				? this.columns[this.columns.length - this.rightColumnCount].getBoundingClientRect().left
+				: parent.right
+		)
+		rect.height = 1 - rect.y + (
+			this.element.tFoot?.firstElementChild?.firstElementChild
+				? this.element.tFoot.firstElementChild.firstElementChild.getBoundingClientRect().top
+				: parent.top
+		)
+		return rect
+	}
+
 }
 export default FixTable

@@ -128,7 +128,44 @@ export class TableEdit extends Table
 
 	scrollToCell(cell: HTMLTableCellElement)
 	{
+		const into = this.visibleInnerRect()
+		const rect = cell.getBoundingClientRect()
+		if (
+			(rect.left >= into.left)
+			&& (rect.top >= into.top)
+			&& (rect.right <= into.right)
+			&& (rect.bottom <= into.bottom)
+		) {
+			return false
+		}
 
+		let parent = cell.closest('table')?.parentElement
+		while (parent && parent.scrollHeight < parent.clientHeight) {
+			parent = parent.parentElement
+		}
+		if (!parent) return
+		const scrollable = (parent === document.body) ? window : parent
+
+		let shiftLeft = 0
+		let shiftTop  = 0
+		if (rect.bottom > into.bottom) {
+			shiftTop = rect.bottom - into.bottom
+		}
+		if (rect.right > into.right) {
+			shiftLeft = rect.right - into.right
+		}
+		if (rect.left < into.left) {
+			shiftLeft = rect.left - into.left
+		}
+		if (rect.top < into.top) {
+			shiftTop = rect.top - into.top
+		}
+
+		if (!shiftLeft && !shiftTop) {
+			return false
+		}
+		scrollable.scrollBy(shiftLeft, shiftTop)
+		return true
 	}
 
 	selectCell(cell: HTMLTableCellElement)
@@ -139,13 +176,7 @@ export class TableEdit extends Table
 		selected     = cell
 		selectedText = cell.innerHTML
 
-		const rect = selected.getBoundingClientRect()
-		if (
-			(document.elementFromPoint(rect.left + 1, rect.top + 1) !== selected)
-			|| (document.elementFromPoint(rect.right - 1, rect.bottom - 1) !== selected)
-		) {
-			this.scrollToCell(cell)
-		}
+		this.scrollToCell(cell)
 
 		const computedStyle = getComputedStyle(selected)
 		selectedStyle       = selected.getAttribute('style') ?? ''

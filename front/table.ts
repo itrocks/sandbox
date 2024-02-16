@@ -45,7 +45,6 @@ function nextTableId(table: Table)
 
 export class Table
 {
-
 	readonly id: number
 	readonly onReset: (() => void)[] = []
 	readonly options = new TableOptions
@@ -129,6 +128,11 @@ export class Table
 	{
 		this.onReset.forEach(onReset => onReset())
 		return tableByElement(this.element, this.options)
+	}
+
+	visibleInnerRect()
+	{
+		return this.element.getBoundingClientRect()
 	}
 
 }
