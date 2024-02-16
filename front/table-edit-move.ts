@@ -5,12 +5,29 @@ function cellPosition(cell: HTMLTableCellElement)
 	let count = 1
 	let previous = cell.previousElementSibling
 	while (previous) {
-		if ((previous.tagName === 'TD') || (previous.tagName === 'TH')) {
+		if (['TD', 'TH'].includes(previous.tagName)) {
 			count ++
 		}
 		previous = previous.previousElementSibling
 	}
 	return count
+}
+
+function editableNode(node: Node|null): Node|null
+{
+	while (node && !((node instanceof Element) && node.hasAttribute('contenteditable'))) {
+		node = node.parentNode
+	}
+	return node
+}
+
+function getSelectionRange()
+{
+	const selection = getSelection()
+	if (!selection) throw 'Should be called only when there is a selection'
+	const range = selection?.getRangeAt(0)
+	if (!range) throw 'Should be called only when there is a selection range'
+	return range
 }
 
 function nextNode(node: Node): Node|null
@@ -65,6 +82,36 @@ function previousSiblingTextContent(range: Range)
 		node = previousNode(node)
 	}
 	return text
+}
+
+function selectFullEditable(range: Range)
+{
+	const selection = getSelection()
+	if (!selection) return null
+	let node = editableNode(range.commonAncestorContainer)
+	if (!node) return null
+	const newRange = new Range()
+	newRange.selectNodeContents(node)
+	selection.removeAllRanges()
+	selection.addRange(newRange)
+	return newRange
+}
+
+function selectRangeEndOf(range: Range)
+{
+	const selection = getSelection()
+	if (!selection) return null
+	let node = editableNode(range.commonAncestorContainer)
+	if (!node) return null
+	while (node.lastChild && !(node.nodeType === Node.TEXT_NODE)) {
+		node = node.lastChild
+	}
+	const newRange = new Range()
+	newRange.setEndAfter(node)
+	newRange.collapse()
+	selection.removeAllRanges()
+	selection.addRange(newRange)
+	return newRange
 }
 
 export class TableEditMove extends TableEdit
@@ -137,35 +184,45 @@ export class TableEditMove extends TableEdit
 
 		editable.addEventListener('keydown', event => {
 			if (event.altKey || event.ctrlKey || event.shiftKey) return
-			const selection = getSelection()
-			if (selection?.rangeCount !== 1) {
-				throw 'Should have range'
-			}
 			switch (event.key) {
 				case 'ArrowDown':
-					if (nextSiblingTextContent(selection.getRangeAt(0)).includes("\n")) return
+					if (nextSiblingTextContent(getSelectionRange()).includes("\n")) return
 					this.selectNextRow()
 					event.preventDefault()
 					return
 				case 'ArrowLeft':
-					if (previousSiblingTextContent(selection.getRangeAt(0)).length) return
+					if (previousSiblingTextContent(getSelectionRange()).length) return
 					this.selectPreviousColumn()
 					event.preventDefault()
 					return
 				case 'ArrowRight':
-					if (nextSiblingTextContent(selection.getRangeAt(0)).length) return
+					if (nextSiblingTextContent(getSelectionRange()).length) return
 					this.selectNextColumn()
 					event.preventDefault()
 					return
 				case 'ArrowUp':
-					if (previousSiblingTextContent(selection.getRangeAt(0)).includes("\n")) return
+					if (previousSiblingTextContent(getSelectionRange()).includes("\n")) return
 					this.selectPreviousRow()
 					event.preventDefault()
 					return
 				case 'Enter':
-					if (nextSiblingTextContent(selection.getRangeAt(0)).length) return
+					if (nextSiblingTextContent(getSelectionRange()).length) return
 					this.selectNextRow()
 					event.preventDefault()
+					return
+				case 'Escape':
+					selectFullEditable(getSelectionRange())
+					return
+				case 'F2':
+					const range = getSelectionRange()
+					if (
+						(range.startContainer instanceof Element)
+						&& range.startContainer.hasAttribute('contenteditable')
+						&& (range.startContainer === range.commonAncestorContainer)
+						&& (range.startContainer === range.endContainer)
+					) {
+						selectRangeEndOf(range)
+					}
 					return
 			}
 		})
