@@ -57,8 +57,7 @@ function rangeTextContent(range: Range)
 	if (text.endsWith('<br>') && !nextSiblingTextContent(range).length) {
 		text = text.substring(0, text.length - 4)
 	}
-	text = text.replaceAll('<br>', "\n").replaceAll('</div><div>', "\n")
-	return text
+	return text.replaceAll('<br>', "\n").replaceAll('</div><div>', "\n").replace(/(<[^>]+>)/g, '')
 }
 
 export class TableEditMove extends TableEdit
