@@ -1,8 +1,15 @@
-import TableEdit from './table-edit.js'
+import {
+	closestEditable,
+	editableEndRange,
+	editableFullRange,
+	getSelectionRange,
+	setSelectionRange,
+	TableEdit
+} from './table-edit.js'
 
 function cellPosition(cell: HTMLTableCellElement)
 {
-	let count = 1
+	let count    = 1
 	let previous = cell.previousElementSibling
 	while (previous) {
 		if (['TD', 'TH'].includes(previous.tagName)) {
@@ -13,105 +20,45 @@ function cellPosition(cell: HTMLTableCellElement)
 	return count
 }
 
-function editableNode(node: Node|null): Node|null
-{
-	while (node && !((node instanceof Element) && node.hasAttribute('contenteditable'))) {
-		node = node.parentNode
-	}
-	return node
-}
-
-function getSelectionRange()
-{
-	const selection = getSelection()
-	if (!selection) throw 'Should be called only when there is a selection'
-	const range = selection?.getRangeAt(0)
-	if (!range) throw 'Should be called only when there is a selection range'
-	return range
-}
-
-function nextNode(node: Node): Node|null
-{
-	return node.nextSibling ?? (
-		node.parentElement?.hasAttribute('contenteditable') ? null : (node.parentNode?.nextSibling ?? null)
-	)
-}
-
 function nextSiblingTextContent(range: Range)
 {
-	const container = range.endContainer
-	if ((container instanceof Element) && container.hasAttribute('contenteditable')) {
-		return ''
-	}
-	let node = nextNode(container)
-	let text = container.textContent ? container.textContent.substring(range.endOffset) : ''
-	while (node) {
-		if (node.textContent?.length) {
-			text += node.textContent
-		}
-		if (['BR', 'DIV'].includes(node.nodeName)) {
-			text += "\n"
-		}
-		node = nextNode(node)
-	}
-	return text
-}
-
-function previousNode(node: Node): Node|null
-{
-	return node.previousSibling ?? (
-		node.parentElement?.hasAttribute('contenteditable') ? null : (node.parentNode?.previousSibling ?? null)
-	)
+	const editable = closestEditable(range.commonAncestorContainer)
+	const next     = new Range()
+	next.setStart(range.endContainer, range.endOffset)
+	editable.lastChild
+		? next.setEndAfter(editable.lastChild)
+		: next.setEnd(editable, editable.textContent?.length ?? 0)
+	return rangeTextContent(next)
 }
 
 function previousSiblingTextContent(range: Range)
 {
-	const container = range.startContainer
-	if ((container instanceof Element) && container.hasAttribute('contenteditable')) {
+	const editable = closestEditable(range.commonAncestorContainer)
+	const previous = new Range()
+	previous.setStart(editable, 0)
+	previous.setEnd(range.startContainer, range.startOffset)
+	return rangeTextContent(previous)
+}
+
+function rangeTextContent(range: Range)
+{
+	if (
+		(range.startContainer === range.endContainer)
+		&& (range.startOffset === range.endOffset)
+	) {
 		return ''
 	}
-	let node = previousNode(container)
-	let text = container.textContent ? container.textContent.substring(0, range.startOffset) : ''
-	while (node) {
-		if (['BR', 'DIV'].includes(node.nodeName)) {
-			text = "\n" + text
-		}
-		if (node.textContent?.length) {
-			text = node.textContent + text
-		}
-		node = previousNode(node)
+	const element = document.createElement('div')
+	element.appendChild(range.cloneContents())
+	let text = element.innerHTML
+	if (text.startsWith('<div>') && text.endsWith('</div>')) {
+		text = text.substring(5, text.length - 6)
 	}
+	if (text.endsWith('<br>') && !nextSiblingTextContent(range).length) {
+		text = text.substring(0, text.length - 4)
+	}
+	text = text.replaceAll('<br>', "\n").replaceAll('</div><div>', "\n")
 	return text
-}
-
-function selectFullEditable(range: Range)
-{
-	const selection = getSelection()
-	if (!selection) return null
-	let node = editableNode(range.commonAncestorContainer)
-	if (!node) return null
-	const newRange = new Range()
-	newRange.selectNodeContents(node)
-	selection.removeAllRanges()
-	selection.addRange(newRange)
-	return newRange
-}
-
-function selectRangeEndOf(range: Range)
-{
-	const selection = getSelection()
-	if (!selection) return null
-	let node = editableNode(range.commonAncestorContainer)
-	if (!node) return null
-	while (node.lastChild && !(node.nodeType === Node.TEXT_NODE)) {
-		node = node.lastChild
-	}
-	const newRange = new Range()
-	newRange.setEndAfter(node)
-	newRange.collapse()
-	selection.removeAllRanges()
-	selection.addRange(newRange)
-	return newRange
 }
 
 export class TableEditMove extends TableEdit
@@ -211,17 +158,12 @@ export class TableEditMove extends TableEdit
 					event.preventDefault()
 					return
 				case 'Escape':
-					selectFullEditable(getSelectionRange())
+					setSelectionRange(editableFullRange(getSelectionRange()))
 					return
 				case 'F2':
 					const range = getSelectionRange()
-					if (
-						(range.startContainer instanceof Element)
-						&& range.startContainer.hasAttribute('contenteditable')
-						&& (range.startContainer === range.commonAncestorContainer)
-						&& (range.startContainer === range.endContainer)
-					) {
-						selectRangeEndOf(range)
+					if (rangeTextContent(range) === rangeTextContent(editableFullRange(range))) {
+						setSelectionRange(editableEndRange(range))
 					}
 					return
 			}

@@ -5,21 +5,103 @@ let selected:      HTMLTableCellElement|null = null
 let selectedStyle: string = ''
 let selectedText:  string = ''
 
-export type RangeSelection = {
-	cell:        HTMLTableCellElement|null
-	endNode:     Node
-	endOffset:   number
-	startNode:   Node
-	startOffset: number
+export class RangeCopy
+{
+	commonAncestorContainer: Node
+	endContainer:   Node
+	endOffset:      number
+	startContainer: Node
+	startOffset:    number
+
+	constructor(range: Range)
+	{
+		this.commonAncestorContainer = range.commonAncestorContainer
+		this.endContainer            = range.endContainer
+		this.endOffset               = range.endOffset
+		this.startContainer          = range.startContainer
+		this.startOffset             = range.startOffset
+	}
+
+	toRange()
+	{
+		const range = new Range()
+		range.setStart(this.startContainer, this.startOffset)
+		range.setEnd(this.endContainer, this.endOffset)
+		return range
+	}
+
 }
 
-export default class TableEdit extends Table
+export function closestEditable(node: Node|Range|RangeCopy): HTMLDivElement
+{
+	if ((node instanceof Range) || (node instanceof RangeCopy)) {
+		node = node.commonAncestorContainer
+	}
+	let parent:Node|null = node
+	while (parent && !((parent instanceof Element) && parent.hasAttribute('contenteditable'))) {
+		parent = parent.parentNode
+	}
+	if (!parent) {
+		throw 'Called from a node outside of contenteditable'
+	}
+	return parent as HTMLDivElement
+}
+
+export function editableEndRange(node: Node|Range|RangeCopy)
+{
+	node = closestEditable(node)
+	while (node.lastChild && !(node.nodeType === Node.TEXT_NODE)) {
+		node = node.lastChild as Node
+	}
+	const newRange = new Range()
+	newRange.setStartAfter(node)
+	newRange.setEndAfter(node)
+	return newRange
+}
+
+export function editableFullRange(node: Node|Range|RangeCopy)
+{
+	const newRange = new Range()
+	newRange.selectNodeContents(closestEditable(node))
+	return newRange
+}
+
+export function getSelectionRange()
+{
+	const selection = getSelection()
+	if (!selection) throw 'Should be called only when there is a selection'
+	const range = selection?.getRangeAt(0)
+	if (!range) throw 'Should be called only when there is a selection range'
+	return range
+}
+
+export function inEditable(node: Node|Range|RangeCopy): boolean
+{
+	if ((node instanceof Range) || (node instanceof RangeCopy)) {
+		node = node.commonAncestorContainer
+	}
+	return !!(
+		(node instanceof Element)
+		? node.closest('div[contenteditable]')
+		: node.parentElement?.closest('div[contenteditable]')
+	)
+}
+
+export function setSelectionRange(range: Range)
+{
+	const selection = getSelection()
+	if (!selection) throw 'Should be called only when there is a selection'
+	selection.removeAllRanges()
+	selection.addRange(range)
+}
+
+export class TableEdit extends Table
 {
 
 	closestEditableCell(target: any)
 	{
 		return (target instanceof Element)
-			? target.closest('td, th') as HTMLTableCellElement|null
+			? target.closest('table.itrocks > * > tr > *, table.itrocks > * > tr > *') as HTMLTableCellElement|null
 			: null
 	}
 
@@ -72,9 +154,9 @@ export default class TableEdit extends Table
 		setTimeout(() => {
 			if (!selected) {
 				console.error('cell:', cell)
-				throw 'Unexpected failure: cell was unselected before contenteditable was set'
+				throw 'Unexpected failure: cell was unselected before contenteditable was effective'
 			}
-			const range = this.selectedRange()
+			const range = new RangeCopy(getSelectionRange())
 
 			selected.removeAttribute('contenteditable')
 			editable = this.createEditable(computedStyle) as HTMLDivElement
@@ -88,7 +170,7 @@ export default class TableEdit extends Table
 				selected.style.zIndex = '2'
 			}
 
-			this.selectRange(range)
+			setSelectionRange(inEditable(range) ? range.toRange() : editableFullRange(editable))
 
 			editable.addEventListener(
 				'keyup', event => this.setSelectedText((event.target as HTMLDivElement)?.innerHTML ?? '')
@@ -96,50 +178,12 @@ export default class TableEdit extends Table
 		})
 	}
 
-	selectRange(range: RangeSelection|null)
-	{
-		const selection = getSelection()
-		if (!selection) return
-		const newRange = document.createRange()
-		if (newRange && range && (range.cell === selected)) {
-			newRange.setStart(range.startNode, range.startOffset)
-			newRange.setEnd(range.endNode, range.endOffset)
-		}
-		else {
-			const editable = this.editable()
-			if (!editable) return
-			newRange.selectNodeContents(editable)
-		}
-		selection.removeAllRanges()
-		selection.addRange(newRange)
-	}
-
 	selected()
 	{
 		return selected
 	}
 
-	selectedRange(): RangeSelection|null
-	{
-		const selection = getSelection()
-		if (!selection) return null
-		const range  = selection.getRangeAt(0)
-		if (!range) return null
-		const cell = (range.commonAncestorContainer instanceof Element)
-			? range.commonAncestorContainer.closest('td')
-			: range.commonAncestorContainer.parentElement?.closest('td') ?? null
-		if (cell !== selected) return null
-
-		return {
-			cell,
-			endNode:     range.endContainer,
-			endOffset:   range.endOffset,
-			startNode:   range.startContainer,
-			startOffset: range.startOffset
-		}
-	}
-
-	setSelectedText(newText: string)
+	protected setSelectedText(newText: string)
 	{
 		if (newText === selectedText) return
 		selectedText = newText
@@ -177,3 +221,4 @@ export default class TableEdit extends Table
 	}
 
 }
+export default TableEdit
