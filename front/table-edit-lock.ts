@@ -3,7 +3,7 @@ import { TableOptions } from './table.js'
 
 function cellPosition(cell: HTMLTableCellElement)
 {
-	let count = 1
+	let count    = 1
 	let previous = cell.previousElementSibling
 	while (previous) {
 		if ((previous.tagName === 'TD') || (previous.tagName === 'TH')) {
@@ -16,9 +16,9 @@ function cellPosition(cell: HTMLTableCellElement)
 
 function colCell(cell: HTMLTableCellElement)
 {
-	const table = cell.closest('table') as HTMLTableElement
+	const table    = cell.closest('table') as HTMLTableElement
 	const position = cellPosition(cell)
-	const col = table.querySelectorAll(':scope > colgroup')[0]
+	const col      = table.querySelector(':scope > colgroup')
 	if (col) {
 		return col.children[position - 1] as HTMLTableColElement
 	}

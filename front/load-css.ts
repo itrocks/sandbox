@@ -17,7 +17,7 @@ export default (fileName: string) => new Promise<void>(resolve =>
 		link = document.createElement('link')
 		link.setAttribute('href', fileName)
 		link.setAttribute('rel', 'stylesheet')
-		document.head.insertBefore(link, document.head.querySelectorAll(':scope > link:first-of-type')[0])
+		document.head.insertBefore(link, document.head.querySelector(':scope > link:first-of-type'))
 	}
 	if (link.sheet) {
 		resolve()

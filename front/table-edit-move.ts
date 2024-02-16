@@ -86,7 +86,7 @@ export class TableEditMove extends TableEdit
 		}
 		if (nextRow) {
 			const selector = ':scope > :nth-child(' + cellPosition(selected) + ')'
-			const cell     = nextRow.querySelectorAll(selector)[0] as HTMLTableCellElement
+			const cell     = nextRow.querySelector(selector) as HTMLTableCellElement
 			if (this.closestEditableCell(cell)) {
 				this.selectCell(cell)
 			}
@@ -116,7 +116,7 @@ export class TableEditMove extends TableEdit
 		}
 		if (previousRow) {
 			const selector = ':scope > :nth-child(' + cellPosition(selected) + ')'
-			const cell     = previousRow.querySelectorAll(selector)[0] as HTMLTableCellElement
+			const cell     = previousRow.querySelector(selector) as HTMLTableCellElement
 			if (this.closestEditableCell(cell)) {
 				this.selectCell(cell)
 			}
