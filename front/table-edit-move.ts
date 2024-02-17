@@ -1,81 +1,87 @@
-import {
-	closestEditable,
-	editableEndRange,
-	editableFullRange,
-	getSelectionRange,
-	setSelectionRange,
-	TableEdit
-} from './table-edit.js'
+import { Plugin, Table } from './table.js'
+import TableEdit         from './table-edit.js'
 
-function cellPosition(cell: HTMLTableCellElement)
+export class TableEditMove extends Plugin
 {
-	let count    = 1
-	let previous = cell.previousElementSibling
-	while (previous) {
-		if (['TD', 'TH'].includes(previous.tagName)) {
-			count ++
+	tableEdit: TableEdit
+
+	constructor(table: Table)
+	{
+		super(table)
+		this.tableEdit = table.plugins.TableEdit as TableEdit
+
+		const origin = this.tableEdit.createEditable
+		this.tableEdit.createEditable = (computedStyle) => this.createEditable(origin, computedStyle)
+	}
+
+	cellPosition(cell: HTMLTableCellElement)
+	{
+		let count    = 1
+		let previous = cell.previousElementSibling
+		while (previous) {
+			if (['TD', 'TH'].includes(previous.tagName)) {
+				count ++
+			}
+			previous = previous.previousElementSibling
 		}
-		previous = previous.previousElementSibling
+		return count
 	}
-	return count
-}
 
-function nextSiblingTextContent(range: Range)
-{
-	const editable = closestEditable(range.commonAncestorContainer)
-	const next     = new Range()
-	next.setStart(range.endContainer, range.endOffset)
-	editable.lastChild
-		? next.setEndAfter(editable.lastChild)
-		: next.setEnd(editable, editable.textContent?.length ?? 0)
-	return rangeTextContent(next)
-}
-
-function previousSiblingTextContent(range: Range)
-{
-	const editable = closestEditable(range.commonAncestorContainer)
-	const previous = new Range()
-	previous.setStart(editable, 0)
-	previous.setEnd(range.startContainer, range.startOffset)
-	return rangeTextContent(previous)
-}
-
-function rangeTextContent(range: Range)
-{
-	if (
-		(range.startContainer === range.endContainer)
-		&& (range.startOffset === range.endOffset)
-	) {
-		return ''
+	nextSiblingTextContent(range: Range)
+	{
+		const editable = this.tableEdit.closestEditable(range.commonAncestorContainer)
+		const next     = new Range()
+		next.setStart(range.endContainer, range.endOffset)
+		editable.lastChild
+			? next.setEndAfter(editable.lastChild)
+			: next.setEnd(editable, editable.textContent?.length ?? 0)
+		return this.rangeTextContent(next)
 	}
-	const element = document.createElement('div')
-	element.appendChild(range.cloneContents())
-	let text = element.innerHTML
-	if (text.startsWith('<div>') && text.endsWith('</div>')) {
-		text = text.substring(5, text.length - 6)
-	}
-	if (text.endsWith('<br>') && !nextSiblingTextContent(range).length) {
-		text = text.substring(0, text.length - 4)
-	}
-	return text.replaceAll('<br>', "\n").replaceAll('</div><div>', "\n").replace(/(<[^>]+>)/g, '')
-}
 
-export class TableEditMove extends TableEdit
-{
+	previousSiblingTextContent(range: Range)
+	{
+		const editable = this.tableEdit.closestEditable(range.commonAncestorContainer)
+		const previous = new Range()
+		previous.setStart(editable, 0)
+		previous.setEnd(range.startContainer, range.startOffset)
+		return this.rangeTextContent(previous)
+	}
+
+	rangeTextContent(range: Range)
+	{
+		if (
+			(range.startContainer === range.endContainer)
+			&& (range.startOffset === range.endOffset)
+		) {
+			return ''
+		}
+		const element = document.createElement('div')
+		element.appendChild(range.cloneContents())
+		let text = element.innerHTML
+		if (text.startsWith('<div>') && text.endsWith('</div>')) {
+			text = text.substring(5, text.length - 6)
+		}
+		if (text.endsWith('<br>') && !this.nextSiblingTextContent(range).length) {
+			text = text.substring(0, text.length - 4)
+		}
+		return text.replaceAll('<br>', "\n").replaceAll('</div><div>', "\n").replace(/(<[^>]+>)/g, '')
+	}
 
 	selectNextColumn()
 	{
-		const selected = this.selected()
+		const tableEdit = this.tableEdit
+		const selected  = tableEdit.selected()
 		if (!selected) return
 		const cell = selected.nextElementSibling as HTMLTableCellElement
-		if (this.closestEditableCell(cell)) {
-			this.selectCell(cell)
+		if (tableEdit.closestEditableCell(cell)) {
+			tableEdit.selectCell(cell)
 		}
 	}
 
 	selectNextRow()
 	{
-		const selected = this.selected()
+		const tableEdit = this.tableEdit
+		const selected  = tableEdit.selected()
 		if (!selected) return
 		const row     = selected.closest('tr') as HTMLTableRowElement
 		let   nextRow = row.nextElementSibling
@@ -85,27 +91,29 @@ export class TableEditMove extends TableEdit
 			nextRow           = nextSection.firstElementChild as HTMLTableRowElement
 		}
 		if (nextRow) {
-			const selector = ':scope > :nth-child(' + cellPosition(selected) + ')'
+			const selector = ':scope > :nth-child(' + this.cellPosition(selected) + ')'
 			const cell     = nextRow.querySelector(selector) as HTMLTableCellElement
-			if (this.closestEditableCell(cell)) {
-				this.selectCell(cell)
+			if (tableEdit.closestEditableCell(cell)) {
+				tableEdit.selectCell(cell)
 			}
 		}
 	}
 
 	selectPreviousColumn()
 	{
-		const selected = this.selected()
+		const tableEdit = this.tableEdit
+		const selected  = tableEdit.selected()
 		if (!selected) return
 		const cell = selected.previousElementSibling as HTMLTableCellElement
-		if (this.closestEditableCell(cell)) {
-			this.selectCell(cell)
+		if (tableEdit.closestEditableCell(cell)) {
+			tableEdit.selectCell(cell)
 		}
 	}
 
 	selectPreviousRow()
 	{
-		const selected = this.selected()
+		const tableEdit = this.tableEdit
+		const selected  = tableEdit.selected()
 		if (!selected) return
 		const row         = selected.closest('tr') as HTMLTableRowElement
 		let   previousRow = row.previousElementSibling
@@ -115,54 +123,57 @@ export class TableEditMove extends TableEdit
 			previousRow           = previousSection.lastElementChild as HTMLTableRowElement
 		}
 		if (previousRow) {
-			const selector = ':scope > :nth-child(' + cellPosition(selected) + ')'
+			const selector = ':scope > :nth-child(' + this.cellPosition(selected) + ')'
 			const cell     = previousRow.querySelector(selector) as HTMLTableCellElement
-			if (this.closestEditableCell(cell)) {
-				this.selectCell(cell)
+			if (tableEdit.closestEditableCell(cell)) {
+				tableEdit.selectCell(cell)
 			}
 		}
 	}
 
-	createEditable(computedStyle: CSSStyleDeclaration)
-	{
-		const editable = super.createEditable(computedStyle)
+	createEditable(
+		origin: (computedStyle: CSSStyleDeclaration) => HTMLDivElement|null,
+		computedStyle: CSSStyleDeclaration
+	) {
+		const tableEdit = this.tableEdit
+		const editable  = origin.call(tableEdit, computedStyle)
 		if (!editable) return null
 
 		editable.addEventListener('keydown', event => {
 			if (event.altKey || event.ctrlKey || event.shiftKey) return
 			switch (event.key) {
 				case 'ArrowDown':
-					if (nextSiblingTextContent(getSelectionRange()).includes("\n")) return
+					if (this.nextSiblingTextContent(tableEdit.getSelectionRange()).includes("\n")) return
 					this.selectNextRow()
 					event.preventDefault()
 					return
 				case 'ArrowLeft':
-					if (previousSiblingTextContent(getSelectionRange()).length) return
+					if (this.previousSiblingTextContent(tableEdit.getSelectionRange()).length) return
 					this.selectPreviousColumn()
 					event.preventDefault()
 					return
 				case 'ArrowRight':
-					if (nextSiblingTextContent(getSelectionRange()).length) return
+					if (this.nextSiblingTextContent(tableEdit.getSelectionRange()).length) return
 					this.selectNextColumn()
 					event.preventDefault()
 					return
 				case 'ArrowUp':
-					if (previousSiblingTextContent(getSelectionRange()).includes("\n")) return
+					if (this.previousSiblingTextContent(tableEdit.getSelectionRange()).includes("\n")) return
 					this.selectPreviousRow()
 					event.preventDefault()
 					return
 				case 'Enter':
-					if (nextSiblingTextContent(getSelectionRange()).length) return
+					if (this.nextSiblingTextContent(tableEdit.getSelectionRange()).length) return
 					this.selectNextRow()
 					event.preventDefault()
 					return
 				case 'Escape':
-					setSelectionRange(editableFullRange(getSelectionRange()))
+					tableEdit.setSelectionRange(tableEdit.editableFullRange(tableEdit.getSelectionRange()))
 					return
 				case 'F2':
-					const range = getSelectionRange()
-					if (rangeTextContent(range) === rangeTextContent(editableFullRange(range))) {
-						setSelectionRange(editableEndRange(range))
+					const range = tableEdit.getSelectionRange()
+					if (this.rangeTextContent(range) === this.rangeTextContent(tableEdit.editableFullRange(range))) {
+						tableEdit.setSelectionRange(tableEdit.editableEndRange(range))
 					}
 					return
 			}

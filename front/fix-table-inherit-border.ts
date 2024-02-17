@@ -1,88 +1,90 @@
-import FixTable                from './fix-table.js'
-import { HTMLTableFixElement } from './table.js'
+import FixTable                               from './fix-table.js'
+import { HTMLTableFixElement, Plugin, Table } from './table.js'
 
 /**
  * This plugin has no use and no effect if your table has border-collapse: separate (default)
  */
-export default class InheritBorder extends FixTable
+export default class InheritBorder extends Plugin
 {
+	tableStyle: CSSStyleDeclaration
+	fixTable:   FixTable
 
-	protected tableStyle: CSSStyleDeclaration
-
-	constructor(element: HTMLTableElement)
+	constructor(table: Table)
 	{
-		super(element)
-		throw 'Plugin should not be instantiated'
-	}
+		super(table)
+		this.fixTable = table.plugins.FixTable as FixTable
 
-	InheritBorderInit()
-	{
-		this.tableStyle = getComputedStyle(this.element)
-		if (this.tableStyle.borderCollapse !== 'collapse') {
-			this.position = super.position
+		this.tableStyle = getComputedStyle(table.element)
+		if (this.tableStyle.borderCollapse === 'collapse') {
+			const original = this.fixTable.position
+			this.fixTable.position = (position, counter, row, side) => this.position(original, position, counter, row, side)
 		}
 	}
 
-	InheritBorder()
+	init()
 	{
 		if (this.tableStyle.borderCollapse !== 'collapse') return
+		const fixTable = this.fixTable
+		const table    = this.table
 
 		// table
-		this.styleSheet.push(`
-			${this.selector} {
+		table.styleSheet.push(`
+			${table.selector} {
 				border-collapse: separate;
 				border-spacing: 0;
 			}
 		`)
 		// columns
 		let rightSelector = '';
-		if (this.rightColumnCount) {
-			rightSelector = `:not(:nth-last-child(${this.rightColumnCount}))`;
-			this.styleSheet.push(`
-				${this.selector} > * > tr > :nth-last-child(${this.rightColumnCount + 1}) {
+		if (fixTable.rightColumnCount) {
+			rightSelector = `:not(:nth-last-child(${fixTable.rightColumnCount}))`;
+			table.styleSheet.push(`
+				${table.selector} > * > tr > :nth-last-child(${fixTable.rightColumnCount + 1}) {
 					border-right-width: 0;
 				}
 			`)
 		}
-		this.styleSheet.push(`
-			${this.selector} > * > tr > :not(:first-child)${rightSelector} {
+		table.styleSheet.push(`
+			${table.selector} > * > tr > :not(:first-child)${rightSelector} {
 				border-left-width: 0;
 			}
 		`)
 		// rows
-		if (this.element.tHead?.rows.length) {
-			this.styleSheet.push(`
-				${this.selector} > tbody > tr > *,
-				${this.selector} > thead > tr:not(:first-child) > * {
+		if (table.element.tHead?.rows.length) {
+			table.styleSheet.push(`
+				${table.selector} > tbody > tr > *,
+				${table.selector} > thead > tr:not(:first-child) > * {
 					border-top-width: 0;
 				}
 			`)
 		}
 		else {
-			this.styleSheet.push(`
-				${this.selector} > tbody > tr:not(:first-child) > * {
+			table.styleSheet.push(`
+				${table.selector} > tbody > tr:not(:first-child) > * {
 					border-top-width: 0;
 				}
 			`)
 		}
-		if (this.element.tFoot?.rows.length) {
-			this.styleSheet.push(`
-				${this.selector} > tbody > tr:last-child > *,
-				${this.selector} > tfoot > tr:not(:last-child) > * { 
+		if (table.element.tFoot?.rows.length) {
+			table.styleSheet.push(`
+				${table.selector} > tbody > tr:last-child > *,
+				${table.selector} > tfoot > tr:not(:last-child) > * { 
 					border-bottom-width: 0;
 				}
 			`)
 		}
 	}
 
-	position(position: number, counter: number, row: HTMLTableFixElement, side: 'bottom' | 'left' | 'right' | 'top')
+	position(
+		original: (position: number, counter: number, row: HTMLTableFixElement, side: 'bottom'|'left'|'right'|'top') => string,
+		position: number, counter: number, row: HTMLTableFixElement, side: 'bottom'|'left'|'right'|'top')
 	{
 		const width = parseFloat(getComputedStyle(row).borderWidth) / 2
 		const shift = (counter > 1) ? width : -width
 		position += ((side === 'bottom') || (side === 'right'))
 			? Math.ceil(shift)
 			: Math.floor(shift)
-		return super.position(position, counter, row, side)
+		return original.call(this.table.plugins.FixTable, position, counter, row, side)
 	}
 
 }

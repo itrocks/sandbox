@@ -1,9 +1,9 @@
-import Table from './table.js'
+import { Plugin } from './table.js'
 
-let editable:      HTMLDivElement|null = null
-let selected:      HTMLTableCellElement|null = null
-let selectedStyle: string = ''
-let selectedText:  string = ''
+let editable:      HTMLDivElement|null
+let selected:      HTMLTableCellElement|null
+let selectedStyle: string
+let selectedText:  string
 
 export class RangeCopy
 {
@@ -32,71 +32,23 @@ export class RangeCopy
 
 }
 
-export function closestEditable(node: Node|Range|RangeCopy): HTMLDivElement
+export class TableEdit extends Plugin
 {
-	if ((node instanceof Range) || (node instanceof RangeCopy)) {
-		node = node.commonAncestorContainer
+
+	closestEditable(node: Node|Range|RangeCopy): HTMLDivElement
+	{
+		if ((node instanceof Range) || (node instanceof RangeCopy)) {
+			node = node.commonAncestorContainer
+		}
+		let parent:Element|null = (node instanceof Element) ? node : node.parentElement
+		while (parent && !parent.hasAttribute('contenteditable')) {
+			parent = parent.parentElement
+		}
+		if (!parent) {
+			throw 'Called from a node outside of contenteditable'
+		}
+		return parent as HTMLDivElement
 	}
-	let parent:Element|null = (node instanceof Element) ? node : node.parentElement
-	while (parent && !parent.hasAttribute('contenteditable')) {
-		parent = parent.parentElement
-	}
-	if (!parent) {
-		throw 'Called from a node outside of contenteditable'
-	}
-	return parent as HTMLDivElement
-}
-
-export function editableEndRange(node: Node|Range|RangeCopy)
-{
-	node = closestEditable(node)
-	while (node.lastChild && !(node.nodeType === Node.TEXT_NODE)) {
-		node = node.lastChild as Node
-	}
-	const newRange = new Range()
-	newRange.setStartAfter(node)
-	newRange.setEndAfter(node)
-	return newRange
-}
-
-export function editableFullRange(node: Node|Range|RangeCopy)
-{
-	const newRange = new Range()
-	newRange.selectNodeContents(closestEditable(node))
-	return newRange
-}
-
-export function getSelectionRange()
-{
-	const selection = getSelection()
-	if (!selection) throw 'Should be called only when there is a selection'
-	const range = selection?.getRangeAt(0)
-	if (!range) throw 'Should be called only when there is a selection range'
-	return range
-}
-
-export function inEditable(node: Node|Range|RangeCopy): boolean
-{
-	if ((node instanceof Range) || (node instanceof RangeCopy)) {
-		node = node.commonAncestorContainer
-	}
-	return !!(
-		(node instanceof Element)
-		? node.closest('div[contenteditable]')
-		: node.parentElement?.closest('div[contenteditable]')
-	)
-}
-
-export function setSelectionRange(range: Range)
-{
-	const selection = getSelection()
-	if (!selection) throw 'Should be called only when there is a selection'
-	selection.removeAllRanges()
-	selection.addRange(range)
-}
-
-export class TableEdit extends Table
-{
 
 	closestEditableCell(target: any)
 	{
@@ -125,9 +77,65 @@ export class TableEdit extends Table
 		return editable
 	}
 
+	editableEndRange(node: Node|Range|RangeCopy)
+	{
+		node = this.closestEditable(node)
+		while (node.lastChild && !(node.nodeType === Node.TEXT_NODE)) {
+			node = node.lastChild as Node
+		}
+		const newRange = new Range()
+		newRange.setStartAfter(node)
+		newRange.setEndAfter(node)
+		return newRange
+	}
+
+	editableFullRange(node: Node|Range|RangeCopy)
+	{
+		const newRange = new Range()
+		newRange.selectNodeContents(this.closestEditable(node))
+		return newRange
+	}
+
+	getSelectionRange()
+	{
+		const selection = getSelection()
+		if (!selection) throw 'Should be called only when there is a selection'
+		const range = selection?.getRangeAt(0)
+		if (!range) throw 'Should be called only when there is a selection range'
+		return range
+	}
+
+	inEditable(node: Node|Range|RangeCopy): boolean
+	{
+		if ((node instanceof Range) || (node instanceof RangeCopy)) {
+			node = node.commonAncestorContainer
+		}
+		return !!(
+			(node instanceof Element)
+				? node.closest('div[contenteditable]')
+				: node.parentElement?.closest('div[contenteditable]')
+		)
+	}
+
+	init()
+	{
+		const table = this.table
+		table.styleSheet.push(`
+			${table.selector} > * > tr > * > div[contenteditable] {
+				position: relative;
+				z-index: 2;
+			}
+		`)
+		table.addEventListener(table.element, 'mousedown', event => {
+			const cell = this.closestEditableCell(event.target)
+			if (!cell) return
+			this.selectCell(cell)
+		})
+	}
+
 	scrollToCell(cell: HTMLTableCellElement)
 	{
-		const into = this.visibleInnerRect()
+		const into = this.table.visibleInnerRect()
 		const rect = cell.getBoundingClientRect()
 		if (
 			(rect.left >= into.left)
@@ -196,7 +204,7 @@ export class TableEdit extends Table
 				console.error('cell:', cell)
 				throw 'Unexpected failure: cell was unselected before contenteditable was effective'
 			}
-			const range = new RangeCopy(getSelectionRange())
+			const range = new RangeCopy(this.getSelectionRange())
 			selected.removeAttribute('contenteditable')
 
 			editable = this.createEditable(computedStyle) as HTMLDivElement
@@ -210,7 +218,7 @@ export class TableEdit extends Table
 				selected.style.zIndex = '2'
 			}
 
-			setSelectionRange(inEditable(range) ? range.toRange() : editableFullRange(editable))
+			this.setSelectionRange(this.inEditable(range) ? range.toRange() : this.editableFullRange(editable))
 
 			editable.addEventListener(
 				'keyup', event => this.setSelectedText((event.target as HTMLDivElement)?.innerHTML ?? '')
@@ -227,22 +235,15 @@ export class TableEdit extends Table
 	{
 		if (newText === selectedText) return
 		selectedText = newText
-		this.reset()
+		this.table.reset()
 	}
 
-	TableEdit()
+	setSelectionRange(range: Range)
 	{
-		this.styleSheet.push(`
-			${this.selector} > * > tr > * > div[contenteditable] {
-				position: relative;
-				z-index: 2;
-			}
-		`)
-		this.addEventListener(this.element, 'mousedown', event => {
-			const cell = this.closestEditableCell(event.target)
-			if (!cell) return
-			this.selectCell(cell)
-		})
+		const selection = getSelection()
+		if (!selection) throw 'Should be called only when there is a selection'
+		selection.removeAllRanges()
+		selection.addRange(range)
 	}
 
 	unselectCell()

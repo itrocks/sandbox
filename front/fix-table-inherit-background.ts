@@ -1,27 +1,23 @@
 import FixTable from './fix-table.js'
+import Table    from './table'
 
 /**
  * This plugin has no use and no effect if your table has border-collapse: collapse
  */
 export default class InheritBackground extends FixTable
 {
+	tableStyle: CSSStyleDeclaration
 
-	protected tableStyle: CSSStyleDeclaration
-
-	constructor(element: HTMLTableElement)
+	constructor(table: Table)
 	{
-		super(element)
-		throw 'Plugin should not be instantiated'
+		super(table)
+		this.tableStyle = getComputedStyle(table.element)
 	}
 
-	InheritBackgroundInit()
-	{
-		this.tableStyle = getComputedStyle(this.element)
-	}
-
-	InheritBackground()
+	init()
 	{
 		if (this.tableStyle.borderCollapse !== 'separate') return
+		const table = this.table
 
 		if (this.tableStyle.backgroundColor.replaceAll(' ', '').endsWith(',0)')) return
 		const borderSpacing = parseFloat(this.tableStyle.borderSpacing)
@@ -29,20 +25,20 @@ export default class InheritBackground extends FixTable
 
 		let selectors = []
 		for (let child = 1; child <= this.leftColumnCount; child ++) {
-			selectors.push(`${this.selector} > tbody > tr > :nth-child(${child})`)
+			selectors.push(`${table.selector} > tbody > tr > :nth-child(${child})`)
 		}
 		for (let child = 1; child <= this.rightColumnCount; child ++) {
-			selectors.push(`${this.selector} > tbody > tr > :nth-last-child(${child})`)
+			selectors.push(`${table.selector} > tbody > tr > :nth-last-child(${child})`)
 		}
-		if (this.element.tFoot?.rows.length) {
-			selectors.push(`${this.selector} > tfoot > tr > *`)
+		if (table.element.tFoot?.rows.length) {
+			selectors.push(`${table.selector} > tfoot > tr > *`)
 		}
-		if (this.element.tHead?.rows.length) {
-			selectors.push(`${this.selector} > thead > tr > *`)
+		if (table.element.tHead?.rows.length) {
+			selectors.push(`${table.selector} > thead > tr > *`)
 		}
 
 		if (!selectors.length) return
-		this.styleSheet.push(`
+		table.styleSheet.push(`
 			${selectors.join(', ')} {
 				box-shadow: 0 0 0 ${borderSpacing}px ${this.tableStyle.backgroundColor};
 			}

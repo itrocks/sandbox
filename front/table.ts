@@ -1,11 +1,10 @@
 
-export type HTMLTableFixElement = HTMLTableCellElement | HTMLTableColElement
+export type HTMLTableFixElement = HTMLTableCellElement|HTMLTableColElement
 
 const styleSheets = new CSSStyleSheet
 document.adoptedStyleSheets.push(styleSheets)
 
-let tableCounter = 0
-
+let tableCounter    = 0
 let tables: Table[] = []
 
 export function applyStyleSheets()
@@ -13,10 +12,10 @@ export function applyStyleSheets()
 	styleSheets.replaceSync(tables.map(table => table.styleSheet.join(`\n`)).join(`\n`))
 }
 
-export class TableOptions
+export class Options
 {
 	[index: string]: any
-	plugins: (typeof Table)[] = []
+	plugins: (typeof Plugin)[] = []
 }
 
 export function garbageCollector()
@@ -43,19 +42,24 @@ function nextTableId(table: Table)
 	return tableCounter
 }
 
+export class Plugin
+{
+	constructor(public table: Table) {}
+	init() {}
+}
+
 export class Table
 {
-	readonly id: number
-	readonly onReset: (() => void)[] = []
-	readonly options = new TableOptions
-	readonly selector: string
+	readonly id:         number
+	readonly onReset:    (() => void)[] = []
+	readonly options =   new Options
+	readonly plugins:    { [index: string]: Plugin } = {}
+	readonly selector:   string
 	readonly styleSheet: string[] = []
 
-	constructor(public readonly element: HTMLTableElement, options: Partial<TableOptions> = {})
+	constructor(public readonly element: HTMLTableElement, options: Partial<Options> = {})
 	{
 		Object.assign(this.options, options)
-
-		this.applyPlugins()
 
 		this.id       = nextTableId(this)
 		this.selector = `table.itrocks[data-table-id="${this.id}"]`
@@ -63,8 +67,8 @@ export class Table
 		this.element.setAttribute('data-table-id', this.id.toString())
 
 		garbageCollector()
-		this.executePlugins('Init')
-		this.executePlugins()
+		this.constructPlugins()
+		this.initPlugins()
 		applyStyleSheets()
 	}
 
@@ -72,56 +76,22 @@ export class Table
 		element:  Document|Element,
 		type:     T,
 		listener: (this: Element, ev: GlobalEventHandlersEventMap[T]) => any,
-		options?: boolean | AddEventListenerOptions
+		options?: AddEventListenerOptions|boolean
 	) {
 		element.addEventListener(type as string, listener as () => any, options)
 		this.onReset.push(() => element.removeEventListener(type as string, listener as () => any, options))
 	}
 
-	protected applyPlugins()
+	protected constructPlugins()
 	{
-		const alreadyDefined: { [index: string]: typeof Table } = {}
-		this.options.plugins.forEach(plugin => {
-			Object.entries(plugin.defaultOptions()).forEach(([index, value]) => {
-				if (!this.options.hasOwnProperty(index)) {
-					this.options[index] = value
-				}
-			})
-			Object.entries(Object.getOwnPropertyDescriptors(plugin.prototype)).forEach(([name, descriptor]) => {
-				if (name === 'constructor') return
-				let found  = false
-				let parent = plugin
-				while (parent.constructor !== Object) {
-					parent = Object.getPrototypeOf(parent)
-					if (parent === alreadyDefined[name]) {
-						found = true
-						break
-					}
-				}
-				if (alreadyDefined[name] && !found) {
-					throw 'Function collision: ' + name
-						+ ' defined into ' + plugin.name
-						+ ' has already be defined into ' + alreadyDefined[name].name
-				}
-				alreadyDefined[name] = plugin
-				Object.defineProperty(Table.prototype, name, descriptor)
-			})
+		this.options.plugins.forEach(pluginType => {
+			this.plugins[pluginType.name] = new pluginType(this)
 		})
 	}
 
-	static defaultOptions()
+	protected initPlugins()
 	{
-		return new TableOptions
-	}
-
-	protected executePlugins(methodSuffix = '')
-	{
-		this.options.plugins.forEach(plugin => {
-			const pluginFunction: () => void = (this as any)[plugin.name + methodSuffix]
-			if (pluginFunction && (typeof pluginFunction === 'function')) {
-				pluginFunction.call(this)
-			}
-		})
+		Object.values(this.plugins).forEach(plugin => plugin.init())
 	}
 
 	reset()
@@ -138,18 +108,18 @@ export class Table
 }
 export default Table
 
-export function tableBySelector(selector: string, options: Partial<TableOptions> = {})
-{
-	return tableByElements(document.body.querySelectorAll<HTMLTableElement>(selector), options)
-}
-
-export function tableByElement(element: HTMLTableElement, options: Partial<TableOptions> = {})
+export function tableByElement(element: HTMLTableElement, options: Partial<Options> = {})
 {
 	return new Table(element, options)
 }
 
 export function tableByElements(
-	elements: Array<HTMLTableElement> | NodeListOf<HTMLTableElement>, options: Partial<TableOptions> = {}
+	elements: Array<HTMLTableElement>|NodeListOf<HTMLTableElement>, options: Partial<Options> = {}
 ) {
 	return Array.from(elements).map(element => tableByElement(element, options))
+}
+
+export function tableBySelector(selector: string, options: Partial<Options> = {})
+{
+	return tableByElements(document.body.querySelectorAll<HTMLTableElement>(selector), options)
 }

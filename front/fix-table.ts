@@ -1,23 +1,24 @@
-import { HTMLTableFixElement, Table } from './table.js'
+import {HTMLTableFixElement, Plugin, Table} from './table.js'
 
-export class FixTable extends Table
+export class FixTable extends Plugin
 {
+	columns:          NodeListOf<HTMLTableFixElement>
+	leftColumnCount:  number
+	rightColumnCount: number
 
-	columns: NodeListOf<HTMLTableFixElement>
-	leftColumnCount: number = 0
-	rightColumnCount: number = 0
-
-	constructor(element: HTMLTableElement)
+	constructor(table: Table)
 	{
-		super(element)
-		throw 'Plugin should not be instantiated'
-	}
-
-	FixTable()
-	{
+		super(table)
 		this.columns          = this.getColumns()
 		this.leftColumnCount  = this.countLeftColumns()
 		this.rightColumnCount = this.countRightColumns()
+
+		const original = this.table.visibleInnerRect
+		this.table.visibleInnerRect = () => this.visibleInnerRect(original)
+	}
+
+	init()
+	{
 		this.fixFootRows()
 		this.fixHeadRows()
 		this.fixLeftColumns()
@@ -44,21 +45,22 @@ export class FixTable extends Table
 
 	protected fixFootRows()
 	{
-		if (!this.element.tFoot?.rows.length) return
-		let counter = 1, bottom = .0, previousBottom = this.element.getBoundingClientRect().bottom
-		Array.from(this.element.tFoot.querySelectorAll<HTMLTableRowElement>(':scope > tr')).reverse().forEach(row => {
+		const table = this.table
+		if (!table.element.tFoot?.rows.length) return
+		let counter = 1, bottom = .0, previousBottom = table.element.getBoundingClientRect().bottom
+		Array.from(table.element.tFoot.querySelectorAll<HTMLTableRowElement>(':scope > tr')).reverse().forEach(row => {
 			const actualBottom = row.getBoundingClientRect().bottom
 			bottom += previousBottom - actualBottom
 			previousBottom = actualBottom
-			this.styleSheet.push(`
-				${this.selector} > tfoot > tr:nth-last-child(${counter}) > * {
+			table.styleSheet.push(`
+				${table.selector} > tfoot > tr:nth-last-child(${counter}) > * {
 					bottom: ${this.position(bottom, counter, row.firstElementChild as HTMLTableCellElement, 'bottom')};
 				}
 			`)
 			counter ++
 		})
-		this.styleSheet.push(`
-			${this.selector} > tfoot > tr > * {
+		table.styleSheet.push(`
+			${table.selector} > tfoot > tr > * {
 				position: sticky;
 			}		
 		`)
@@ -66,21 +68,22 @@ export class FixTable extends Table
 
 	protected fixHeadRows()
 	{
-		if (!this.element.tHead?.rows.length) return
-		let counter = 1, top = .0, previousTop = this.element.getBoundingClientRect().top
-		this.element.tHead.querySelectorAll<HTMLTableRowElement>(':scope > tr').forEach(row => {
+		const table = this.table
+		if (!table.element.tHead?.rows.length) return
+		let counter = 1, top = .0, previousTop = table.element.getBoundingClientRect().top
+		table.element.tHead.querySelectorAll<HTMLTableRowElement>(':scope > tr').forEach(row => {
 			const actualTop = row.getBoundingClientRect().top
 			top += actualTop - previousTop
 			previousTop = actualTop
-			this.styleSheet.push(`
-				${this.selector} > thead > tr:nth-child(${counter}) > * {
+			table.styleSheet.push(`
+				${table.selector} > thead > tr:nth-child(${counter}) > * {
 					top: ${this.position(top, counter, row.firstElementChild as HTMLTableCellElement, 'top')};
 				}
 			`)
 			counter ++
 		})
-		this.styleSheet.push(`
-			${this.selector} > thead > tr > * {
+		table.styleSheet.push(`
+			${table.selector} > thead > tr > * {
 				position: sticky;
 			}		
 		`)
@@ -89,24 +92,25 @@ export class FixTable extends Table
 	protected fixLeftColumns()
 	{
 		if (!this.leftColumnCount) return
+		const table = this.table
 		const bodySel: string[] = []
 		const headSel: string[] = []
-		let counter = 1, left = .0, previousLeft = this.element.getBoundingClientRect().left
+		let counter = 1, left = .0, previousLeft = table.element.getBoundingClientRect().left
 		Array.from(this.columns).toSpliced(this.leftColumnCount).forEach(col => {
 			const actualLeft = col.getBoundingClientRect().left
 			left += actualLeft - previousLeft
 			previousLeft = actualLeft
-			this.styleSheet.push(`
-				${this.selector} > * > tr > :nth-child(${counter}) {
+			table.styleSheet.push(`
+				${table.selector} > * > tr > :nth-child(${counter}) {
 					left: ${this.position(left, counter, col, 'left')};
 				}
 			`)
-			bodySel.push(`${this.selector} > tbody > tr > :nth-child(${counter})`)
-			headSel.push(`${this.selector} > tfoot > tr > :nth-child(${counter})`)
-			headSel.push(`${this.selector} > thead > tr > :nth-child(${counter})`)
+			bodySel.push(`${table.selector} > tbody > tr > :nth-child(${counter})`)
+			headSel.push(`${table.selector} > tfoot > tr > :nth-child(${counter})`)
+			headSel.push(`${table.selector} > thead > tr > :nth-child(${counter})`)
 			counter ++
 		})
-		this.styleSheet.push(`
+		table.styleSheet.push(`
 			${bodySel.join(', ')} {
 				position: sticky;
 			}
@@ -119,23 +123,24 @@ export class FixTable extends Table
 	protected fixRightColumns()
 	{
 		if (!this.rightColumnCount) return
+		const table = this.table
 		const bodySel: string[] = []
 		const headSel: string[] = []
-		let counter = 1, right = .0, previousRight = this.element.getBoundingClientRect().right
+		let counter = 1, right = .0, previousRight = table.element.getBoundingClientRect().right
 		Array.from(this.columns).reverse().toSpliced(this.rightColumnCount).forEach(col => {
 			const actualRight = col.getBoundingClientRect().right
 			right += previousRight - actualRight
 			previousRight = actualRight
-			this.styleSheet.push(`
-				${this.selector} > * > tr > :nth-last-child(${counter}) {
+			table.styleSheet.push(`
+				${table.selector} > * > tr > :nth-last-child(${counter}) {
 					right: ${this.position(right, counter, col, 'right')};
 				}
 			`)
-			bodySel.push(`${this.selector} > tbody > tr > :nth-last-child(${counter})`)
-			headSel.push(`${this.selector} > thead > tr > :nth-last-child(${counter})`)
+			bodySel.push(`${table.selector} > tbody > tr > :nth-last-child(${counter})`)
+			headSel.push(`${table.selector} > thead > tr > :nth-last-child(${counter})`)
 			counter ++
 		})
-		this.styleSheet.push(`
+		table.styleSheet.push(`
 			${bodySel.join(', ')} {
 				position: sticky;
 			}
@@ -148,34 +153,36 @@ export class FixTable extends Table
 	protected getColumns()
 	{
 		if (this.columns) return this.columns
-		let columns = this.element.querySelectorAll<HTMLTableColElement>(':scope > colgroup > col')
+		const table = this.table
+		let columns = table.element.querySelectorAll<HTMLTableColElement>(':scope > colgroup > col')
 		if (!columns.length) {
-			columns = this.element.querySelectorAll<HTMLTableColElement>(':scope > thead > tr:first-child > *')
+			columns = table.element.querySelectorAll<HTMLTableColElement>(':scope > thead > tr:first-child > *')
 			if (!columns.length) {
-				columns = this.element.querySelectorAll<HTMLTableColElement>(':scope > tbody > tr:first-child > *')
+				columns = table.element.querySelectorAll<HTMLTableColElement>(':scope > tbody > tr:first-child > *')
 			}
 		}
 		return columns
 	}
 
-	protected position(
+	position(
 		position: number,
 		_counter: number,
 		_row: HTMLTableFixElement,
-		_side: 'bottom' | 'left' | 'right' | 'top'
+		_side: 'bottom'|'left'|'right'|'top'
 	) {
 		return `${position}px`
 	}
 
-	visibleInnerRect()
+	visibleInnerRect(original: () => DOMRect)
 	{
-		const parent = this.element.getBoundingClientRect()
-		const rect   = new DOMRect()
+		const parent       = original.call(this.table)
+		const rect         = new DOMRect()
+		const tableElement = this.table.element
 		rect.x = this.leftColumnCount
 			? this.columns[this.leftColumnCount - 1].getBoundingClientRect().right
 			: parent.left
-		rect.y = this.element.tHead?.lastElementChild?.firstElementChild
-			? this.element.tHead.lastElementChild.firstElementChild.getBoundingClientRect().bottom
+		rect.y = tableElement.tHead?.lastElementChild?.firstElementChild
+			? tableElement.tHead.lastElementChild.firstElementChild.getBoundingClientRect().bottom
 			: parent.bottom
 		rect.width = 1 - rect.x + (
 			this.rightColumnCount
@@ -183,8 +190,8 @@ export class FixTable extends Table
 				: parent.right
 		)
 		rect.height = 1 - rect.y + (
-			this.element.tFoot?.firstElementChild?.firstElementChild
-				? this.element.tFoot.firstElementChild.firstElementChild.getBoundingClientRect().top
+			tableElement.tFoot?.firstElementChild?.firstElementChild
+				? tableElement.tFoot.firstElementChild.firstElementChild.getBoundingClientRect().top
 				: parent.top
 		)
 		return rect
