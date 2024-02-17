@@ -1,5 +1,5 @@
 body {
-  background: #efe;
+  background: #eee;
   margin: 10px; }
   body > main {
     height: calc(100vh - 20px);
@@ -22,7 +22,8 @@ table {
     width: 0; }
   table > * > tr > * > div[contenteditable] {
     background: white;
-    outline: 2px solid #777; }
+    outline: 2px solid #777;
+    text-align: left; }
   table > :not(tbody) > tr > *,
   table > tbody > tr > :first-child,
   table > tbody > tr > :last-child {

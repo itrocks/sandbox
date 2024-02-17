@@ -37,9 +37,9 @@ export function closestEditable(node: Node|Range|RangeCopy): HTMLDivElement
 	if ((node instanceof Range) || (node instanceof RangeCopy)) {
 		node = node.commonAncestorContainer
 	}
-	let parent:Node|null = node
-	while (parent && !((parent instanceof Element) && parent.hasAttribute('contenteditable'))) {
-		parent = parent.parentNode
+	let parent:Element|null = (node instanceof Element) ? node : node.parentElement
+	while (parent && !parent.hasAttribute('contenteditable')) {
+		parent = parent.parentElement
 	}
 	if (!parent) {
 		throw 'Called from a node outside of contenteditable'
@@ -111,7 +111,6 @@ export class TableEdit extends Table
 
 		const editable = document.createElement('div') as HTMLDivElement
 		editable.setAttribute('contenteditable', '')
-
 		editable.style.minHeight     = computedStyle.height
 		editable.style.paddingBottom = computedStyle.paddingBottom
 		editable.style.paddingLeft   = computedStyle.paddingLeft
@@ -198,8 +197,8 @@ export class TableEdit extends Table
 				throw 'Unexpected failure: cell was unselected before contenteditable was effective'
 			}
 			const range = new RangeCopy(getSelectionRange())
-
 			selected.removeAttribute('contenteditable')
+
 			editable = this.createEditable(computedStyle) as HTMLDivElement
 			while (selected.childNodes.length) {
 				editable.appendChild(selected.childNodes[0])
@@ -236,7 +235,7 @@ export class TableEdit extends Table
 		this.styleSheet.push(`
 			${this.selector} > * > tr > * > div[contenteditable] {
 				position: relative;
-				z-index: 1;
+				z-index: 2;
 			}
 		`)
 		this.addEventListener(this.element, 'mousedown', event => {

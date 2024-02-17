@@ -1,6 +1,6 @@
 
 body {
-	background: #efe;
+	background: #eee;
 	margin: 10px;
 
 	> main {
@@ -40,6 +40,7 @@ table {
 	> * > tr > * > div[contenteditable] {
 		background: white;
 		outline: 2px solid #777;
+		text-align: left;
 	}
 
 	// non-data col / row background
