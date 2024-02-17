@@ -15,10 +15,12 @@ export default class InheritBorder extends Plugin
 		this.fixTable = table.plugins.FixTable as FixTable
 
 		this.tableStyle = getComputedStyle(table.element)
-		if (this.tableStyle.borderCollapse === 'collapse') {
-			const original = this.fixTable.position
-			this.fixTable.position = (position, counter, row, side) => this.position(original, position, counter, row, side)
-		}
+		if (this.tableStyle.borderCollapse !== 'collapse') return
+
+		const original         = this.fixTable.position
+		this.fixTable.position = (position, counter, row, side) => original.call(
+			this.table.plugins.FixTable, this.position(position, counter, row, side), counter, row, side
+		)
 	}
 
 	init()
@@ -75,16 +77,14 @@ export default class InheritBorder extends Plugin
 		}
 	}
 
-	position(
-		original: (position: number, counter: number, row: HTMLTableFixElement, side: 'bottom'|'left'|'right'|'top') => string,
-		position: number, counter: number, row: HTMLTableFixElement, side: 'bottom'|'left'|'right'|'top')
+	position(position: number, counter: number, row: HTMLTableFixElement, side: 'bottom'|'left'|'right'|'top')
 	{
 		const width = parseFloat(getComputedStyle(row).borderWidth) / 2
 		const shift = (counter > 1) ? width : -width
-		position += ((side === 'bottom') || (side === 'right'))
+		position += (side === 'bottom') || (side === 'right')
 			? Math.ceil(shift)
 			: Math.floor(shift)
-		return original.call(this.table.plugins.FixTable, position, counter, row, side)
+		return position
 	}
 
 }

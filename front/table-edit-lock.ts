@@ -20,7 +20,7 @@ export class TableEditLock extends Plugin
 
 		const tableEdit               = table.plugins.TableEdit as TableEdit
 		const original                = tableEdit.closestEditableCell
-		tableEdit.closestEditableCell = (target) => this.closestEditableCell(original, target)
+		tableEdit.closestEditableCell = (target) => this.closestEditableCell(original.call(tableEdit, target))
 	}
 
 	cellPosition(cell: HTMLTableCellElement)
@@ -61,12 +61,9 @@ export class TableEditLock extends Plugin
 		return foreignRow?.children[position - 1] as HTMLTableCellElement ?? cell
 	}
 
-	closestEditableCell(
-		original: (target: any) => HTMLTableCellElement|null,
-		target: any
-	) {
+	closestEditableCell(editable: HTMLTableCellElement|null)
+	{
 		let style: CSSStyleDeclaration
-		let editable = original.call(this.table.plugins.TableEdit, target)
 		Object.entries(this.options.nonEditableConditions).forEach(([index, value]) => {
 			if (!editable) return null
 			switch (index) {

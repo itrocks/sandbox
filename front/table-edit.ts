@@ -133,67 +133,25 @@ export class TableEdit extends Plugin
 		})
 	}
 
-	scrollToCell(cell: HTMLTableCellElement)
-	{
-		const into = this.table.visibleInnerRect()
-		const rect = cell.getBoundingClientRect()
-		if (
-			(rect.left >= into.left)
-			&& (rect.top >= into.top)
-			&& (rect.right <= into.right)
-			&& (rect.bottom <= into.bottom)
-		) {
-			return false
-		}
-
-		let parent = cell.closest('table')?.parentElement
-		while (parent && parent.scrollHeight < parent.clientHeight) {
-			parent = parent.parentElement
-		}
-		if (!parent) return
-		const scrollable = (parent === document.body) ? window : parent
-
-		let shiftLeft = 0
-		let shiftTop  = 0
-		if (rect.bottom > into.bottom) {
-			shiftTop = rect.bottom - into.bottom
-		}
-		if (rect.right > into.right) {
-			shiftLeft = rect.right - into.right
-		}
-		if (rect.left < into.left) {
-			shiftLeft = rect.left - into.left
-		}
-		if (rect.top < into.top) {
-			shiftTop = rect.top - into.top
-		}
-
-		if (!shiftLeft && !shiftTop) {
-			return false
-		}
-
-		if (getComputedStyle(cell).position === 'sticky') {
-			if ((getComputedStyle(cell).left !== 'auto') || (getComputedStyle(cell).right !== 'auto')) {
-				shiftLeft = 0
-			}
-			if ((getComputedStyle(cell).top !== 'auto') || (getComputedStyle(cell).bottom !== 'auto')) {
-				shiftTop = 0
-			}
-		}
-
-		scrollable.scrollBy(shiftLeft, shiftTop)
-		return true
-	}
-
+	/** If cell is not already selected : unselects old cell, then selects this new one */
 	selectCell(cell: HTMLTableCellElement)
 	{
 		if (cell === selected) return
 		this.unselectCell()
-		if (!cell) return
-		selected     = cell
-		selectedText = cell.innerHTML
+		this.setSelectedCell(cell)
+	}
 
-		this.scrollToCell(cell)
+	/** Returns the currently selected cell, or null if no cell is selected */
+	selected()
+	{
+		return selected
+	}
+
+	/** Sets selected cell to this cell, and set its content to div[contenteditable] */
+	setSelectedCell(cell: HTMLTableCellElement)
+	{
+		selected     = cell
+		selectedText = selected.innerHTML
 
 		const computedStyle = getComputedStyle(selected)
 		selectedStyle       = selected.getAttribute('style') ?? ''
@@ -224,11 +182,6 @@ export class TableEdit extends Plugin
 				'keyup', event => this.setSelectedText((event.target as HTMLDivElement)?.innerHTML ?? '')
 			)
 		})
-	}
-
-	selected()
-	{
-		return selected
 	}
 
 	protected setSelectedText(newText: string)

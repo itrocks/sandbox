@@ -13,8 +13,8 @@ export class FixTable extends Plugin
 		this.leftColumnCount  = this.countLeftColumns()
 		this.rightColumnCount = this.countRightColumns()
 
-		const original = this.table.visibleInnerRect
-		this.table.visibleInnerRect = () => this.visibleInnerRect(original)
+		const original         = table.visibleInnerRect
+		table.visibleInnerRect = () => this.visibleInnerRect(original.call(table))
 	}
 
 	init()
@@ -173,26 +173,25 @@ export class FixTable extends Plugin
 		return `${position}px`
 	}
 
-	visibleInnerRect(original: () => DOMRect)
+	visibleInnerRect(tableRect: DOMRect)
 	{
-		const parent       = original.call(this.table)
 		const rect         = new DOMRect()
 		const tableElement = this.table.element
 		rect.x = this.leftColumnCount
 			? this.columns[this.leftColumnCount - 1].getBoundingClientRect().right
-			: parent.left
+			: tableRect.left
 		rect.y = tableElement.tHead?.lastElementChild?.firstElementChild
 			? tableElement.tHead.lastElementChild.firstElementChild.getBoundingClientRect().bottom
-			: parent.bottom
+			: tableRect.bottom
 		rect.width = 1 - rect.x + (
 			this.rightColumnCount
 				? this.columns[this.columns.length - this.rightColumnCount].getBoundingClientRect().left
-				: parent.right
+				: tableRect.right
 		)
 		rect.height = 1 - rect.y + (
 			tableElement.tFoot?.firstElementChild?.firstElementChild
 				? tableElement.tFoot.firstElementChild.firstElementChild.getBoundingClientRect().top
-				: parent.top
+				: tableRect.top
 		)
 		return rect
 	}

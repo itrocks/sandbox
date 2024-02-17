@@ -6,6 +6,7 @@ import { tableBySelector, Options } from '../table.js'
 import TableEdit                    from '../table-edit.js'
 import TableEditLock                from '../table-edit-lock.js'
 import TableEditMove                from '../table-edit-move.js'
+import TableEditScroll              from '../table-edit-scroll.js'
 
 const options: Partial<Options> = {
 	plugins: [
@@ -15,7 +16,8 @@ const options: Partial<Options> = {
 		FixTableInheritBorder,
 		TableEdit,
 		TableEditLock,
-		TableEditMove
+		TableEditMove,
+		TableEditScroll
 	]
 }
 
