@@ -4,7 +4,7 @@ import Table    from './table'
 /**
  * This plugin has no use and no effect if your table has border-collapse: collapse
  */
-export default class InheritBackground extends FixTable
+export class InheritBackground extends FixTable
 {
 	tableStyle: CSSStyleDeclaration
 
@@ -46,3 +46,4 @@ export default class InheritBackground extends FixTable
 	}
 
 }
+export default InheritBackground

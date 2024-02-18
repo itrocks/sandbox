@@ -1,6 +1,6 @@
 import { HTMLTableFixElement, Plugin, Table } from './table.js'
 
-export default class ColumnReorderTable extends Plugin
+export class ColumnReorderTable extends Plugin
 {
 	reorderCells: NodeListOf<HTMLTableFixElement>
 
@@ -54,3 +54,4 @@ export default class ColumnReorderTable extends Plugin
 	}
 
 }
+export default ColumnReorderTable

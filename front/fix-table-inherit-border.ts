@@ -4,7 +4,7 @@ import { HTMLTableFixElement, Plugin, Table } from './table.js'
 /**
  * This plugin has no use and no effect if your table has border-collapse: separate (default)
  */
-export default class InheritBorder extends Plugin
+export class InheritBorder extends Plugin
 {
 	tableStyle: CSSStyleDeclaration
 	fixTable:   FixTable
@@ -88,3 +88,4 @@ export default class InheritBorder extends Plugin
 	}
 
 }
+export default InheritBorder
