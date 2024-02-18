@@ -10,10 +10,7 @@ export class TableEditScroll extends Plugin
 
 		const tableEdit = table.plugins.TableEdit as TableEdit
 		const original  = tableEdit.setSelectedCell
-		tableEdit.setSelectedCell = (cell: HTMLTableCellElement) => {
-			this.scrollToCell(cell)
-			original.call(tableEdit, cell)
-		}
+		tableEdit.setSelectedCell = cell => original.call(tableEdit, this.scrollToCell(cell))
 	}
 
 	closestScrollable(element: Element)
@@ -35,11 +32,11 @@ export class TableEditScroll extends Plugin
 			&& (rect.right <= into.right)
 			&& (rect.top   >= into.top)
 		) {
-			return
+			return cell
 		}
 
 		const scrollable = this.closestScrollable(cell)
-		if (!scrollable) return
+		if (!scrollable) return cell
 
 		let shiftLeft = 0
 		let shiftTop  = 0
@@ -55,7 +52,7 @@ export class TableEditScroll extends Plugin
 		else if (rect.right > into.right) {
 			shiftLeft = rect.right - into.right
 		}
-		if (!shiftLeft && !shiftTop) return
+		if (!shiftLeft && !shiftTop) return cell
 
 		if (getComputedStyle(cell).position === 'sticky') {
 			if ((getComputedStyle(cell).left !== 'auto') || (getComputedStyle(cell).right !== 'auto')) {
@@ -65,9 +62,10 @@ export class TableEditScroll extends Plugin
 				shiftTop = 0
 			}
 		}
-		if (!shiftLeft && !shiftTop) return
+		if (!shiftLeft && !shiftTop) return cell
 
 		scrollable.scrollBy(shiftLeft, shiftTop)
+		return cell
 	}
 
 }

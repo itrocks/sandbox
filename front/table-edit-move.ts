@@ -10,8 +10,10 @@ export class TableEditMove extends Plugin
 		super(table)
 		this.tableEdit = table.plugins.TableEdit as TableEdit
 
-		const origin = this.tableEdit.createEditable
-		this.tableEdit.createEditable = (computedStyle) => this.createEditable(origin, computedStyle)
+		const original = this.tableEdit.createEditable
+		this.tableEdit.createEditable = computedStyle => this.setEditableKeydownListener(
+			original.call(this.tableEdit, computedStyle)
+		)
 	}
 
 	cellPosition(cell: HTMLTableCellElement)
@@ -86,9 +88,8 @@ export class TableEditMove extends Plugin
 		const row     = selected.closest('tr') as HTMLTableRowElement
 		let   nextRow = row.nextElementSibling
 		if (!nextRow) {
-			const section     = row.closest('tbody, tfoot, thead') as HTMLTableSectionElement
-			const nextSection = section.nextElementSibling as HTMLTableSectionElement
-			nextRow           = nextSection.firstElementChild as HTMLTableRowElement
+			const section = row.closest('tbody, tfoot, thead') as HTMLTableSectionElement
+			nextRow       = section.nextElementSibling?.firstElementChild as HTMLTableRowElement
 		}
 		if (nextRow) {
 			const selector = ':scope > :nth-child(' + this.cellPosition(selected) + ')'
@@ -118,9 +119,8 @@ export class TableEditMove extends Plugin
 		const row         = selected.closest('tr') as HTMLTableRowElement
 		let   previousRow = row.previousElementSibling
 		if (!previousRow) {
-			const section         = row.closest('tbody, tfoot, thead') as HTMLTableSectionElement
-			const previousSection = section.previousElementSibling as HTMLTableSectionElement
-			previousRow           = previousSection.lastElementChild as HTMLTableRowElement
+			const section = row.closest('tbody, tfoot, thead') as HTMLTableSectionElement
+			previousRow   = section.previousElementSibling?.lastElementChild as HTMLTableRowElement
 		}
 		if (previousRow) {
 			const selector = ':scope > :nth-child(' + this.cellPosition(selected) + ')'
@@ -131,15 +131,11 @@ export class TableEditMove extends Plugin
 		}
 	}
 
-	createEditable(
-		origin: (computedStyle: CSSStyleDeclaration) => HTMLDivElement|null,
-		computedStyle: CSSStyleDeclaration
-	) {
-		const tableEdit = this.tableEdit
-		const editable  = origin.call(tableEdit, computedStyle)
+	setEditableKeydownListener(editable: HTMLDivElement|null)
+	{
 		if (!editable) return null
-
 		editable.addEventListener('keydown', event => {
+			const tableEdit = this.tableEdit
 			if (event.altKey || event.ctrlKey || event.shiftKey) return
 			switch (event.key) {
 				case 'ArrowDown':

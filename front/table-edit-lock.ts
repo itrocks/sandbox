@@ -20,7 +20,7 @@ export class TableEditLock extends Plugin
 
 		const tableEdit               = table.plugins.TableEdit as TableEdit
 		const original                = tableEdit.closestEditableCell
-		tableEdit.closestEditableCell = (target) => this.closestEditableCell(original.call(tableEdit, target))
+		tableEdit.closestEditableCell = target => this.closestEditableCell(original.call(tableEdit, target))
 	}
 
 	cellPosition(cell: HTMLTableCellElement)
