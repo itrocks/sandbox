@@ -1,10 +1,19 @@
 import {HTMLTableFixElement, Plugin, Table} from './table.js'
 
+interface FullIndex
+{
+	column: string
+	corner: string
+	row:    string
+}
+
 export class FixTable extends Plugin
 {
 	columns:          NodeListOf<HTMLTableFixElement>
+	full?:            FullIndex
 	leftColumnCount:  number
 	rightColumnCount: number
+	zIndex            = '1'
 
 	constructor(table: Table)
 	{
@@ -59,9 +68,11 @@ export class FixTable extends Plugin
 			`)
 			counter ++
 		})
+		const zIndex = this.full ? `z-index: ${this.full.row};` : ''
 		table.styleSheet.push(`
 			${table.selector} > tfoot > tr > * {
 				position: sticky;
+				${zIndex}
 			}		
 		`)
 	}
@@ -82,9 +93,11 @@ export class FixTable extends Plugin
 			`)
 			counter ++
 		})
+		const zIndex = this.full ? `z-index: ${this.full.row};` : ''
 		table.styleSheet.push(`
 			${table.selector} > thead > tr > * {
 				position: sticky;
+				${zIndex}
 			}		
 		`)
 	}
@@ -93,8 +106,8 @@ export class FixTable extends Plugin
 	{
 		if (!this.leftColumnCount) return
 		const table = this.table
-		const bodySel: string[] = []
-		const headSel: string[] = []
+		const bodySel:   string[] = []
+		const cornerSel: string[] = []
 		let counter = 1, left = .0, previousLeft = table.element.getBoundingClientRect().left
 		Array.from(this.columns).toSpliced(this.leftColumnCount).forEach(col => {
 			const actualLeft = col.getBoundingClientRect().left
@@ -106,16 +119,19 @@ export class FixTable extends Plugin
 				}
 			`)
 			bodySel.push(`${table.selector} > tbody > tr > :nth-child(${counter})`)
-			headSel.push(`${table.selector} > tfoot > tr > :nth-child(${counter})`)
-			headSel.push(`${table.selector} > thead > tr > :nth-child(${counter})`)
+			cornerSel.push(`${table.selector} > tfoot > tr > :nth-child(${counter})`)
+			cornerSel.push(`${table.selector} > thead > tr > :nth-child(${counter})`)
 			counter ++
 		})
+		const zIndex      = this.full ? `z-index: ${this.full.column};` : ''
+		const zIndexValue = this.full ? this.full.corner : this.zIndex
 		table.styleSheet.push(`
 			${bodySel.join(', ')} {
 				position: sticky;
+				${zIndex}
 			}
-			${headSel.join(', ')} {
-				z-index: 1;
+			${cornerSel.join(', ')} {
+				z-index: ${zIndexValue};
 			}
 		`)
 	}
@@ -124,8 +140,8 @@ export class FixTable extends Plugin
 	{
 		if (!this.rightColumnCount) return
 		const table = this.table
-		const bodySel: string[] = []
-		const headSel: string[] = []
+		const bodySel:   string[] = []
+		const cornerSel: string[] = []
 		let counter = 1, right = .0, previousRight = table.element.getBoundingClientRect().right
 		Array.from(this.columns).reverse().toSpliced(this.rightColumnCount).forEach(col => {
 			const actualRight = col.getBoundingClientRect().right
@@ -137,15 +153,21 @@ export class FixTable extends Plugin
 				}
 			`)
 			bodySel.push(`${table.selector} > tbody > tr > :nth-last-child(${counter})`)
-			headSel.push(`${table.selector} > thead > tr > :nth-last-child(${counter})`)
+			if (this.full) {
+				cornerSel.push(`${table.selector} > tfoot > tr > :nth-last-child(${counter})`)
+			}
+			cornerSel.push(`${table.selector} > thead > tr > :nth-last-child(${counter})`)
 			counter ++
 		})
+		const zIndex      = this.full ? `z-index: ${this.full.column};` : ''
+		const zIndexValue = this.full ? this.full.corner : this.zIndex
 		table.styleSheet.push(`
 			${bodySel.join(', ')} {
 				position: sticky;
+				${zIndex}
 			}
-			${headSel.join(', ')} {
-				z-index: 1;
+			${cornerSel.join(', ')} {
+				z-index: ${zIndexValue};
 			}
 		`)
 	}
