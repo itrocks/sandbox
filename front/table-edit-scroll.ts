@@ -19,10 +19,10 @@ export class TableEditScroll extends Plugin
 	closestScrollable(element: Element)
 	{
 		let parent = element.closest('table')?.parentElement
-		while (parent && parent.scrollHeight < parent.clientHeight) {
+		while (parent && (parent.scrollHeight <= parent.clientHeight)) {
 			parent = parent.parentElement
 		}
-		return parent ? ((parent.scrollHeight < parent.clientHeight) ? window : parent) : null
+		return parent ? ((parent instanceof HTMLHtmlElement) ? window : parent) : null
 	}
 
 	scrollToCell(cell: HTMLTableCellElement)
@@ -30,10 +30,10 @@ export class TableEditScroll extends Plugin
 		const into = this.table.visibleInnerRect()
 		const rect = cell.getBoundingClientRect()
 		if (
-			(rect.left >= into.left)
-			&& (rect.top >= into.top)
+			(rect.bottom   <= into.bottom)
+			&& (rect.left  >= into.left)
 			&& (rect.right <= into.right)
-			&& (rect.bottom <= into.bottom)
+			&& (rect.top   >= into.top)
 		) {
 			return
 		}
@@ -43,17 +43,17 @@ export class TableEditScroll extends Plugin
 
 		let shiftLeft = 0
 		let shiftTop  = 0
-		if (rect.bottom > into.bottom) {
-			shiftTop = rect.bottom - into.bottom
+		if (rect.top < into.top) {
+			shiftTop = rect.top - into.top
 		}
-		if (rect.right > into.right) {
-			shiftLeft = rect.right - into.right
+		else if (rect.bottom > into.bottom) {
+			shiftTop = rect.bottom - into.bottom
 		}
 		if (rect.left < into.left) {
 			shiftLeft = rect.left - into.left
 		}
-		if (rect.top < into.top) {
-			shiftTop = rect.top - into.top
+		else if (rect.right > into.right) {
+			shiftLeft = rect.right - into.right
 		}
 		if (!shiftLeft && !shiftTop) return
 

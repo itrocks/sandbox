@@ -73,7 +73,7 @@ export class Table
 	}
 
 	addEventListener<T extends keyof GlobalEventHandlersEventMap>(
-		element:  Document|Element,
+		element:  Document|Element|Window,
 		type:     T,
 		listener: (this: Element, ev: GlobalEventHandlersEventMap[T]) => any,
 		options?: AddEventListenerOptions|boolean
