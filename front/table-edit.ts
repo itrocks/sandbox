@@ -34,6 +34,7 @@ export class RangeCopy
 
 export class TableEdit extends Plugin
 {
+	zIndex = '2'
 
 	closestEditable(node: Node|Range|RangeCopy): HTMLDivElement
 	{
@@ -57,18 +58,26 @@ export class TableEdit extends Plugin
 			: null
 	}
 
-	createEditable(computedStyle: CSSStyleDeclaration)
+	createEditable(selected: HTMLTableCellElement, selectedStyle: CSSStyleDeclaration)
 	{
-		if (!selected) return null
-
 		const editable = document.createElement('div') as HTMLDivElement
 		editable.setAttribute('contenteditable', '')
-		editable.style.minHeight     = computedStyle.height
-		editable.style.paddingBottom = computedStyle.paddingBottom
-		editable.style.paddingLeft   = computedStyle.paddingLeft
-		editable.style.paddingRight  = computedStyle.paddingRight
-		editable.style.paddingTop    = computedStyle.paddingTop
-
+		editable.style.minHeight     = selectedStyle.height
+		editable.style.paddingBottom = selectedStyle.paddingBottom
+		editable.style.paddingLeft   = selectedStyle.paddingLeft
+		editable.style.paddingRight  = selectedStyle.paddingRight
+		editable.style.paddingTop    = selectedStyle.paddingTop
+		editable.addEventListener(
+			'keyup', event => this.setSelectedText((event.target as HTMLDivElement)?.innerHTML ?? '')
+		)
+		while (selected.childNodes.length) {
+			editable.appendChild(selected.childNodes[0])
+		}
+		selected.replaceChildren(editable)
+		selected.style.padding = '0'
+		if (selectedStyle.position === 'sticky') {
+			selected.style.zIndex = this.zIndex
+		}
 		return editable
 	}
 
@@ -123,7 +132,7 @@ export class TableEdit extends Plugin
 		table.styleSheet.push(`
 			${table.selector} > * > tr > * > div[contenteditable] {
 				position: relative;
-				z-index: 2;
+				z-index: ${this.zIndex};
 			}
 		`)
 		table.addEventListener(table.element, 'mousedown', event => {
@@ -153,8 +162,8 @@ export class TableEdit extends Plugin
 		selected     = cell
 		selectedText = selected.innerHTML
 
-		const computedStyle = getComputedStyle(selected)
-		selectedStyle       = selected.getAttribute('style') ?? ''
+		const originSelectedStyle = getComputedStyle(selected)
+		selectedStyle             = selected.getAttribute('style') ?? ''
 
 		selected.setAttribute('contenteditable', '')
 		setTimeout(() => {
@@ -165,22 +174,8 @@ export class TableEdit extends Plugin
 			const range = new RangeCopy(this.getSelectionRange())
 			selected.removeAttribute('contenteditable')
 
-			editable = this.createEditable(computedStyle) as HTMLDivElement
-			while (selected.childNodes.length) {
-				editable.appendChild(selected.childNodes[0])
-			}
-			selected.replaceChildren(editable)
-
-			selected.style.padding = '0'
-			if (computedStyle.position === 'sticky') {
-				selected.style.zIndex = '2'
-			}
-
+			editable = this.createEditable(selected, originSelectedStyle)
 			this.setSelectionRange(this.inEditable(range) ? range.toRange() : this.editableFullRange(editable))
-
-			editable.addEventListener(
-				'keyup', event => this.setSelectedText((event.target as HTMLDivElement)?.innerHTML ?? '')
-			)
 		})
 	}
 

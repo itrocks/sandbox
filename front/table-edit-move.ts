@@ -11,8 +11,8 @@ export class TableEditMove extends Plugin
 		this.tableEdit = table.plugins.TableEdit as TableEdit
 
 		const original = this.tableEdit.createEditable
-		this.tableEdit.createEditable = computedStyle => this.setEditableKeydownListener(
-			original.call(this.tableEdit, computedStyle)
+		this.tableEdit.createEditable = (selected, selectedStyle) => this.setEditableKeydownListener(
+			original.call(this.tableEdit, selected, selectedStyle)
 		)
 	}
 
@@ -131,9 +131,8 @@ export class TableEditMove extends Plugin
 		}
 	}
 
-	setEditableKeydownListener(editable: HTMLDivElement|null)
+	setEditableKeydownListener(editable: HTMLDivElement)
 	{
-		if (!editable) return null
 		editable.addEventListener('keydown', event => {
 			const tableEdit = this.tableEdit
 			if (event.altKey || event.ctrlKey || event.shiftKey) return
