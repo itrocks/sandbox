@@ -13,9 +13,9 @@ export class TableEditFixHide extends Plugin
 	readonly fixTable:  FixTable
 	readonly tableEdit: TableEdit
 
-	addEditableEventListeners(editable: HTMLDivElement)
+	addEditableEventListeners(editable: HTMLDivElement, selected: HTMLTableCellElement)
 	{
-		const goAhead = () => this.goAhead(this.tableEdit.editable(), this.tableEdit.selected())
+		const goAhead = () => this.goAhead(editable, selected)
 		editable.addEventListener('keydown', goAhead)
 		editable.addEventListener('keyup',   goAhead)
 		editable.addEventListener('click',   goAhead)
@@ -32,11 +32,16 @@ export class TableEditFixHide extends Plugin
 		const into = this.table.visibleInnerRect()
 		const rect = selected.getBoundingClientRect()
 
-		if ((rect.left > into.left) && (rect.top > into.top) && (rect.right < into.right) && (rect.bottom < into.bottom)) {
-			this.goAhead(editable, selected)
+		if (
+			(Math.round(rect.left - into.left) < 0)
+			|| (Math.round(rect.top - into.top) < 0)
+			|| (Math.round(rect.right - into.right) > 0)
+			|| (Math.round(rect.bottom - into.bottom) > 0)
+		) {
+			this.goBack(editable, selected)
 		}
 		else {
-			this.goBack(editable, selected)
+			this.goAhead(editable, selected)
 		}
 	}
 
@@ -66,7 +71,7 @@ export class TableEditFixHide extends Plugin
 
 		const original = tableEdit.createEditable
 		tableEdit.createEditable = (selected, selectedStyle) => this.addEditableEventListeners(
-			original.call(tableEdit, selected, selectedStyle)
+			original.call(tableEdit, selected, selectedStyle), selected
 		)
 	}
 
