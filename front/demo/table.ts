@@ -25,4 +25,4 @@ const options: Partial<Options> = {
 
 let tables = tableBySelector('table', options)
 
-addEventListener('resize', () => { tables = tables.map(table => table.reset()) })
+addEventListener('resize', () => { setTimeout(() => (tables = tables.map(table => table.reset())))})

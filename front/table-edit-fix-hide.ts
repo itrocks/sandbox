@@ -68,6 +68,7 @@ export class TableEditFixHide extends Plugin
 		tableEdit.zIndex = '7'
 
 		table.addEventListener(scrollable, 'scroll', () => this.autoHide())
+		table.addEventListener(window,     'resize', () => this.autoHide())
 
 		const original = tableEdit.createEditable
 		tableEdit.createEditable = (selected, selectedStyle) => this.addEditableEventListeners(
