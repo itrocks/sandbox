@@ -3,6 +3,7 @@ import { Plugin, Table } from './table.js'
 import TableEdit         from './table-edit.js'
 
 const zIndex = {
+	back:     false,
 	editable: '',
 	selected: ''
 }
@@ -71,26 +72,29 @@ export class TableEditFixHide extends Plugin
 
 	goAhead(editable: HTMLDivElement|null, selected: HTMLTableCellElement|null)
 	{
-		if (!editable || !selected || !zIndex.editable) return
-		editable.style.zIndex = zIndex.editable
-		selected.style.zIndex = zIndex.selected
+		if (!editable || !selected || !zIndex.back) return
+
+		zIndex.editable.length ? (editable.style.zIndex = zIndex.editable) : editable.style.removeProperty('z-index')
+		zIndex.selected.length ? (selected.style.zIndex = zIndex.selected) : selected.style.removeProperty('z-index')
+
+		zIndex.back     = false
 		zIndex.editable = ''
-		console.log('goAhead')
+		zIndex.selected = ''
 	}
 
-	goBack(editable: HTMLDivElement, selected: HTMLTableCellElement)
+	goBack(editable: HTMLDivElement|null, selected: HTMLTableCellElement|null)
 	{
-		if (zIndex.editable) return
+		if (!editable || !selected || zIndex.back) return
+
+		zIndex.back     = true
+		zIndex.editable = editable.style.zIndex
+		zIndex.selected = selected.style.zIndex
+
 		selected.style.removeProperty('z-index')
-		const style     = getComputedStyle(selected)
-		zIndex.editable = getComputedStyle(editable).zIndex
-		zIndex.selected = (style.zIndex === 'auto') ? '0' : style.zIndex
-		const newIndex  = (parseInt(zIndex.selected) + 1).toString()
-		if (style.position === 'sticky') {
-			selected.style.zIndex = newIndex
-		}
+		const style    = getComputedStyle(selected)
+		const newIndex = (parseInt((style.zIndex === 'auto') ? '0' : style.zIndex) + 1).toString()
+		selected.style.zIndex = newIndex
 		editable.style.zIndex = newIndex
-		console.log('goBack', newIndex)
 	}
 
 }
