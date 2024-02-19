@@ -23,29 +23,17 @@ export class TableEditLock extends Plugin
 		tableEdit.closestEditableCell = target => this.closestEditableCell(original.call(tableEdit, target))
 	}
 
-	cellPosition(cell: HTMLTableCellElement)
-	{
-		let count    = 1
-		let previous = cell.previousElementSibling
-		while (previous) {
-			if ((previous.tagName === 'TD') || (previous.tagName === 'TH')) {
-				count ++
-			}
-			previous = previous.previousElementSibling
-		}
-		return count
-	}
-
 	colCell(cell: HTMLTableCellElement)
 	{
 		const table    = cell.closest('table') as HTMLTableElement
-		const position = this.cellPosition(cell)
+		const position = this.table.cellColumnNumber(cell)
 		const col      = table.querySelector(':scope > colgroup')
 		if (col) {
 			return col.children[position - 1] as HTMLTableColElement
 		}
-		const sections: NodeListOf<HTMLTableSectionElement>
-			= table.querySelectorAll(':scope > tbody, :scope > tfoot, :scope > thead')
+		const sections: NodeListOf<HTMLTableSectionElement> = table.querySelectorAll(
+			':scope > tbody, :scope > tfoot, :scope > thead'
+		)
 		const cellTr = cell.closest('tr')
 		let foreignRow: HTMLTableRowElement|undefined
 		sections.forEach(section => {

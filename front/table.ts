@@ -82,6 +82,19 @@ export class Table
 		this.onReset.push(() => element.removeEventListener(type as string, listener as () => any, options))
 	}
 
+	cellColumnNumber(cell: HTMLTableCellElement)
+	{
+		let count    = 1
+		let previous = cell.previousElementSibling
+		while (previous) {
+			if ((previous.tagName === 'TD') || (previous.tagName === 'TH')) {
+				count ++
+			}
+			previous = previous.previousElementSibling
+		}
+		return count
+	}
+
 	protected constructPlugins()
 	{
 		this.options.plugins.forEach(pluginType => {
