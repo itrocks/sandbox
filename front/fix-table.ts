@@ -21,9 +21,6 @@ export class FixTable extends Plugin
 		this.columns          = this.getColumns()
 		this.leftColumnCount  = this.countLeftColumns()
 		this.rightColumnCount = this.countRightColumns()
-
-		const original         = table.visibleInnerRect
-		table.visibleInnerRect = () => this.visibleInnerRect(original.call(table))
 	}
 
 	init()
@@ -32,6 +29,15 @@ export class FixTable extends Plugin
 		this.fixHeadRows()
 		this.fixLeftColumns()
 		this.fixRightColumns()
+	}
+
+	closestScrollable(element: Element)
+	{
+		let parent = element.closest('table')?.parentElement
+		while (parent && (parent.scrollHeight <= parent.clientHeight)) {
+			parent = parent.parentElement
+		}
+		return parent ? ((parent instanceof HTMLHtmlElement) ? window : parent) : null
 	}
 
 	protected countLeftColumns()
@@ -109,13 +115,13 @@ export class FixTable extends Plugin
 		const bodySel:   string[] = []
 		const cornerSel: string[] = []
 		let counter = 1, left = .0, previousLeft = table.element.getBoundingClientRect().left
-		Array.from(this.columns).toSpliced(this.leftColumnCount).forEach(col => {
-			const actualLeft = col.getBoundingClientRect().left
+		Array.from(this.columns).toSpliced(this.leftColumnCount).forEach(colCell => {
+			const actualLeft = colCell.getBoundingClientRect().left
 			left += actualLeft - previousLeft
 			previousLeft = actualLeft
 			table.styleSheet.push(`
 				${table.selector} > * > tr > :nth-child(${counter}) {
-					left: ${this.position(left, counter, col, 'left')};
+					left: ${this.position(left, counter, colCell, 'left')};
 				}
 			`)
 			bodySel.push(`${table.selector} > tbody > tr > :nth-child(${counter})`)
@@ -143,13 +149,13 @@ export class FixTable extends Plugin
 		const bodySel:   string[] = []
 		const cornerSel: string[] = []
 		let counter = 1, right = .0, previousRight = table.element.getBoundingClientRect().right
-		Array.from(this.columns).reverse().toSpliced(this.rightColumnCount).forEach(col => {
-			const actualRight = col.getBoundingClientRect().right
+		Array.from(this.columns).reverse().toSpliced(this.rightColumnCount).forEach(colCell => {
+			const actualRight = colCell.getBoundingClientRect().right
 			right += previousRight - actualRight
 			previousRight = actualRight
 			table.styleSheet.push(`
 				${table.selector} > * > tr > :nth-last-child(${counter}) {
-					right: ${this.position(right, counter, col, 'right')};
+					right: ${this.position(right, counter, colCell, 'right')};
 				}
 			`)
 			bodySel.push(`${table.selector} > tbody > tr > :nth-last-child(${counter})`)
@@ -189,32 +195,28 @@ export class FixTable extends Plugin
 	position(
 		position: number,
 		_counter: number,
-		_row: HTMLTableFixElement,
-		_side: 'bottom'|'left'|'right'|'top'
+		_colCell: HTMLTableFixElement,
+		_side:    'bottom'|'left'|'right'|'top'
 	) {
 		return `${position}px`
 	}
 
-	visibleInnerRect(tableRect: DOMRect)
+	visibleInnerRect()
 	{
-		const rect         = new DOMRect()
 		const tableElement = this.table.element
-		rect.x = this.leftColumnCount
-			? this.columns[this.leftColumnCount - 1].getBoundingClientRect().right
-			: tableRect.left
-		rect.y = tableElement.tHead?.lastElementChild?.firstElementChild
-			? tableElement.tHead.lastElementChild.firstElementChild.getBoundingClientRect().bottom
-			: tableRect.bottom
-		rect.width = 1 - rect.x + (
-			this.rightColumnCount
-				? this.columns[this.columns.length - this.rightColumnCount].getBoundingClientRect().left
-				: tableRect.right
-		)
-		rect.height = 1 - rect.y + (
-			tableElement.tFoot?.firstElementChild?.firstElementChild
-				? tableElement.tFoot.firstElementChild.firstElementChild.getBoundingClientRect().top
-				: tableRect.top
-		)
+		const rect         = tableElement.getBoundingClientRect()
+		if (this.leftColumnCount) {
+			rect.x = this.columns[this.leftColumnCount - 1].getBoundingClientRect().right
+		}
+		if (tableElement.tHead?.lastElementChild?.firstElementChild) {
+			rect.y = tableElement.tHead.lastElementChild.firstElementChild.getBoundingClientRect().bottom
+		}
+		if (this.rightColumnCount) {
+			rect.width = this.columns[this.columns.length - this.rightColumnCount].getBoundingClientRect().left - rect.x + 1
+		}
+		if (tableElement.tFoot?.firstElementChild?.firstElementChild) {
+			rect.height = tableElement.tFoot.firstElementChild.firstElementChild.getBoundingClientRect().top - rect.y + 1
+		}
 		return rect
 	}
 

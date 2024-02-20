@@ -36,6 +36,22 @@ export class TableEdit extends Plugin
 {
 	zIndex = '2'
 
+	init()
+	{
+		const table = this.table
+		table.styleSheet.push(`
+			${table.selector} > * > tr > * > div[contenteditable] {
+				position: relative;
+				z-index: ${this.zIndex};
+			}
+		`)
+		table.addEventListener(table.element, 'mousedown', event => {
+			const cell = this.closestEditableCell(event.target)
+			if (!cell) return
+			this.selectCell(cell)
+		})
+	}
+
 	closestEditable(node: Node|Range|RangeCopy): HTMLDivElement
 	{
 		if ((node instanceof Range) || (node instanceof RangeCopy)) {
@@ -124,22 +140,6 @@ export class TableEdit extends Plugin
 				? node.closest('div[contenteditable]')
 				: node.parentElement?.closest('div[contenteditable]')
 		)
-	}
-
-	init()
-	{
-		const table = this.table
-		table.styleSheet.push(`
-			${table.selector} > * > tr > * > div[contenteditable] {
-				position: relative;
-				z-index: ${this.zIndex};
-			}
-		`)
-		table.addEventListener(table.element, 'mousedown', event => {
-			const cell = this.closestEditableCell(event.target)
-			if (!cell) return
-			this.selectCell(cell)
-		})
 	}
 
 	/** If cell is not already selected : unselects old cell, then selects this new one */

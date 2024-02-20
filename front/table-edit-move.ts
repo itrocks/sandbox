@@ -78,7 +78,7 @@ export class TableEditMove extends Plugin
 			siblingRow           = siblingSection ? siblingSection[elementChild] : null
 		}
 		if (siblingRow) {
-			const selector = ':scope > :nth-child(' + this.table.cellColumnNumber(selected) + ')'
+			const selector = ':scope > :nth-child(' + (this.table.cellColumnNumber(selected) + 1).toString() + ')'
 			const cell     = siblingRow.querySelector(selector) as HTMLTableCellElement
 			if (tableEdit.closestEditableCell(cell)) {
 				tableEdit.selectCell(cell)

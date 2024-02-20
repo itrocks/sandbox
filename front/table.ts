@@ -84,7 +84,7 @@ export class Table
 
 	cellColumnNumber(cell: HTMLTableCellElement)
 	{
-		let count    = 1
+		let count    = 0
 		let previous = cell.previousElementSibling
 		while (previous) {
 			if ((previous.tagName === 'TD') || (previous.tagName === 'TH')) {
@@ -111,11 +111,6 @@ export class Table
 	{
 		this.onReset.forEach(onReset => onReset())
 		return tableByElement(this.element, this.options)
-	}
-
-	visibleInnerRect()
-	{
-		return this.element.getBoundingClientRect()
 	}
 
 }

@@ -18,8 +18,8 @@ export class InheritBorder extends Plugin
 		if (this.tableStyle.borderCollapse !== 'collapse') return
 
 		const original         = this.fixTable.position
-		this.fixTable.position = (position, counter, row, side) => original.call(
-			this.table.plugins.FixTable, this.position(position, counter, row, side), counter, row, side
+		this.fixTable.position = (position, counter, colCell, side) => original.call(
+			this.table.plugins.FixTable, this.position(position, counter, colCell, side), counter, colCell, side
 		)
 	}
 
@@ -77,9 +77,9 @@ export class InheritBorder extends Plugin
 		}
 	}
 
-	position(position: number, counter: number, row: HTMLTableFixElement, side: 'bottom'|'left'|'right'|'top')
+	position(position: number, counter: number, colCell: HTMLTableFixElement, side: 'bottom'|'left'|'right'|'top')
 	{
-		const width = parseFloat(getComputedStyle(row).borderWidth) / 2
+		const width = parseFloat(getComputedStyle(colCell).borderWidth) / 2
 		const shift = (counter > 1) ? width : -width
 		position += (side === 'bottom') || (side === 'right')
 			? Math.ceil(shift)

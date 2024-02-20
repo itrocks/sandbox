@@ -29,7 +29,7 @@ export class TableEditLock extends Plugin
 		const position = this.table.cellColumnNumber(cell)
 		const col      = table.querySelector(':scope > colgroup')
 		if (col) {
-			return col.children[position - 1] as HTMLTableColElement
+			return col.children[position] as HTMLTableColElement
 		}
 		const sections: NodeListOf<HTMLTableSectionElement> = table.querySelectorAll(
 			':scope > tbody, :scope > tfoot, :scope > thead'
@@ -46,7 +46,7 @@ export class TableEditLock extends Plugin
 			if (!tr) return
 			foreignRow = tr
 		})
-		return foreignRow?.children[position - 1] as HTMLTableCellElement ?? cell
+		return foreignRow?.children[position] as HTMLTableCellElement ?? cell
 	}
 
 	closestEditableCell(editable: HTMLTableCellElement|null)
