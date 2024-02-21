@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import Request                          from './request'
+import { Method, Request }              from './request'
 import Response                         from './response'
 
 export const fastifyRequest = (request: FastifyRequest<{ Params: { [index: string]: string, '*': string } }>) =>
@@ -9,7 +9,7 @@ export const fastifyRequest = (request: FastifyRequest<{ Params: { [index: strin
 	delete params['*']
 
 	return new Request(
-		request.method,
+		request.method as Method,
 		request.protocol,
 		request.hostname,
 		path,

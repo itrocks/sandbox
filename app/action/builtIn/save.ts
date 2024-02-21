@@ -8,12 +8,17 @@ import Response from '../../server/response'
 export default class Save extends Action
 {
 
-	run(request: Request): Response
+	html(request: Request): Response
 	{
 		return this.htmlResponse(`<html lang="en">
 <head><meta charset="utf-8"><title>HTML save</title></head>
 <body>${dump(request.object)}</body>
 </html>`)
+	}
+
+	json(request: Request): Response
+	{
+		return this.jsonResponse(request.object)
 	}
 
 }

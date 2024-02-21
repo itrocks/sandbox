@@ -1,9 +1,11 @@
 
-export default class Request
+export type Method = 'DELETE' | 'GET' | 'PATH' | 'POST' | 'PUT'
+
+export class Request
 {
 
 	constructor(
-		public method:     string,
+		public method:     Method,
 		public scheme:     string,
 		public host:       string,
 		public path:       string,
@@ -18,3 +20,4 @@ export default class Request
 	}
 
 }
+export default Request

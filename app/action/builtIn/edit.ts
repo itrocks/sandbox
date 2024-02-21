@@ -9,7 +9,7 @@ import { representativeValueOf } from '../../view/class/representative'
 export default class Edit extends Action
 {
 
-	run(request: Request): Response
+	html(request: Request): Response
 	{
 		const object     = request.object
 		const mainTitle = `Edit ${displayOf(object)} ${representativeValueOf(object)}`
@@ -26,6 +26,12 @@ export default class Edit extends Action
 		const title = `<h2>${mainTitle}</h2>`
 
 		return this.htmlResponse(pageHead + head + title + foot + pageFoot)
+	}
+
+	json(request: Request): Response
+	{
+		// the edit API will return data needed by object editors : e.g. links to auto-completion API
+		return this.jsonResponse(request.object)
 	}
 
 }

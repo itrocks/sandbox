@@ -11,27 +11,23 @@ import Response                            from './server/response'
 
 async function execute(request: ActionRequest): Promise<Response>
 {
-	const accept  = request.request.headers.accept
-	const accepts = accept ? accept.replace(/ /g, '').split(',') : []
-	const format  = (
-		[['html', 'text/html'], ['json', 'application/json']].find(([,mime]) => accepts.includes(mime))
-		?? ['text', 'text/plain']
-	)[0]
-	let action: Action
+	let action: Action & { [index: string]: (request: ActionRequest) => Promise<Response> }
 	if (!request.action) {
 		throw new Exception('Action is missing')
 	}
 	try {
-		action = new (require('./crud/' + format + '/' + request.action).default)()
-	}
-	catch {
+		action = new (require('./action/builtIn/' + request.action).default)()
+	} catch {
 		throw new Exception('Action ' + request.action + ' not found')
+	}
+	if (!action[request.format]) {
+		throw new Exception('Action ' + request.action + ' unavailable in format ' + request.format)
 	}
 	const objects = await request.getObjects()
 	if ((needOf(action) === 'object') && !objects.length) {
 		return new Exception('Action ' + request.action + ' needs an object').response
 	}
-	return action.run(request)
+	return action[request.format](request)
 }
 
 const server = fastify()
