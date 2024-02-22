@@ -5,4 +5,3 @@ import { representativeValueOf } from './representative'
 export const outputOf = (target: object|Type) => (typeof target === 'object')
 	? (displayOf(target) + ' ' + representativeValueOf(target))
 	: displayOf(target)
-export default outputOf

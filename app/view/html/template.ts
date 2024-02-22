@@ -7,7 +7,8 @@ import { displayOf as propertyDisplayOf } from '../property/display'
 import Str                                from '../str'
 
 type BlockStack = Array<{ blockStart: number, collection: any[], data: any, iteration: number, iterations: number }>
-type Stack      = Array<{ close: string, target: string }>
+type Close      = '' | '"' | ')' | '-->' | '}'
+type Stack      = Array<{ close: Close, target: string }>
 
 export default class Template
 {
@@ -37,7 +38,7 @@ export default class Template
 
 	async parseFile(): Promise<string>
 	{
-		return await readFile(this.file, 'utf-8')
+		return this.parseBuffer(await readFile(this.file, 'utf-8'))
 	}
 
 	protected parseVariable(variable: string, data: any)
@@ -70,20 +71,22 @@ export default class Template
 
 	protected parseVars(source: string)
 	{
-		let   acceptParenthesis = false
-		let   acceptTag = true
+		let   acceptParenthesis      = false
+		let   acceptTag              = true
 		const blockStack: BlockStack = []
-		let   blockStart = 0
-		let   close = ''
-		let   collection: any[] = []
-		let   data = this.data
-		let   index = 0
-		let   iteration = 0
-		let   iterations = 0
-		const length = source.length
-		const stack: Stack = []
-		let   start = 0
-		let   target = ''
+		let   blockStart             = 0
+		let   close:      Close      = ''
+		let   collection: any[]      = []
+		let   data                   = this.data
+		let   index                  = 0
+		let   iteration              = 0
+		let   iterations             = 0
+		const length                 = source.length
+		const stack:      Stack      = []
+		let   start                  = 0
+		let   tagName                = ''
+		let   tagStack:   string[]   = []
+		let   target                 = ''
 
 		while (index < length) {
 			const char = source[index]
@@ -100,63 +103,86 @@ export default class Template
 				continue
 			}
 
-			if (
-				(char === '<')
-				&& acceptTag
-				&& (source.substring(index, index + 4) === '<!--')
-				&& source[index + 4].match(/[a-z@%A-Z0-9]/)
-			) {
-				const mayBeEnd = source.substring(index + 4, index + 10)
-				if ((mayBeEnd === 'end-->') || (mayBeEnd === 'END-->')) {
-					iteration ++
-					if (iteration < iterations) {
-						data = collection[iteration]
-						target += source.substring(start, index)
-						index = start = blockStart
+			if ((char === '<') && acceptTag) {
+				if (source.substring(index, index + 4) === '<!--') {
+					if (source[index + 4].match(/[a-z0-9@%]/i)) {
+						const mayBeEnd = source.substring(index + 4, index + 10)
+						if ((mayBeEnd === 'end-->') || (mayBeEnd === 'END-->')) {
+							iteration++
+							if (iteration < iterations) {
+								data    =  collection[iteration]
+								target += source.substring(start, index)
+								index   =  start = blockStart
+								continue
+							}
+							const block = target;
+							({ close, target } = stack.pop() ?? { close: '', target: '' })
+							target += block + source.substring(start, index);
+							({ blockStart, collection, data, iteration, iterations } = blockStack.pop()
+								?? { blockStart: 0, collection: [], data: undefined, iteration: 0, iterations: 0 })
+							index += 10
+							start  = index
+							continue
+						}
+						stack.push({ close, target: target + source.substring(start, index) })
+						index += 4
+						close  = '-->'
+						start  = index
+						target = ''
 						continue
 					}
-					const block = target;
-					({ close, target } = stack.pop() ?? { close: '', target: '' })
-					target += block + source.substring(start, index);
-					({ blockStart, collection, data, iteration, iterations } = blockStack.pop()
-						?? { blockStart: 0, collection: [], data: undefined, iteration: 0, iterations: 0 })
-					index  += 10
-					start   = index
+				}
+				else {
+					index ++
+					const endTag = (source[index] === '/') ? '/' : ''
+					if (endTag) {
+						index ++
+					}
+					const position = index
+					while (source[index].match(/[a-z]/i)) {
+						index ++
+					}
+					if (index > position) {
+						tagName = source.substring(position, index)
+						if (endTag) {
+							while (tagStack.pop() !== tagName) {}
+							tagName = tagStack.length ? tagStack[tagStack.length - 1] : ''
+						}
+						else {
+							tagStack.push(tagName)
+						}
+					}
 					continue
 				}
-				stack.push({ close, target: target + source.substring(start, index) })
-				index += 4
-				close  = '-->'
-				start  = index
-				target = ''
-				continue
 			}
 
-			if (
-				(char === 'h')
-				&& (source.substring(index, index + 6) === 'href="')
-			) {
-				index += 6
-				stack.push({ close, target: target + source.substring(start, index) })
-				acceptParenthesis = true
-				acceptTag = false
-				close  = '"'
-				start  = index
-				target = ''
-				continue
-			}
+			if (tagName) {
+				if (
+					(char === 'h')
+					&& (source.substring(index, index + 6) === 'href="')
+				) {
+					index += 6
+					stack.push({ close, target: target + source.substring(start, index) })
+					acceptParenthesis = true
+					acceptTag         = false
+					close  = '"'
+					start  = index
+					target = ''
+					continue
+				}
 
-			if (
-				(char === '(')
-				&& acceptParenthesis
-				&& source[index + 1].match(/[a-z@%A-Z0-9]/)
-			) {
-				stack.push({ close, target: target + source.substring(start, index) })
-				close  = ')'
-				index ++
-				start  = index
-				target = ''
-				continue
+				if (
+					(char === '(')
+					&& acceptParenthesis
+					&& source[index + 1].match(/[a-z@%A-Z0-9]/)
+				) {
+					stack.push({ close, target: target + source.substring(start, index) })
+					close  = ')'
+					index ++
+					start  = index
+					target = ''
+					continue
+				}
 			}
 
 			if (
@@ -167,9 +193,9 @@ export default class Template
 				if (close === '-->') {
 					blockStack.push({ blockStart, collection, data, iteration: 0, iterations })
 					const blockData = this.parseExpression(expr, data)
-					index += 3
+					index     += 3
 					blockStart = start = index
-					close = ''
+					close      = ''
 					iteration  = 0
 					if (Array.isArray(blockData)) {
 						collection = blockData
