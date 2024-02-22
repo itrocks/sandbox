@@ -149,24 +149,20 @@ Features available for the user can be accessed from your local browser. Follow 
 
 To test outputs:
 
-- http://localhost:3000/user
-- http://localhost:3000/user/json
-- http://localhost:3000/user/1
+- http://localhost:3000/user/list
+- http://localhost:3000/user/list/json
 - http://localhost:3000/user/new
+- http://localhost:3000/user/1
 - http://localhost:3000/user/1/edit
-- http://localhost:3000/user/1/json
 - http://localhost:3000/user/1,2/json
 
-To tests changes:
+To test changes:
 
-- http://localhost:3000/user/1/save
-- http://localhost:3000/user/1/delete
+- http://localhost:3000/user/save
+- http://localhost:3000/user/1/save/json
 - http://localhost:3000/user/1,2/delete
 
-Some other tests:
-
-- http://localhost:3000/user/1/edit/json
-- http://localhost:3000/user/list/html
+You can remove the save/delete action if you set the HTTP method to DELETE / PATCH / POST / PUT.
 
 ### Route errors
 
@@ -180,13 +176,12 @@ Some other tests:
 ### Route rules
 
 A route contains:
-- /a/path/to/your/business/module. This may be full path or end of path
-- numeric identifiers when needed, alone or multiple, separated by commas
-- an action, matching any action module stored into the app/action/builtIn/ project folder.
-  Default may be calculated if no action given: first using the HTTP method used by the caller,
-  or a default one.
-- a response format: e.g. html, json. Format names are reserved words that cannot be used for modules or actions.
-  If no response format is asked, the first valid format in HTTP header Accept is taken.
+- /a/path/to/your/business/module: this may be full path or end of path,
+- numeric identifiers when needed, alone or multiple, separated by commas,
+- an action, matching any action module stored into the app/action/builtIn/ project folder;
+  default may be calculated if no action given using the HTTP method used by the caller,
+- a response format: e.g. csv, json. Format names are reserved words that should not be used for modules or actions;
+  if no response format is asked, the first valid format in HTTP header Accept is taken; default will be html.
 
 Default action calculation:
 - HTTP method DELETE => delete

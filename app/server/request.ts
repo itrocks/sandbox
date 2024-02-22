@@ -1,5 +1,5 @@
 
-export type Method = 'DELETE' | 'GET' | 'PATH' | 'POST' | 'PUT'
+export type Method = 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT'
 
 export class Request
 {
@@ -9,8 +9,8 @@ export class Request
 		public scheme:     string,
 		public host:       string,
 		public path:       string,
-		public parameters: { [index: string]: string } = {},
 		public headers:    { [index: string]: string } = {},
+		public parameters: { [index: string]: string } = {},
 		public data:       string = ''
 	) {}
 

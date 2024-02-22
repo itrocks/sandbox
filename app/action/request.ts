@@ -21,7 +21,7 @@ export default class Request
 	getModule(): object|string|undefined
 	{
 		let route: { [name: string]: any } = routes
-		this.route.split('/').reverse().forEach(name => {
+		this.route.substring(1).split('/').reverse().forEach(name => {
 			if (!route[name]) {
 				return false
 			}
@@ -42,7 +42,7 @@ export default class Request
 	{
 		const module = this.getModule()
 		if (!module) {
-			throw new Exception('Module ' + this.route + ' not found')
+			throw new Exception('Module ' + this.route.substring(1) + ' not found')
 		}
 		return require('..' + module).default
 	}
@@ -58,107 +58,92 @@ export default class Request
 		}))
 	}
 
-	protected parsePath(): Partial<Request>
+	parsePath(): Partial<Request>
 	{
-		const route  = '(?<route>(?:\\/[A-Za-z_][A-Za-z0-9_]*)+)'
-		const id     = '(?<id>\\/(?!,)(?:,?[0-9*?]+)+)'
-		const action = '(?<action>\\/[A-Za-z_][A-Za-z0-9_]*)'
-		const format = '(?<format>\\/[A-Za-z_]+)'
+		const route  = '(?<route>(?:/[A-Za-z][A-Za-z0-9]*)+)'
+		const id     = '(?:/(?<id>(?!,)(?:,?[0-9]+)+))'
+		const action = '(?:/(?<action>[A-Za-z]+))'
+		const format = '(?:/(?<format>[A-Za-z]+))'
 
 		const request = this.request
 		const method  = request.method
 		const regExp  = (method === 'GET')
 			? `^${route}${id}?${action}?${format}?$`
 			: (method === 'POST')
-				? `^${route}?${format}$`
-				// this.request.method === any of 'DELETE' | 'PATH' | 'PUT'
+				? `^${route}${format}?$`
+				// method === any of 'DELETE' | 'PATCH' | 'PUT'
 				: `^${route}${id}${action}?${format}?$`
 		const match = request.path.replaceAll('-', '_').match(new RegExp(regExp))
 		if (!match?.groups) {
 			return {}
 		}
-		type Groups = { action?: string, format?: string, id?: string, route?: string }
+		type Groups = { action?: string, format?: string, id?: string, route: string }
 		const path: Partial<Request> & Groups = match.groups as Groups
 
-		console.log(path)
-
-		// id
-		path.ids = path.id?.substring(1).split(',') ?? []
+		// ids <- id
+		path.ids = path.id?.split(',') ?? []
 		delete path.id
 
-		// route
-		if (path.format && !path.route) {
-			path.route = path.format
-			delete path.format
-		}
-
-		// format <- action
-		if (path.action && !path.format && formats.find(([format]) => format === path.action?.substring(1))) {
-			path.format = path.action
-			path.action = ''
-		}
-
-		// action <- format
-		if (path.format && (!path.action || !path.ids.length) && !formats.find(([format]) => format === path.format?.substring(1))) {
-			if (path.action) {
-				path.route += path.action
-			}
-			path.action = path.format
-			delete path.format
-		}
-
-		if (path.route && !path.action) {
-			// action <- method
-			if (method === 'DELETE') {
-				path.action = '/delete'
-			}
-			else if (method.startsWith('P')) { // PATCH, POST, PUT
-				path.action = '/save'
-			}
-			// action & format <- route
-			else if (method === 'GET') {
-				const parts = path.route.split('/')
-				if (!path.format && (parts.length > 2) && formats.find(([format]) => format === parts[parts.length - 1])) {
-					path.format = '/' + parts.pop()
-				}
-				if (parts.length > 2) {
-					path.action = '/' + parts.pop()
-				}
-				path.route = parts.join('/')
-			}
-		}
-
-		// default action
-		if (!path.action) {
-			path.action = path.ids.length
-				? '/output'
-				: '/list'
-		}
-
 		if (!path.format) {
-			// format <- accept
-			if (request.headers.accept) {
-				for (const acceptMime of request.headers.accept.split(',')) {
-					const format = formats.find(([,mime]) => acceptMime === mime)
-					if (format) {
-						path.format = '/' + format[0]
-						break
+			// format <- action
+			if (path.action && formats.find(([isFormat]) => path.action === isFormat)) {
+				path.format = path.action
+				path.action = ''
+			}
+			else {
+				// format <- route
+				const position = path.route.lastIndexOf('/')
+				const format   = path.route.substring(position + 1)
+				if (formats.find(([isFormat]) => format === isFormat)) {
+					path.format = format
+					path.route = path.route.substring(0, position)
+				}
+				// format <- accept
+				else if (request.headers.accept) {
+					for (const acceptMime of request.headers.accept.split(',')) {
+						const format = formats.find(([, mime]) => acceptMime === mime)
+						if (format) {
+							path.format = format[0]
+							break
+						}
 					}
 				}
 			}
-			// default format
+			// format <- default
 			if (!path.format) {
-				path.format = '/html'
+				path.format = 'html'
 			}
 		}
 
-		path.route  = path.route?.substring(1)  ?? ''
-		path.action = path.action?.substring(1) ?? ''
-		path.format = path.format?.substring(1) ?? ''
+		if (!path.action) {
+			// action <- method
+			if (path.ids.length) {
+				if (method === 'DELETE') {
+					path.action = 'delete'
+				}
+				else if (method === 'GET') {
+					path.action = 'output'
+				}
+				else if ((method === 'PATCH') || (method === 'PUT')) {
+					path.action = 'save'
+				}
+			}
+			else if (method === 'POST') {
+				path.action = 'save'
+			}
+			// action <- route
+			else if (path.route.lastIndexOf('/') > 0) {
+				const position = path.route.lastIndexOf('/')
+				path.action    = path.route.substring(position + 1)
+				path.route     = path.route.substring(0, position)
+			}
+			// action <- default
+			else {
+				path.action = 'list'
+			}
+		}
 
-		console.log(path)
-
-		return path
+		return path.route ? path : {}
 	}
 
 }

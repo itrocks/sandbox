@@ -13,8 +13,8 @@ export const fastifyRequest = (request: FastifyRequest<{ Params: { [index: strin
 		request.protocol,
 		request.hostname,
 		path,
-		params,
-		request.headers as { [index: string]: string }
+		request.headers as { [index: string]: string },
+		params
 	)
 }
 
