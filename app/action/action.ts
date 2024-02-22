@@ -1,27 +1,18 @@
-import dump     from '../debug/dump'
-import Response from '../server/response'
-import Request  from './request'
+import { Headers }  from '../server/response'
+import HtmlResponse from '../server/response/html'
+import JsonResponse from '../server/response/json'
 
 export default class Action
 {
 
-	protected htmlResponse(body: string, statusCode: number = 200)
+	protected htmlResponse(body: string, statusCode: number = 200, headers: Headers = {})
 	{
-		if (!body.startsWith('<!DOCTYPE html>')) {
-			body = '<!DOCTYPE html>' + "\n" + body
-		}
-		return new Response(body, statusCode, { 'Content-Type': 'text/html' })
+		return new HtmlResponse(body, statusCode, headers)
 	}
 
-	protected jsonResponse(data: object, statusCode: number = 200)
+	protected jsonResponse(data: object, statusCode: number = 200, headers: Headers = {})
 	{
-		const json = JSON.stringify(data, (_, value) => typeof value === 'bigint' ? value.toString() : value)
-		return new Response(json, statusCode, { 'Content-Type': 'application/json' })
-	}
-
-	run(request: Request): Promise<Response>|Response
-	{
-		return new Response('Action' + dump(request.objects))
+		return new JsonResponse(data, statusCode, headers)
 	}
 
 }
