@@ -10,8 +10,8 @@ export default class Output extends Action
 
 	async html(request: Request)
 	{
-		const template = new Template(__dirname + '/output.html', request.object)
-		return this.htmlResponse(await template.parseFile())
+		const template = new Template(request.object)
+		return this.htmlResponse(await template.parseFile(__dirname + '/output.html'))
 	}
 
 	async json(request: Request)
