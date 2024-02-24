@@ -6,15 +6,31 @@ import { outputOf }                       from '../class/output'
 import { displayOf as propertyDisplayOf } from '../property/display'
 import Str                                from '../str'
 
-const DEBUG = false
-
 type BlockStack = Array<{ blockStart: number, collection: any[], data: any, iteration: number, iterations: number }>
 
 export default class Template
 {
+	doExpression = true
+
+	onAttribute?: ((name: string, value: string|undefined, tag: string) => void)
+	onTagOpen?:   ((name: string) => void)
+	onTagOpened?: ((name: string) => void)
+	onTagClose?:  ((name: string) => void)
 
 	constructor(public data?: any)
 	{}
+
+	debugEvents()
+	{
+		this.onAttribute = (name: string, value: string|undefined, tag: string) =>
+			console.log('attribute', name, '=', value, 'in tag', tag)
+		this.onTagOpen = (name: string) =>
+			console.log('tag.open =', name)
+		this.onTagOpened = (name: string) =>
+			console.log('tag.opened =', name)
+		this.onTagClose = (name: string) =>
+			console.log('tag.closed =', name)
+	}
 
 	parseBuffer(source: string): string
 	{
@@ -157,7 +173,6 @@ export default class Template
 		let   iteration               = 0
 		let   iterations              = 0
 		const length                  = source.length
-		let   tagStack:    string[]   = []
 		let   start                   = 0
 		let   target:      any        = ''
 		const targetStack: string[]   = []
@@ -166,7 +181,7 @@ export default class Template
 			const char = source[index]
 
 			// expression
-			if (char === '{') {
+			if ((char === '{') && this.doExpression) {
 				({ index, start, target } = this.parseExpression(index, start, target, source, data, '}'))
 				continue
 			}
@@ -177,78 +192,95 @@ export default class Template
 				continue
 			}
 
-			// comment tag
-			if (source.substring(index, index + 4) === '<!--') {
-				const indexIn = index + 4
-				if (!source[indexIn].match(/[a-z0-9@%{]/i)) {
+			if (source[index + 1] === '!') {
+				const nextChar = source[index + 2]
+
+				// cdata section
+				if ((nextChar === '[') && (source.substring(index, index + 9) === '<![CDATA[') && !this.doExpression) {
+					start = source.indexOf(']]>', index + 9) + 3
+					if (start === 2) {
+						start = source.length
+					}
+					index = start
 					continue
 				}
 
-				// end condition / loop
-				if (['end-->', 'END-->'].includes(source.substring(indexIn, indexIn + 6))) {
-					iteration ++
-					if (iteration < iterations) {
-						data    = collection[iteration]
-						target += this.trimEndLine(source.substring(start, index))
-						index   = start = blockStart
+				// comment tag
+				if ((nextChar === '-') && (source.substring(index, index + 4) === '<!--')) {
+					if (!this.doExpression) {
+						index = source.indexOf('-->', index + 4) + 3
+						if (index === 2) {
+							index = source.length
+						}
 						continue
 					}
-					const block = target;
-					target  = targetStack.pop() ?? ''
-					target += block + this.trimEndLine(source.substring(start, index));
-					({ blockStart, collection, data, iteration, iterations } = blockStack.pop()
-						?? { blockStart: 0, collection: [], data: undefined, iteration: 0, iterations: 0 })
-					index += 10
-					start  = index
+
+					const indexIn = index + 4
+					if (!source[indexIn].match(/[a-z0-9@%{]/i)) {
+						continue
+					}
+
+					// end condition / loop
+					if (['end-->', 'END-->'].includes(source.substring(indexIn, indexIn + 6))) {
+						iteration ++
+						if (iteration < iterations) {
+							data    = collection[iteration]
+							target += this.trimEndLine(source.substring(start, index))
+							index   = start = blockStart
+							continue
+						}
+						const block = target;
+						target  = targetStack.pop() ?? ''
+						target += block + this.trimEndLine(source.substring(start, index));
+						({ blockStart, collection, data, iteration, iterations } = blockStack.pop()
+							?? { blockStart: 0, collection: [], data: undefined, iteration: 0, iterations: 0 })
+						index += 10
+						start  = index
+						continue
+					}
+
+					// begin condition / loop
+					blockStack.push({ blockStart, collection, data, iteration, iterations })
+					let blockData: any
+					if (index > start) {
+						target += this.trimEndLine(source.substring(start, index))
+						start   = index
+					}
+					({ index, start, target: blockData } = this.parseExpression(index, start, '', source, data, '}', '-->'))
+					blockStart = start = index
+					iteration  = 0
+					if (Array.isArray(blockData)) {
+						collection = blockData
+						data       = collection[0]
+						iterations = collection.length
+					}
+					else {
+						collection = []
+						data       = blockData
+						iterations = data ? 1 : 0
+					}
 					continue
 				}
-
-				// begin condition / loop
-				blockStack.push({ blockStart, collection, data, iteration, iterations })
-				let blockData: any
-				if (index > start) {
-					target += this.trimEndLine(source.substring(start, index))
-					start   = index
-				}
-				({ index, start, target: blockData } = this.parseExpression(index, start, '', source, data, '}', '-->'))
-				blockStart = start = index
-				iteration  = 0
-				if (Array.isArray(blockData)) {
-					collection = blockData
-					data       = collection[0]
-					iterations = collection.length
-				}
-				else {
-					collection = []
-					data       = blockData
-					iterations = data ? 1 : 0
-				}
-				continue
 			}
 
-			// closing tag name
+			// tag close
 			index ++
 			if (source[index] === '/') {
 				index ++
 				const closeTagName = source.substring(index, source.indexOf('>', index))
-				let   popTagName: string|undefined
 				index += closeTagName.length + 1
-				while (popTagName = tagStack.pop()) {
-					if (popTagName === closeTagName) break
-				}
-				if (DEBUG) console.log('tag.closed =', closeTagName)
+				if (this.onTagClose) this.onTagClose.call(this, closeTagName)
 				continue
 			}
 
-			// opening tag name
+			// tag open
 			const position = index
 			while ((index < length) && !' >\n\r\t\f'.includes(source[index])) index ++
 			const tagName = source.substring(position, index)
-			if (DEBUG) console.log('tag.open =', tagName)
-			tagStack.push(tagName)
+			if (this.onTagOpen) this.onTagOpen.call(this, tagName)
 			if (source[index] === '>') {
 				index ++
-				if (DEBUG) console.log('tag.opened =', tagName)
+				if (this.onTagOpened) this.onTagOpened.call(this, tagName)
 				continue
 			}
 
@@ -263,7 +295,6 @@ export default class Template
 				while ((index < length) && !' =>\n\r\t\f'.includes(source[index])) index ++
 				const attributeName = source.substring(position, index)
 				while (' \n\r\t\f'.includes(source[index])) index ++
-				if (DEBUG) console.log('attributeName =', attributeName)
 
 				// attribute value
 				if (source[index] === '=') {
@@ -284,23 +315,24 @@ export default class Template
 						const char = source[index]
 						if ((quote.length === 1) ? (char === quote) : quote.includes(char)) {
 							const attributeValue = source.substring(position, index)
-							if (DEBUG) console.log('attributeValue =', attributeValue)
+							if (this.onAttribute) this.onAttribute(attributeName, attributeValue, tagName)
 							if (char !== '>') index ++
 							break
 						}
-						// begin expression in attribute value
-						if (char === open) {
+						// expression in attribute value
+						if ((char === open) && this.doExpression) {
 							({ index, start, target } = this.parseExpression(index, start, target, source, data, close))
 							continue
 						}
 						index ++
 					}
 				}
+				else if (this.onAttribute) this.onAttribute(attributeName, undefined, tagName)
 
 				// next attribute
 				while (' \n\r\t\f'.includes(source[index])) index ++
 			}
-			if (DEBUG) console.log('tag.opened =', tagName)
+			if (this.onTagOpened) this.onTagOpened.call(this, tagName)
 
 			index ++
 		}
