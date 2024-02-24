@@ -13,6 +13,7 @@ describe('parseExpression', () => {
 		value:           'valuable',
 		valueRecursion:  'result',
 
+		'"simple"':                 'simple',
 		'"escaped}".toUpperCase':   'ESCAPED}',
 		"'escaped}'.toUpperCase":   'ESCAPED}',
 		'"escaped)".toUpperCase':   'ESCAPED)',
@@ -30,6 +31,8 @@ describe('parseExpression', () => {
 			.toEqual({ index: 13, start: 13, target: 'value' })
 		expect(parseExpression('<!--no{real{name-->', '}', '-->'))
 			.toEqual({ index: 19, start: 19, target: 'norealvalue' })
+		expect(parseExpression('<!--no{real{name{deep-->', '}', '-->'))
+			.toEqual({ index: 24, start: 24, target: 'norealnameundefined' })
 	})
 	it('badEnd', () => {
 		expect(parseExpression('{name', '}'))
@@ -48,6 +51,8 @@ describe('parseExpression', () => {
 			.toEqual({ index: 11, start: 11, target: '<!--no{name' })
 		expect(parseExpression('<!--no{ka{name', '}', '-->'))
 			.toEqual({ index: 14, start: 14, target: '<!--no{ka{name' })
+		expect(parseExpression('<!--no{ka{name{deep', '}', '-->'))
+			.toEqual({ index: 19, start: 19, target: '<!--no{ka{name{deep' })
 		expect(parseExpression('<!--no{ka-{name}', '}', '-->'))
 			.toEqual({ index: 16, start: 16, target: '<!--no{ka-value' })
 	})
@@ -96,6 +101,8 @@ describe('parseExpression', () => {
 			.toEqual({ index: 2, start: 2, target: undefined})
 	})
 	it('quoted', () => {
+		expect(parseExpression('{"simple"}', '}'))
+			.toEqual({ index: 10, start: 10, target: 'simple'})
 		expect(parseExpression('{"escaped}".toUpperCase}', '}'))
 			.toEqual({ index: 24, start: 24, target: 'ESCAPED}'})
 		expect(parseExpression("{'escaped}'.toUpperCase}", '}'))
@@ -156,6 +163,9 @@ describe('parseVariable', () => {
 	it('property', () => {
 		expect(template.parseVariable('name', { name: 'value' })).toEqual('value')
 		expect(template.parseVariable('unknown', { name: 'value' })).toEqual(undefined)
+	})
+	it('quoted', () => {
+		expect(template.parseVariable('"name"', { name: 'value' })).toEqual('name')
 	})
 })
 

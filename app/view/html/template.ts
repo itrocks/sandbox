@@ -61,16 +61,19 @@ export default class Template
 				|| ((char === finalChar) && (source.substring(index, index + finalClose.length) === finalClose))
 			) {
 				const expression = target + source.substring(start, index)
+				const lastTarget = targetStack.pop()
+				const parsed     = this.parsePath(expression, data)
 				index           += (char === close) ? 1 : finalClose.length
 				start            = index
-				const parsed     = this.parsePath(expression, data)
-				let   popTarget  = targetStack.pop()
-				target = (popTarget === '') ? parsed : (popTarget + parsed)
+				target           = ''
 				if (char === finalChar) while (targetStack.length) {
-					popTarget = targetStack.pop()
-					if (popTarget !== '') {
-						target = popTarget + target
-					}
+					target += targetStack.shift()
+				}
+				if ((lastTarget === '') && (target === '')) {
+					target = parsed
+				}
+				else {
+					target += lastTarget + parsed
 				}
 				if (!targetStack.length) {
 					return { index, start, target }
@@ -112,6 +115,12 @@ export default class Template
 
 	parseVariable(variable: string, data: any)
 	{
+		if (
+			(variable.startsWith('"') && variable.endsWith('"'))
+			|| (variable.startsWith("'") && variable.endsWith("'"))
+		) {
+			return variable.substring(1, variable.length - 1)
+		}
 		switch (variable) {
 			case 'BEGIN':
 				return data
