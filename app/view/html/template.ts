@@ -12,7 +12,7 @@ export default class Template
 {
 	doExpression = true
 
-	onAttribute?: ((name: string, value: string|undefined, tag: string) => void)
+	onAttribute?: ((name: string, value: string) => void)
 	onTagOpen?:   ((name: string) => void)
 	onTagOpened?: ((name: string) => void)
 	onTagClose?:  ((name: string) => void)
@@ -22,14 +22,10 @@ export default class Template
 
 	debugEvents()
 	{
-		this.onAttribute = (name: string, value: string|undefined, tag: string) =>
-			console.log('attribute', name, '=', value, 'in tag', tag)
-		this.onTagOpen = (name: string) =>
-			console.log('tag.open =', name)
-		this.onTagOpened = (name: string) =>
-			console.log('tag.opened =', name)
-		this.onTagClose = (name: string) =>
-			console.log('tag.closed =', name)
+		this.onAttribute = (name: string, value: string) => console.log('attribute', name, '=', value)
+		this.onTagOpen   = (name: string) => console.log('tag.open =', name)
+		this.onTagOpened = (name: string) => console.log('tag.opened =', name)
+		this.onTagClose  = (name: string) => console.log('tag.closed =', name)
 	}
 
 	parseBuffer(source: string): string
@@ -314,8 +310,7 @@ export default class Template
 					while (index < length) {
 						const char = source[index]
 						if ((quote.length === 1) ? (char === quote) : quote.includes(char)) {
-							const attributeValue = source.substring(position, index)
-							if (this.onAttribute) this.onAttribute(attributeName, attributeValue, tagName)
+							if (this.onAttribute) this.onAttribute(attributeName, source.substring(position, index))
 							if (char !== '>') index ++
 							break
 						}
@@ -327,7 +322,7 @@ export default class Template
 						index ++
 					}
 				}
-				else if (this.onAttribute) this.onAttribute(attributeName, undefined, tagName)
+				else if (this.onAttribute) this.onAttribute(attributeName, '')
 
 				// next attribute
 				while (' \n\r\t\f'.includes(source[index])) index ++
@@ -335,6 +330,13 @@ export default class Template
 			if (this.onTagOpened) this.onTagOpened.call(this, tagName)
 
 			index ++
+
+			// script
+			if (tagName === 'script') {
+				if (this.onTagClose) this.onTagClose.call(this, 'script')
+				index = source.indexOf('</script>', index) + 9
+				if (index === 8) break
+			}
 		}
 		return target + source.substring(start)
 	}
