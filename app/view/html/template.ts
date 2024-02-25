@@ -15,6 +15,8 @@ let start:  number
 let target: string
 let text:   string
 
+let translateStack: string[] = []
+
 export default class Template
 {
 	doExpression = true
@@ -210,7 +212,7 @@ export default class Template
 				}
 
 				// comment tag
-				if ((char === '-') && (source[index + 1] === '-')) {
+					if ((char === '-') && (source[index] === '-')) {
 					index ++
 					if (!this.doExpression) {
 						index = source.indexOf('-->', index) + 3
@@ -252,11 +254,13 @@ export default class Template
 						start   = indexOut
 					}
 					const backTarget = target
+					index  = indexOut
+					target = ''
 					this.parseExpression(data, '}', '-->')
 					blockData  = target
-					blockStart = start = indexOut
-					target     = backTarget
+					blockStart = start = index
 					iteration  = 0
+					target     = backTarget
 					if (Array.isArray(blockData)) {
 						collection = blockData
 						data       = collection[0]
