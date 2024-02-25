@@ -1,6 +1,6 @@
-import { createConnection, Connection } from 'mariadb'
-import { Dao }                          from './dao'
-import { storeOf }                      from './store'
+import { Connection, ConnectionConfig, createConnection } from 'mariadb'
+import { Dao }                                            from './dao'
+import { storeOf }                                        from './store'
 
 export default class Mysql implements Dao
 {
@@ -9,7 +9,9 @@ export default class Mysql implements Dao
 
 	constructor(config: { host: string, user: string, password: string, database: string })
 	{
-		createConnection(config).then(connection => this.connection = connection)
+		const mariaDbConfig: ConnectionConfig = config
+		mariaDbConfig.allowPublicKeyRetrieval = true
+		createConnection(mariaDbConfig).then(connection => this.connection = connection)
 	}
 
 	async read<T extends object>(type: new() => T, id: bigint|string): Promise<T>

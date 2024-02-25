@@ -31,9 +31,10 @@ npm i
 - You need a mysql server and a database for your app:
 
 ```sql
-CREATE database ts ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+CREATE DATABASE ts DEFAULT CHARSET=utf8mb3;
 CREATE USER common@localhost IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON ts.* TO common@localhost;
+FLUSH PRIVILEGES;
 CREATE TABLE ts.user (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   active INT NOT NULL DEFAULT 0,
