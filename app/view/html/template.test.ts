@@ -22,9 +22,11 @@ describe('parseExpression', () => {
 
 	}[name])
 
-	const parseExpression = (expression: string, close: string, finalClose: string = '') => template.parseExpression(
-		0, 0, '', expression, null, close, finalClose
-	)
+	const parseExpression = (expression: string, close: string, finalClose: string = '') => {
+		template.setSource(expression)
+		template.parseExpression(null, close, finalClose)
+		return template.getPosition()
+	}
 
 	it('badClose', () => {
 		expect(parseExpression('<!--{{name-->', '}', '-->'))
@@ -93,7 +95,9 @@ describe('parseExpression', () => {
 			.toEqual({ index: 1, start: 0, target: ''})
 	})
 	it('targetTransmit', () => {
-		expect(template.parseExpression(16, 12, 'done trans', '{name} transmit {name}{next}', { name: 'value' }, '}'))
+		template.setSource('{name} transmit {name}{next}', 16, 12, 'done trans')
+		template.parseExpression({ name: 'value' }, '}')
+		expect(template.getPosition())
 			.toEqual({ index: 22, start: 22, target: 'done transmit value'})
 	})
 	it('empty', () => {
@@ -152,7 +156,7 @@ describe('parsePath', () => {
 
 describe('parseVariable', () => {
 	const template = new Template()
-	template.parseExpression = (index, start, target) => ({ index, start, target })
+	template.parseExpression = () => ({ index: 0, start: 0, target: '' })
 
 	it('empty', () => {
 		expect(template.parseVariable('', {})).toEqual(undefined)
@@ -171,9 +175,10 @@ describe('parseVariable', () => {
 
 describe('parseVars', () => {
 	const template = new Template()
-	template.parseExpression = (index, start, target) => ({ index, start, target })
+	template.parseExpression = () => ({ index: 0, start: 0, target: '' })
 
 	it('empty', () => {
-		expect(template.parseVars('')).toEqual('')
+		template.setSource('')
+		expect(template.parseVars()).toEqual('')
 	})
 })
