@@ -1,4 +1,5 @@
 import { readdir } from 'node:fs/promises'
+import path        from 'path'
 
 const walk = async (path: string): Promise<string[]> =>
 {
@@ -21,7 +22,7 @@ const readDirRecursive = async (path: string): Promise<string[]> =>
 export const routes: { [name: string]: any } = {}
 export default routes
 
-readDirRecursive(__dirname.substring(0, __dirname.lastIndexOf('/'))).then(entries => {
+readDirRecursive(__dirname.substring(0, __dirname.lastIndexOf(path.sep))).then(entries => {
 	entries.forEach(entry => {
 		if (!entry.endsWith('.ts')) {
 			return
