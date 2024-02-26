@@ -1,4 +1,5 @@
 import './class/compose'
+import './expand'
 import 'reflect-metadata'
 
 import fastify                             from 'fastify'
