@@ -30,7 +30,42 @@ export default class Template
 	onTagClose?:  ((name: string) => void)
 	onText?:      ((text: string) => void)
 
+	// Translate these attribute content.
 	translateAttributes = ['alt', 'enterkeyhint', 'label', 'placeholder', 'srcdoc', 'title']
+
+	// Translate these element content. They are marks into the translated parent element phrase.
+	translateComponents = [
+		'a', 'big', 'button', 'data', 'font', 'label', 'meter', 'optgroup', 'option', 'select', 'span', 'strike', 'time'
+	]
+
+	// Translate these element content.
+	translateElements = [
+		'a', 'abbr', 'acronym', 'article', 'aside', 'bdi', 'bdo', 'big', 'blockquote', 'body', 'br', 'button',
+		'caption', 'center', 'data', 'datalist', 'dd', 'details', 'dfn', 'dialog', 'div', 'dt',
+		'fieldset', 'figcaption', 'figure', 'font', 'footer', 'form',
+		'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hr', 'iframe', 'keygen', 'label', 'legend', 'li',
+		'main', 'menuitem', 'meter', 'nav', 'noframes', 'noscript', 'option', 'optgroup', 'option', 'p', 'pre', 'rb',
+		's', 'section', 'select', 'span', 'strike', 'summary', 'td', 'template', 'textarea', 'th', 'time', 'title'
+	]
+
+	// These tags are ignored: they are part of the translated text.
+	translateIgnore = ['b', 'cite', 'del', 'em', 'i', 'ins', 'mark', 'q', 'small', 'strong', 'sub', 'sup', 'u', 'wbr']
+
+	// Do not translate these element content. They are marks into the translated parent element phrase.
+	translateMark = ['code', 'kbd', 'img', 'input', 'picture', 'output', 'rt', 'samp', 'svg', 'var']
+
+	// Do not translate these element content. When they are closed, gets the parent element translation status back.
+	translateNotElements = [
+		'address', 'applet', 'area', 'audio', 'base', 'basefont', 'canvas', 'col', 'colgroup', 'dir', 'dl', 'embed',
+		'frame', 'frameset', 'head', 'html', 'link', 'map', 'menu', 'meta', 'object', 'ol', 'param', 'progress',
+		'ruby', 'script', 'source', 'style', 'table', 'tbody', 'tfoot', 'thead', 'track', 'ul', 'video'
+	]
+
+	// These elements have no closing tag.
+	unclosing = [
+		'area', 'base', 'basefont', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source',
+		'track'
+	]
 
 	constructor(public data?: any)
 	{}
@@ -188,6 +223,7 @@ export default class Template
 		let   data                    = this.data
 		let   iteration               = 0
 		let   iterations              = 0
+		const tagStack: { tagName: string, translating: boolean }[] = []
 		const targetStack: string[]   = []
 
 		while (index < length) {
@@ -288,6 +324,9 @@ export default class Template
 				index += closeTagName.length + 1
 				if (this.onText)     this.onText.call(this, text)
 				if (this.onTagClose) this.onTagClose.call(this, closeTagName)
+				let tagName: string
+				do ({ tagName, translating } = tagStack.pop() ?? { tagName: '', translating: false })
+				while ((tagName !== closeTagName) && (tagName !== ''))
 				continue
 			}
 
@@ -298,6 +337,8 @@ export default class Template
 			if (this.onTagOpen) this.onTagOpen.call(this, tagName)
 			if (source[index] === '>') {
 				index ++
+				tagStack.push({ tagName, translating })
+				translating = this.translateElements.orderedIncludes(tagName)
 				if (this.onTagOpened) this.onTagOpened.call(this, tagName)
 				continue
 			}
@@ -329,7 +370,7 @@ export default class Template
 						quote = ' >'
 					}
 
-					translating = this.translateAttributes.includes(attributeName)
+					translating = this.translateAttributes.orderedIncludes(attributeName)
 					if (translating) {
 						if (index > start) {
 							target += source.substring(start, index)
@@ -350,6 +391,7 @@ export default class Template
 								target  = targetStack.pop() as string + tr(target, translateParts)
 								translateCount = 0
 								translateParts = []
+								translating    = false
 							}
 							if (this.onAttribute) this.onAttribute(attributeName, source.substring(position, index))
 							if (char !== '>') index ++
@@ -377,7 +419,11 @@ export default class Template
 				if (this.onTagClose) this.onTagClose.call(this, 'script')
 				index = source.indexOf('</script>', index) + 9
 				if (index === 8) break
+				continue
 			}
+
+			tagStack.push({ tagName, translating })
+			translating = this.translateElements.orderedIncludes(tagName)
 		}
 		return target + source.substring(start)
 	}

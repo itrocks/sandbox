@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" title="This is the {@output} I love">
+<html lang="en">
 <head>
 	<meta charset="utf-8">
 	<title>{@output.ucFirst}</title>
@@ -8,12 +8,14 @@
 <!--BEGIN-->
 
 	<article class="{@display} output" data-id="{id}">
-		<h2>{@output}</h2>
+		<h2 title="This is the {@output} I love">{@output.ucFirst}</h2>
+		<hr>
 		<ul class="general actions">
 			<li class="list"><a href="/(@route)/list">close</a></li>
 			<li class="edit"><a href="/(@route)/edit/(id)">edit</a></li>
 			<li class="delete"><a href="/(@route)/delete/(id)">delete</a></li>
 		</ul>
+		<hr>
 		<table class="{@display} object">
 			<!--%properties-->
 			<tr class="{name}"><th>{@display}</th><td>{object.{name}}</td></tr>
