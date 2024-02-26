@@ -3,11 +3,13 @@
 	"dependencies": {
 		"fastify": "^4.25.2",
 		"mariadb": "^3.2.3",
+		"papaparse": "^5.4.1",
 		"reflect-metadata": "^0.1.13"
 	},
 	"devDependencies": {
 		"@types/jest": "^29.5.11",
 		"@types/node": "^20.11.7",
+		"@types/papaparse": "^5.3.14",
 		"jest": "^29.7.0",
 		"nodemon": "^3.0.3",
 		"ts-jest": "^29.1.2",

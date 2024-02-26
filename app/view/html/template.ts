@@ -1,5 +1,6 @@
 import { readFile }                       from 'node:fs/promises'
 import { properties }                     from '../../class/reflect'
+import { tr }                             from '../../locale/translate'
 import ReflectProperty                    from '../../property/reflect'
 import { displayOf as classDisplayOf }    from '../class/display'
 import { outputOf }                       from '../class/output'
@@ -15,7 +16,9 @@ let start:  number
 let target: string
 let text:   string
 
-let translateStack: string[] = []
+let translateCount           = 0
+let translateParts: string[] = []
+let translating              = false
 
 export default class Template
 {
@@ -26,6 +29,8 @@ export default class Template
 	onTagOpened?: ((name: string) => void)
 	onTagClose?:  ((name: string) => void)
 	onText?:      ((text: string) => void)
+
+	translateAttributes = ['alt', 'enterkeyhint', 'label', 'placeholder', 'srcdoc', 'title']
 
 	constructor(public data?: any)
 	{}
@@ -65,7 +70,7 @@ export default class Template
 			return
 		}
 
-		const targetStack: string[]  = []
+		const targetStack: string[] = []
 		targetStack.push(target + source.substring(start, indexOut))
 		start  = index
 		target = ''
@@ -94,7 +99,12 @@ export default class Template
 				if (char === finalChar) while (targetStack.length) {
 					target += targetStack.shift()
 				}
-				if ((lastTarget === '') && (target === '')) {
+				if (translating && !targetStack.length) {
+					translateCount ++
+					translateParts.push(parsed)
+					target += lastTarget + '$' + translateCount
+				}
+				else if ((lastTarget === '') && (target === '')) {
 					target = parsed
 				}
 				else {
@@ -116,12 +126,11 @@ export default class Template
 
 			index ++
 		}
+		// bad close
 		while (targetStack.length > 1) {
 			target = targetStack.pop() + open + target
 		}
-		target  = targetStack.pop() + (finalClose.length ? '<!--' : open) + target
-		target += source.substring(start)
-		start   = source.length
+		target = targetStack.pop() + (finalClose.length ? '<!--' : open) + target
 	}
 
 	async parseFile(fileName: string): Promise<string>
@@ -229,16 +238,13 @@ export default class Template
 					// end condition / loop
 					const indexOut = index - 4
 					if (['end-->', 'END-->'].includes(source.substring(index, index + 6))) {
+						target += this.trimEndLine(source.substring(start, indexOut))
 						iteration ++
 						if (iteration < iterations) {
-							data    = collection[iteration]
-							target += this.trimEndLine(source.substring(start, indexOut))
-							index   = start = blockStart
+							data  = collection[iteration]
+							index = start = blockStart
 							continue
 						}
-						const block = target;
-						target  = targetStack.pop() ?? ''
-						target += block + this.trimEndLine(source.substring(start, indexOut));
 						({ blockStart, collection, data, iteration, iterations } = blockStack.pop()
 							?? { blockStart: 0, collection: [], data: undefined, iteration: 0, iterations: 0 })
 						index += 6
@@ -249,7 +255,7 @@ export default class Template
 					// begin condition / loop
 					blockStack.push({ blockStart, collection, data, iteration, iterations })
 					let blockData: any
-					if (index > start) {
+					if (indexOut > start) {
 						target += this.trimEndLine(source.substring(start, indexOut))
 						start   = indexOut
 					}
@@ -322,10 +328,29 @@ export default class Template
 					else {
 						quote = ' >'
 					}
-					const position = index
+
+					translating = this.translateAttributes.includes(attributeName)
+					if (translating) {
+						if (index > start) {
+							target += source.substring(start, index)
+							start   = index
+						}
+						targetStack.push(target)
+						target  = ''
+					}
+
+					const position   = index
+					const shortQuote = !(quote.length - 1)
 					while (index < length) {
 						const char = source[index]
-						if ((quote.length === 1) ? (char === quote) : quote.includes(char)) {
+						if (shortQuote ? (char === quote) : quote.includes(char)) {
+							if (translating) {
+								target += source.substring(start, index)
+								start   = index
+								target  = targetStack.pop() as string + tr(target, translateParts)
+								translateCount = 0
+								translateParts = []
+							}
 							if (this.onAttribute) this.onAttribute(attributeName, source.substring(position, index))
 							if (char !== '>') index ++
 							break
