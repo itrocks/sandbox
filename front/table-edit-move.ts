@@ -71,11 +71,11 @@ export class TableEditMove extends Plugin
 		const selected  = tableEdit.selected()
 		if (!selected) return
 		const row     = selected.closest('tr') as HTMLTableRowElement
-		let   siblingRow = row[elementSibling]
+		let   siblingRow = row[elementSibling] ?? undefined
 		if (!siblingRow) {
 			const section        = row.closest('tbody, tfoot, thead') as HTMLTableSectionElement
-			const siblingSection = section[elementSibling] as HTMLTableSectionElement|null
-			siblingRow           = siblingSection ? siblingSection[elementChild] : null
+			const siblingSection = section[elementSibling] as HTMLTableSectionElement ?? undefined
+			siblingRow           = siblingSection[elementChild] ?? undefined
 		}
 		if (siblingRow) {
 			const selector = ':scope > :nth-child(' + (this.table.cellColumnNumber(selected) + 1).toString() + ')'

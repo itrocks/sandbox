@@ -35,13 +35,13 @@ export class TableEditLock extends Plugin
 			':scope > tbody, :scope > tfoot, :scope > thead'
 		)
 		const cellTr = cell.closest('tr')
-		let foreignRow: HTMLTableRowElement|undefined
+		let foreignRow: HTMLTableRowElement | undefined
 		sections.forEach(section => {
 			if (foreignRow) return
-			let tr = section.firstElementChild as HTMLTableRowElement|null
+			let tr = section.firstElementChild as HTMLTableRowElement ?? undefined
 			if (!tr) return
 			if (cellTr === tr) {
-				tr = tr.nextElementSibling as HTMLTableRowElement|null
+				tr = tr.nextElementSibling as HTMLTableRowElement ?? undefined
 			}
 			if (!tr) return
 			foreignRow = tr
@@ -49,21 +49,21 @@ export class TableEditLock extends Plugin
 		return foreignRow?.children[position] as HTMLTableCellElement ?? cell
 	}
 
-	closestEditableCell(editable: HTMLTableCellElement|null)
+	closestEditableCell(editable?: HTMLTableCellElement)
 	{
 		let style: CSSStyleDeclaration
 		Object.entries(this.options.nonEditableConditions).forEach(([index, value]) => {
-			if (!editable) return null
+			if (!editable) return
 			switch (index) {
 				case 'closest':
-					if (editable.closest(value)) editable = null
+					if (editable.closest(value)) editable = undefined
 					break
 				case 'col':
-					if (this.colCell(editable).matches(value)) editable = null
+					if (this.colCell(editable).matches(value)) editable = undefined
 					break
 				default:
 					if (!style) style = getComputedStyle(editable)
-					if (style[index as keyof CSSStyleDeclaration] === value) editable = null
+					if (style[index as keyof CSSStyleDeclaration] === value) editable = undefined
 			}
 		})
 		return editable

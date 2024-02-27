@@ -1,7 +1,7 @@
 import { Plugin } from './table.js'
 
-let editable:      HTMLDivElement|null
-let selected:      HTMLTableCellElement|null
+let editable:      HTMLDivElement | undefined
+let selected:      HTMLTableCellElement | undefined
 let selectedStyle: string
 let selectedText:  string
 
@@ -52,14 +52,14 @@ export class TableEdit extends Plugin
 		})
 	}
 
-	closestEditable(node: Node|Range|RangeCopy): HTMLDivElement
+	closestEditable(node: Node | Range | RangeCopy): HTMLDivElement
 	{
 		if ((node instanceof Range) || (node instanceof RangeCopy)) {
 			node = node.commonAncestorContainer
 		}
-		let parent:Element|null = (node instanceof Element) ? node : node.parentElement
+		let parent : Element | undefined = (node instanceof Element) ? node : (node.parentElement ?? undefined)
 		while (parent && !parent.hasAttribute('contenteditable')) {
-			parent = parent.parentElement
+			parent = parent.parentElement ?? undefined
 		}
 		if (!parent) {
 			throw 'Called from a node outside of contenteditable'
@@ -70,8 +70,8 @@ export class TableEdit extends Plugin
 	closestEditableCell(target: any)
 	{
 		return (target instanceof Element)
-			? target.closest('table.itrocks > * > tr > *, table.itrocks > * > tr > *') as HTMLTableCellElement|null
-			: null
+			? target.closest('table.itrocks > * > tr > *, table.itrocks > * > tr > *') as HTMLTableCellElement ?? undefined
+			: undefined
 	}
 
 	createEditable(selected: HTMLTableCellElement, selectedStyle: CSSStyleDeclaration)
@@ -102,7 +102,7 @@ export class TableEdit extends Plugin
 		return editable
 	}
 
-	editableEndRange(node: Node|Range|RangeCopy)
+	editableEndRange(node: Node | Range | RangeCopy)
 	{
 		node = this.closestEditable(node)
 		while (node.lastChild && !(node.nodeType === Node.TEXT_NODE)) {
@@ -114,7 +114,7 @@ export class TableEdit extends Plugin
 		return newRange
 	}
 
-	editableFullRange(node: Node|Range|RangeCopy)
+	editableFullRange(node: Node | Range | RangeCopy)
 	{
 		const newRange = new Range()
 		newRange.selectNodeContents(this.closestEditable(node))
@@ -130,7 +130,7 @@ export class TableEdit extends Plugin
 		return range
 	}
 
-	inEditable(node: Node|Range|RangeCopy): boolean
+	inEditable(node: Node | Range | RangeCopy): boolean
 	{
 		if ((node instanceof Range) || (node instanceof RangeCopy)) {
 			node = node.commonAncestorContainer
@@ -150,7 +150,7 @@ export class TableEdit extends Plugin
 		this.setSelectedCell(cell)
 	}
 
-	/** Returns the currently selected cell, or null if no cell is selected */
+	/** Returns the currently selected cell, or undefined if no cell is selected */
 	selected()
 	{
 		return selected
@@ -205,8 +205,8 @@ export class TableEdit extends Plugin
 			? selected.setAttribute('style', selectedStyle)
 			: selected.removeAttribute('style')
 		this.setSelectedText(selected.innerHTML)
-		editable = null
-		selected = null
+		editable = undefined
+		selected = undefined
 	}
 
 }

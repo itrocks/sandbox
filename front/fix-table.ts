@@ -37,7 +37,7 @@ export class FixTable extends Plugin
 		while (parent && (parent.scrollHeight <= parent.clientHeight)) {
 			parent = parent.parentElement
 		}
-		return parent ? ((parent instanceof HTMLHtmlElement) ? window : parent) : null
+		return parent ? ((parent instanceof HTMLHtmlElement) ? window : parent) : undefined
 	}
 
 	protected countLeftColumns()

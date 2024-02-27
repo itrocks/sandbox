@@ -46,7 +46,7 @@ export class TableEditFixHide extends Plugin
 		return editable
 	}
 
-	autoHide(editable: HTMLDivElement|null, selected: HTMLTableCellElement|null)
+	autoHide(editable?: HTMLDivElement, selected?: HTMLTableCellElement)
 	{
 		if (!editable || !selected) return
 
@@ -74,7 +74,7 @@ export class TableEditFixHide extends Plugin
 		}
 	}
 
-	goAhead(editable: HTMLDivElement|null, selected: HTMLTableCellElement|null)
+	goAhead(editable?: HTMLDivElement, selected?: HTMLTableCellElement)
 	{
 		if (!zIndex.back || !editable || !selected) return
 
@@ -86,7 +86,7 @@ export class TableEditFixHide extends Plugin
 		zIndex.selected = ''
 	}
 
-	goBack(editable: HTMLDivElement|null, selected: HTMLTableCellElement|null)
+	goBack(editable?: HTMLDivElement, selected?: HTMLTableCellElement)
 	{
 		if (zIndex.back || !editable || !selected) return
 
