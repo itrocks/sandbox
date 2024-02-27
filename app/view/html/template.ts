@@ -16,9 +16,9 @@ let start:  number
 let target: string
 let text:   string
 
-let translateCount           = 0
-let translateParts: string[] = []
-let translating              = false
+let translateCount = 0
+let translateParts = [] as string[]
+let translating    = false
 
 export default class Template
 {
@@ -83,13 +83,13 @@ export default class Template
 		return { index, start, target }
 	}
 
-	parseBuffer(buffer: string): string
+	parseBuffer(buffer: string)
 	{
 		this.setSource(buffer)
 		return this.parseVars()
 	}
 
-	parseExpression(data: any, close: string, finalClose: string = '')
+	parseExpression(data: any, close: string, finalClose = '')
 	{
 		const finalChar = finalClose.length ? finalClose[0] : ''
 		const indexOut  = index
@@ -105,7 +105,7 @@ export default class Template
 			return
 		}
 
-		const targetStack: string[] = []
+		const targetStack = [] as string[]
 		targetStack.push(target + source.substring(start, indexOut))
 		start  = index
 		target = ''
@@ -168,7 +168,7 @@ export default class Template
 		target = targetStack.pop() + (finalClose.length ? '<!--' : open) + target
 	}
 
-	async parseFile(fileName: string): Promise<string>
+	async parseFile(fileName: string)
 	{
 		return this.parseBuffer(await readFile(fileName, 'utf-8'))
 	}
@@ -217,14 +217,14 @@ export default class Template
 
 	parseVars()
 	{
-		const blockStack:  BlockStack = []
-		let   blockStart              = 0
-		let   collection:  any[]      = []
-		let   data                    = this.data
-		let   iteration               = 0
-		let   iterations              = 0
-		const tagStack: { tagName: string, translating: boolean }[] = []
-		const targetStack: string[]   = []
+		const blockStack  = [] as BlockStack
+		let   blockStart  = 0
+		let   collection  = []
+		let   data        = this.data
+		let   iteration   = 0
+		let   iterations  = 0
+		const tagStack    = [] as { tagName: string, translating: boolean }[]
+		const targetStack = [] as string[]
 
 		while (index < length) {
 			let char = source[index]
@@ -246,24 +246,12 @@ export default class Template
 				char = source[++index]
 				index ++
 
-				// cdata section
-				if ((char === '[') && (source.substring(index, index + 6) === 'CDATA[') && !this.doExpression) {
-					start = source.indexOf(']]>', index + 6) + 3
-					if (start === 2) {
-						start = length
-					}
-					index = start
-					continue
-				}
-
 				// comment tag
-					if ((char === '-') && (source[index] === '-')) {
+				if ((char === '-') && (source[index] === '-')) {
 					index ++
 					if (!this.doExpression) {
 						index = source.indexOf('-->', index) + 3
-						if (index === 2) {
-							index = length
-						}
+						if (index === 2) break
 						continue
 					}
 
@@ -313,8 +301,17 @@ export default class Template
 						data       = blockData
 						iterations = data ? 1 : 0
 					}
+				}
+
+				// cdata section
+				if ((char === '[') && (source.substring(index, index + 6) === 'CDATA[') && !this.doExpression) {
+					index = source.indexOf(']]>', index + 6) + 3
+					if (index === 2) break
 					continue
 				}
+
+				// DOCTYPE
+				continue
 			}
 
 			// tag close
@@ -412,8 +409,20 @@ export default class Template
 				continue
 			}
 
+			const wasTranslating = translating
 			tagStack.push({ tagName, translating })
-			//translating = this.translateElements.orderedIncludes(tagName)
+			translating = this.translateElements.orderedIncludes(tagName)
+			if (translating) {
+				if (wasTranslating) {
+					if (this.translateComponents.orderedIncludes(tagName)) {
+						console.log('inside translation component')
+					}
+					else {
+						console.log('next translation block')
+					}
+				}
+				translating = false // during development, to avoid side effects
+			}
 		}
 		return target + source.substring(start)
 	}
