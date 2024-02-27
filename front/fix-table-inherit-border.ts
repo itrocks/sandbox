@@ -37,9 +37,9 @@ export class InheritBorder extends Plugin
 			}
 		`)
 		// columns
-		let rightSelector = '';
+		let rightSelector = ''
 		if (fixTable.rightColumnCount) {
-			rightSelector = `:not(:nth-last-child(${fixTable.rightColumnCount}))`;
+			rightSelector = `:not(:nth-last-child(${fixTable.rightColumnCount}))`
 			table.styleSheet.push(`
 				${table.selector} > * > tr > :nth-last-child(${fixTable.rightColumnCount + 1}) {
 					border-right-width: 0;

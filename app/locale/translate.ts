@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import path         from 'path'
 
 const parseCsv = require('papaparse').parse
-const translations: Map<string, string> = new Map();
+const translations: Map<string, string> = new Map()
 
 readFile(__dirname + path.sep + 'fr.csv', 'utf-8')
 	.then(data => parseCsv(data, { delimiter: ';' }).data as [string, string][])

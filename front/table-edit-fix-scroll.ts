@@ -22,8 +22,8 @@ export class TableEditFixScroll extends Plugin
 		const rect = cell.getBoundingClientRect()
 
 		const cellStyle  = getComputedStyle(cell)
-		const rectBottom = rect.bottom + 1 - parseFloat(cellStyle.borderBottomWidth);
-		const rectRight  = rect.right  + 2 - parseFloat(cellStyle.borderRightWidth) * 2; // fine-tuning
+		const rectBottom = rect.bottom + 1 - parseFloat(cellStyle.borderBottomWidth)
+		const rectRight  = rect.right  + 2 - parseFloat(cellStyle.borderRightWidth) * 2 // fine-tuning
 
 		if (
 			(rect.top      >= into.top)
