@@ -335,16 +335,7 @@ export default class Template
 			while ((index < length) && !' >\n\r\t\f'.includes(source[index])) index ++
 			const tagName = source.substring(position, index)
 			if (this.onTagOpen) this.onTagOpen.call(this, tagName)
-			if (source[index] === '>') {
-				index ++
-				tagStack.push({ tagName, translating })
-				translating = this.translateElements.orderedIncludes(tagName)
-				if (this.onTagOpened) this.onTagOpened.call(this, tagName)
-				continue
-			}
-
-			// first attribute
-			do index ++; while (' \n\r\t\f'.includes(source[index]))
+			while (' \n\r\t\f'.includes(source[index])) index ++
 
 			// attributes
 			while (source[index] !== '>') {
@@ -410,9 +401,8 @@ export default class Template
 				// next attribute
 				while (' \n\r\t\f'.includes(source[index])) index ++
 			}
-			if (this.onTagOpened) this.onTagOpened.call(this, tagName)
-
 			index ++
+			if (this.onTagOpened) this.onTagOpened.call(this, tagName)
 
 			// script
 			if (tagName === 'script') {
