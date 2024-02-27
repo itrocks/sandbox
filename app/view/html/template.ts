@@ -413,7 +413,7 @@ export default class Template
 			}
 
 			tagStack.push({ tagName, translating })
-			translating = this.translateElements.orderedIncludes(tagName)
+			//translating = this.translateElements.orderedIncludes(tagName)
 		}
 		return target + source.substring(start)
 	}
