@@ -10,7 +10,7 @@ import ActionRequest                       from './action/request'
 import { fastifyRequest, fastifyResponse } from './server/fastify'
 import Response                            from './server/response'
 
-async function execute(request: ActionRequest): Promise<Response>
+async function execute(request: ActionRequest)
 {
 	let action: Action & { [index: string]: (request: ActionRequest) => Promise<Response> }
 	if (!request.action) {

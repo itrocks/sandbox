@@ -14,13 +14,13 @@ export class ColumnReorderTable extends Plugin
 		let dragging: HTMLTableCellElement | undefined
 		let mouse     = new DOMRect()
 		let mouseFrom = new DOMRect()
-		Array.from(this.reorderCells).forEach(cell => {
+		for (const cell of Array.from(this.reorderCells)) {
 			table.addEventListener(cell, 'mousedown', event => {
 				console.log('mousedown', event.target)
 				downed    = event.target as HTMLTableCellElement
 				mouseFrom = new DOMRect(mouse.x, mouse.y)
 			})
-		})
+		}
 		table.addEventListener(document, 'mousemove', event => {
 			Object.assign(mouse, { x: event.pageX, y: event.pageY })
 			if (downed && (Math.sqrt(Math.abs(mouse.x - mouseFrom.x) * Math.abs(mouse.y - mouseFrom.y)) > 10)) {

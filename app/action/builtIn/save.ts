@@ -1,14 +1,13 @@
-import Action   from '../../action/action'
-import Need     from '../../action/need'
-import Request  from '../../action/request'
-import dump     from '../../debug/dump'
-import Response from '../../server/response'
+import Action  from '../../action/action'
+import Need    from '../../action/need'
+import Request from '../../action/request'
+import dump    from '../../debug/dump'
 
 @Need('?object')
 export default class Save extends Action
 {
 
-	html(request: Request): Response
+	html(request: Request)
 	{
 		return this.htmlResponse(`<html lang="en">
 <head><meta charset="utf-8"><title>HTML save</title></head>
@@ -16,7 +15,7 @@ export default class Save extends Action
 </html>`)
 	}
 
-	json(request: Request): Response
+	json(request: Request)
 	{
 		return this.jsonResponse(request.object)
 	}

@@ -51,8 +51,8 @@ export class TableEditLock extends Plugin
 
 	closestEditableCell(editable?: HTMLTableCellElement)
 	{
-		let style: CSSStyleDeclaration
-		Object.entries(this.options.nonEditableConditions).forEach(([index, value]) => {
+		let style: CSSStyleDeclaration | undefined
+		for (const [index, value] of Object.entries(this.options.nonEditableConditions)) {
 			if (!editable) return
 			switch (index) {
 				case 'closest':
@@ -65,7 +65,7 @@ export class TableEditLock extends Plugin
 					if (!style) style = getComputedStyle(editable)
 					if (style[index as keyof CSSStyleDeclaration] === value) editable = undefined
 			}
-		})
+		}
 		return editable
 	}
 

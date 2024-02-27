@@ -14,7 +14,7 @@ export default function dump(variable: any, indent: number = 0): string
 	let   out     = open + "\n"
 
 	indent += 2
-	for (let property in variable) {
+	for (const property in variable) {
 		out += ' '.repeat(indent) + property + ': ' + dump(variable[property], indent)
 	}
 	indent -= 2

@@ -1,9 +1,9 @@
-import Response from '../response'
+import { Headers, Response } from '../response'
 
 export default class HtmlResponse extends Response
 {
 
-	constructor(body: string = '', statusCode: number = 200, headers: { [index: string]: string } = {})
+	constructor(body = '', statusCode = 200, headers: Headers = {})
 	{
 		if (!body.startsWith('<!DOCTYPE html>')) {
 			body = `<!DOCTYPE html>\n` + body

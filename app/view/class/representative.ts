@@ -3,9 +3,7 @@ import { decorateCallback, decoratorOfCallback } from '../../decorator/class'
 import { requiredOf }                            from '../../property/validate/required'
 
 const defaultValue = (target: object) =>
-{
-	return Object.getOwnPropertyNames(target).filter(name => requiredOf(target, name))
-}
+	Object.getOwnPropertyNames(target).filter(name => requiredOf(target, name))
 
 const REPRESENTATIVE = Symbol('representative')
 

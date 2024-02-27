@@ -1,10 +1,10 @@
 
-export function lcFirst(string: string): string
+export function lcFirst(string: string)
 {
 	return string[0].toLowerCase() + string.slice(1)
 }
 
-export function toClass(string: string): string
+export function toClass(string: string)
 {
 	return string[0].toUpperCase() + string.slice(1).replace(
 		/([a-zA-Z0-9_])[ -]([a-zA-Z0-9_])/g,
@@ -12,7 +12,7 @@ export function toClass(string: string): string
 	)
 }
 
-export function toVar(string: string): string
+export function toVar(string: string)
 {
 	return string[0].toLowerCase() + string.slice(1).replace(
 		/([a-zA-Z0-9_])[ -]([a-zA-Z0-9_])/g,
@@ -20,7 +20,7 @@ export function toVar(string: string): string
 	)
 }
 
-export function toDisplay(string: string): string
+export function toDisplay(string: string)
 {
 	return string[0].toLowerCase() + string.slice(1).replace(
 		/([a-z0-9_])([A-Z])/g,
@@ -28,7 +28,7 @@ export function toDisplay(string: string): string
 	)
 }
 
-export function toRoute(string: string): string
+export function toRoute(string: string)
 {
 	return string[0].toLowerCase() + string.slice(1).replace(
 		/([a-z0-9_])([A-Z])/g,
@@ -36,7 +36,7 @@ export function toRoute(string: string): string
 	)
 }
 
-export function ucFirst(string: string): string
+export function ucFirst(string: string)
 {
 	return string[0].toUpperCase() + string.slice(1)
 }

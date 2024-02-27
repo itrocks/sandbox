@@ -1,7 +1,6 @@
 import Action                    from '../../action/action'
 import Need                      from '../../action/need'
 import Request                   from '../../action/request'
-import Response                  from '../../server/response'
 import { displayOf }             from '../../view/class/display'
 import { representativeValueOf } from '../../view/class/representative'
 
@@ -9,7 +8,7 @@ import { representativeValueOf } from '../../view/class/representative'
 export default class Edit extends Action
 {
 
-	html(request: Request): Response
+	html(request: Request)
 	{
 		const object     = request.object
 		const mainTitle = `Edit ${displayOf(object)} ${representativeValueOf(object)}`
@@ -28,7 +27,7 @@ export default class Edit extends Action
 		return this.htmlResponse(pageHead + head + title + foot + pageFoot)
 	}
 
-	json(request: Request): Response
+	json(request: Request)
 	{
 		// the edit API will return data needed by object editors : e.g. links to auto-completion API
 		return this.jsonResponse(request.object)

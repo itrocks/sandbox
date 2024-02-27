@@ -1,4 +1,4 @@
-import path     from 'path'
+import { sep }  from 'path'
 import Action   from '../../action/action'
 import Need     from '../../action/need'
 import Request  from '../../action/request'
@@ -12,7 +12,7 @@ export default class Output extends Action
 	async html(request: Request)
 	{
 		const template = new Template(request.object)
-		return this.htmlResponse(await template.parseFile(__dirname + path.sep + 'output.html'))
+		return this.htmlResponse(await template.parseFile(__dirname + sep + 'output.html'))
 	}
 
 	async json(request: Request)

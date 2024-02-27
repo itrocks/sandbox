@@ -4,8 +4,8 @@ export type HTMLTableFixElement = HTMLTableCellElement | HTMLTableColElement
 const styleSheets = new CSSStyleSheet
 document.adoptedStyleSheets.push(styleSheets)
 
-let tableCounter    = 0
-let tables: Table[] = []
+let tableCounter = 0
+let tables       = [] as Table[]
 
 export function applyStyleSheets()
 {
@@ -50,12 +50,13 @@ export class Plugin
 
 export class Table
 {
-	readonly id:         number
-	readonly onReset:    (() => void)[] = []
-	readonly options =   new Options
-	readonly plugins:    { [index: string]: Plugin } = {}
-	readonly selector:   string
-	readonly styleSheet: string[] = []
+	readonly id:       number
+	readonly selector: string
+
+	readonly onReset    = [] as (() => void)[]
+	readonly options    = new Options
+	readonly plugins    = {} as { [index: string]: Plugin }
+	readonly styleSheet = {} as string[]
 
 	constructor(public readonly element: HTMLTableElement, options: Partial<Options> = {})
 	{
@@ -97,19 +98,21 @@ export class Table
 
 	protected constructPlugins()
 	{
-		this.options.plugins.forEach(pluginType => {
+		for (const pluginType of this.options.plugins) {
 			this.plugins[pluginType.name] = new pluginType(this)
-		})
+		}
 	}
 
 	protected initPlugins()
 	{
-		Object.values(this.plugins).forEach(plugin => plugin.init())
+		for (const plugin of Object.values(this.plugins)) {
+			plugin.init()
+		}
 	}
 
 	reset()
 	{
-		this.onReset.forEach(onReset => onReset())
+		for (const onReset of this.onReset) onReset.call(this)
 		return tableByElement(this.element, this.options)
 	}
 

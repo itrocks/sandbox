@@ -58,7 +58,7 @@ describe('orderedIndexOf', () => {
 
 describe('orderedInsert', () => {
 	it('first', () => {
-		const array: string[] = []
+		const array = [] as string[]
 		expect(array.orderedInsert('a')).toEqual(0)
 		expect(array).toEqual(['a'])
 	})

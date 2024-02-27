@@ -1,11 +1,11 @@
 
-export const objectOf = (target: object | Type): object => (typeof target === 'object')
+export const objectOf = <T extends object>(target: T | Type<T>): T => (typeof target === 'object')
 	? target
-	: new target
+	: new target as T
 
-export type Type = new(...args: any[]) => object
+export type Type<T extends object = object> = new(...args: any[]) => T
 export default Type
 
-export const typeOf = (target: object | Type): Type => (typeof target === 'object')
+export const typeOf = <T extends object>(target: T | Type<T>): Type<T> => (typeof target === 'object')
 	? Object.getPrototypeOf(target).constructor
 	: target

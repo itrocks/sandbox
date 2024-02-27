@@ -1,13 +1,12 @@
-import Action   from '../../action/action'
-import Request  from '../../action/request'
-import dao      from '../../dao/dao'
-import dump     from '../../debug/dump'
-import Response from '../../server/response'
+import Action  from '../../action/action'
+import Request from '../../action/request'
+import dao     from '../../dao/dao'
+import dump    from '../../debug/dump'
 
 export default class List extends Action
 {
 
-	async html(request: Request): Promise<Response>
+	async html(request: Request)
 	{
 		const objects = await dao.search(request.getType())
 		return this.htmlResponse(`<html lang="en">
@@ -16,7 +15,7 @@ export default class List extends Action
 </html>`)
 	}
 
-	async json(request: Request): Promise<Response>
+	async json(request: Request)
 	{
 		const objects = await dao.search(request.getType())
 		return this.jsonResponse(objects)

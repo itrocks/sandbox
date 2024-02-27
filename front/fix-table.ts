@@ -63,7 +63,7 @@ export class FixTable extends Plugin
 		const table = this.table
 		if (!table.element.tFoot?.rows.length) return
 		let counter = 1, bottom = .0, previousBottom = table.element.getBoundingClientRect().bottom
-		Array.from(table.element.tFoot.querySelectorAll<HTMLTableRowElement>(':scope > tr')).reverse().forEach(row => {
+		for (const row of Array.from(table.element.tFoot.querySelectorAll<HTMLTableRowElement>(':scope > tr')).reverse()) {
 			const actualBottom = row.getBoundingClientRect().bottom
 			bottom += previousBottom - actualBottom
 			previousBottom = actualBottom
@@ -73,7 +73,7 @@ export class FixTable extends Plugin
 				}
 			`)
 			counter ++
-		})
+		}
 		const zIndex = this.full ? `z-index: ${this.full.row};` : ''
 		table.styleSheet.push(`
 			${table.selector} > tfoot > tr > * {
@@ -115,7 +115,7 @@ export class FixTable extends Plugin
 		const bodySel:   string[] = []
 		const cornerSel: string[] = []
 		let counter = 1, left = .0, previousLeft = table.element.getBoundingClientRect().left
-		Array.from(this.columns).toSpliced(this.leftColumnCount).forEach(colCell => {
+		for (const colCell of Array.from(this.columns).toSpliced(this.leftColumnCount)) {
 			const actualLeft = colCell.getBoundingClientRect().left
 			left += actualLeft - previousLeft
 			previousLeft = actualLeft
@@ -128,7 +128,7 @@ export class FixTable extends Plugin
 			cornerSel.push(`${table.selector} > tfoot > tr > :nth-child(${counter})`)
 			cornerSel.push(`${table.selector} > thead > tr > :nth-child(${counter})`)
 			counter ++
-		})
+		}
 		const zIndex      = this.full ? `z-index: ${this.full.column};` : ''
 		const zIndexValue = this.full ? this.full.corner : this.zIndex
 		table.styleSheet.push(`
@@ -149,7 +149,7 @@ export class FixTable extends Plugin
 		const bodySel:   string[] = []
 		const cornerSel: string[] = []
 		let counter = 1, right = .0, previousRight = table.element.getBoundingClientRect().right
-		Array.from(this.columns).reverse().toSpliced(this.rightColumnCount).forEach(colCell => {
+		for (const colCell of Array.from(this.columns).reverse().toSpliced(this.rightColumnCount)) {
 			const actualRight = colCell.getBoundingClientRect().right
 			right += previousRight - actualRight
 			previousRight = actualRight
@@ -164,7 +164,7 @@ export class FixTable extends Plugin
 			}
 			cornerSel.push(`${table.selector} > thead > tr > :nth-last-child(${counter})`)
 			counter ++
-		})
+		}
 		const zIndex      = this.full ? `z-index: ${this.full.column};` : ''
 		const zIndexValue = this.full ? this.full.corner : this.zIndex
 		table.styleSheet.push(`

@@ -4,7 +4,7 @@ import { toDisplay }                             from '../rename'
 
 const DISPLAY = Symbol('display')
 
-export const Display = (name: string = '') => decorateCallback<string>(
+export const Display = (name = '') => decorateCallback<string>(
 	DISPLAY,
 	(_target, property) => (name === '') ? toDisplay(property) : name
 )

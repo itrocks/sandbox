@@ -22,30 +22,30 @@ export function uses<T extends Type>(target: T, mixins: Type[]): T
 		[index: string]: any
 		constructor(...args: any[]) {
 			super(...args)
-			mixins.forEach(mixin => this[mixin.name]())
+			for (const mixin of mixins) this[mixin.name]()
 		}
 	}
 
-	mixins.forEach(mixin => {
+	for (const mixin of mixins) {
 		const already = ['constructor']
 		let   proto   = mixin.prototype
 		while (proto.constructor !== Object) {
-			Object.entries(Object.getOwnPropertyDescriptors(proto)).forEach(([name, descriptor]) => {
-				if (already.includes(name)) return
+			for (const [name, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(proto))) {
+				if (already.includes(name)) continue
 				already.push(name)
 				Object.defineProperty(builtClass.prototype, name, descriptor)
-			})
+			}
 			proto = Object.getPrototypeOf(proto)
 		}
-	})
+	}
 
-	mixins.forEach(mixin => {
+	for (const mixin of mixins) {
 		Object.defineProperty(builtClass.prototype, mixin.name, {
 			value: function() {
-				Object.entries(new mixin).forEach(([name, value]: [string, any]) => this[name] = value)
+				for (const [name, value] of Object.entries(new mixin)) this[name] = value
 			}
 		})
-	})
+	}
 
 	return builtClass
 }

@@ -1,18 +1,18 @@
 import { ReflectClass } from '../class/reflect'
 import { Type }         from '../class/type'
 
-export class ReflectProperty
+export class ReflectProperty<T extends object>
 {
-	#class:        object | ReflectClass | Type
-	readonly name: string
+	readonly #class: T | ReflectClass<T> | Type<T>
+	readonly name:   string
 
-	constructor(object: object | ReflectClass | Type, name: string)
+	constructor(object: T | ReflectClass<T> | Type<T>, name: string)
 	{
 		this.#class = object
 		this.name   = name
 	}
 
-	get class(): ReflectClass
+	get class()
 	{
 		const value = (this.#class instanceof ReflectClass)
 			? this.#class
@@ -21,7 +21,7 @@ export class ReflectProperty
 		return value
 	}
 
-	get object(): object | undefined
+	get object()
 	{
 		const value = this.class.object
 		Object.defineProperty(this, 'object', { value, writable: false })
