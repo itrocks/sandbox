@@ -10,7 +10,7 @@ export const Display = (name: string = '') => decorateCallback<string>(
 )
 export default Display
 
-export const displayOf = (target: object|Type, property: string) => decoratorOfCallback<string>(
+export const displayOf = (target: object | Type, property: string) => decoratorOfCallback<string>(
 	target,
 	property,
 	DISPLAY,

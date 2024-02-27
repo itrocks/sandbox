@@ -5,32 +5,39 @@ class ParentMixin2Extends {
 	parentMixin2ExtendsMethod() { return 'parentMixin2ExtendsMethod' }
 	parentMixin2ExtendsProperty = 'parentMixin2ExtendsProperty'
 }
+
 class ParentMixin1 {
 	parentMixin1Method() { return 'parentMixin1Method' }
 	parentMixin1Property = 'parentMixin1Property'
 }
+
 class ParentMixin2 extends ParentMixin2Extends {
 	parentMixin2Method() { return 'parentMixin2Method' }
 	parentMixin2Property = 'parentMixin2Property'
 }
+
 @Uses(ParentMixin1, ParentMixin2)
 class Parent {
 	parentMethod() { return 'parentMethod' }
 	parentProperty = 'parentProperty'
 }
+
 class Mixin1Mixin1 {
 	mixin1Mixin1Method() { return 'mixin1Mixin1Method' }
 	mixin1Mixin1Property = 'mixin1Mixin1Property'
 }
+
 @Uses(Mixin1Mixin1)
 class Mixin1 {
 	mixin1Method() { return 'mixin1Method' }
 	mixin1Property = 'mixin1Property'
 }
+
 class Mixin2 {
 	mixin2Method() { return 'mixin2Method' }
 	mixin2Property = 'mixin2Property'
 }
+
 @Uses(Mixin1, Mixin2)
 class Class extends Parent {
 	classMethod() { return 'classMethod' }
@@ -42,8 +49,7 @@ describe('build', () =>
 
 	it('getAllMethods', () =>
 	{
-		const object: Class&Mixin1&Mixin1Mixin1&Mixin2&ParentMixin1&ParentMixin2
-			= new Class as Class&Mixin1&Mixin1Mixin1&Mixin2&ParentMixin1&ParentMixin2
+		const object = new Class as Class & Mixin1 & Mixin1Mixin1 & Mixin2 & ParentMixin1 & ParentMixin2
 		expect(object.classMethod()).toEqual('classMethod')
 		expect(object.parentMethod()).toEqual('parentMethod')
 		expect(object.mixin1Method()).toEqual('mixin1Method')
@@ -56,8 +62,7 @@ describe('build', () =>
 
 	it('getAllProperties', () =>
 	{
-		const object: Class&Mixin1&Mixin1Mixin1&Mixin2&ParentMixin1&ParentMixin2
-			= new Class as Class&Mixin1&Mixin1Mixin1&Mixin2&ParentMixin1&ParentMixin2
+		const object = new Class as Class & Mixin1 & Mixin1Mixin1 & Mixin2 & ParentMixin1 & ParentMixin2
 		expect(object.classProperty).toEqual('classProperty')
 		expect(object.parentProperty).toEqual('parentProperty')
 		expect(object.mixin1Property).toEqual('mixin1Property')

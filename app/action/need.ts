@@ -8,4 +8,4 @@ export type Needs = ''|'?object'|'object'|'objects'
 export const Need = (value: Needs) => decorate(NEED, value)
 export default Need
 
-export const needOf = (target: object|Type) => decoratorOf<Needs>(target, NEED, '')
+export const needOf = (target: object | Type) => decoratorOf<Needs>(target, NEED, '')

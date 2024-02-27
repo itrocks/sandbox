@@ -24,7 +24,7 @@ describe('parseExpression', () => {
 
 	const parseExpression = (expression: string, close: string, finalClose: string = '') => {
 		template.setSource(expression)
-		template.parseExpression(null, close, finalClose)
+		template.parseExpression(undefined, close, finalClose)
 		return template.getPosition()
 	}
 

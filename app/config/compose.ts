@@ -1,5 +1,5 @@
 
-export const config: { [index: string]: string|string[] } =
+export const config: { [index: string]: string | string[] } =
 {
 	'/account/account': '/account/active'
 }

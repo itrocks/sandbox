@@ -1,5 +1,5 @@
 
-export type HTMLTableFixElement = HTMLTableCellElement|HTMLTableColElement
+export type HTMLTableFixElement = HTMLTableCellElement | HTMLTableColElement
 
 const styleSheets = new CSSStyleSheet
 document.adoptedStyleSheets.push(styleSheets)
@@ -73,10 +73,10 @@ export class Table
 	}
 
 	addEventListener<T extends keyof GlobalEventHandlersEventMap>(
-		element:  Document|Element|Window,
+		element:  Document | Element | Window,
 		type:     T,
 		listener: (this: Element, ev: GlobalEventHandlersEventMap[T]) => any,
-		options?: AddEventListenerOptions|boolean
+		options?: AddEventListenerOptions | boolean
 	) {
 		element.addEventListener(type as string, listener as () => any, options)
 		this.onReset.push(() => element.removeEventListener(type as string, listener as () => any, options))

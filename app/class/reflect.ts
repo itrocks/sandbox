@@ -1,10 +1,10 @@
 import { ReflectProperty }        from '../property/reflect'
 import { objectOf, Type, typeOf } from './type'
 
-export const properties = (object: object|ReflectClass|Type) => propertyNames(object)
+export const properties = (object: object | ReflectClass | Type) => propertyNames(object)
 	.map(propertyName => new ReflectProperty(object, propertyName))
 
-export const propertyNames = (object: object|ReflectClass|Type) => Object
+export const propertyNames = (object: object | ReflectClass | Type) => Object
 	.getOwnPropertyNames((object instanceof ReflectClass) ? new (object.type) : objectOf(object))
 
 export class ReflectClass
@@ -12,13 +12,13 @@ export class ReflectClass
 
 	name: string
 
-	object: object|null
+	object?: object
 
 	type: Type
 
-	constructor(object: object|Type)
+	constructor(object: object | Type)
 	{
-		this.object = (typeof object === 'object') ? object : null
+		this.object = (typeof object === 'object') ? object : undefined
 		this.type   = typeOf(object)
 		this.name   = this.type.name
 	}

@@ -3,7 +3,7 @@ import { Super, Uses } from '../../uses'
 
 class MixinParent {
 	a = 1
-	// @ts-ignore
+
 	method() {
 		if (this instanceof Mixin) {
 			console.log('this instanceOf Class')
@@ -12,18 +12,21 @@ class MixinParent {
 		return Super<Class>(this).method.call(this) + '-mixinParentMethod' + this.a
 	}
 }
+
 class Mixin extends MixinParent {
 	a = 2
 	method() {
 		return super.method() + '-mixinMethod' + this.a
 	}
 }
+
 class Parent {
 	a = 3
 	method() {
 		return 'parentMethod' + this.a
 	}
 }
+
 @Uses(Mixin)
 class Class extends Parent {
 	a = 4
@@ -34,7 +37,7 @@ class Class extends Parent {
 
 describe('mixinOverride', () => {
 	it('mixinOverrideIt', () => {
-		const object: Class&Mixin = new Class()
+		const object = new Class() as Class & Mixin
 		expect(object.method()).toEqual('parentMethod2-method2-mixinParentMethod2-mixinMethod2')
 	})
 })

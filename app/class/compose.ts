@@ -3,7 +3,7 @@ import config   from '../config/compose'
 import Type     from './type'
 import { uses } from './uses'
 
-const replacements: { [p: string]: string|string[] } = Object.fromEntries(
+const replacements: { [p: string]: string | string[] } = Object.fromEntries(
 	Object.entries(config).map(([module, replacement]) => [
 		path.normalize(require.resolve('..' + module)),
 		(typeof replacement === 'string')

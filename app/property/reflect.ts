@@ -4,11 +4,11 @@ import { Type }         from '../class/type'
 export class ReflectProperty
 {
 
-	#class: object|ReflectClass|Type
+	#class: object | ReflectClass | Type
 
 	readonly name: string
 
-	constructor(object: object|ReflectClass|Type, name: string)
+	constructor(object: object | ReflectClass | Type, name: string)
 	{
 		this.#class = object
 		this.name   = name

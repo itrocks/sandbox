@@ -10,8 +10,8 @@ export class ColumnReorderTable extends Plugin
 
 		this.reorderCells = this.getReorderCells()
 
-		let downed:   HTMLTableCellElement|undefined
-		let dragging: HTMLTableCellElement|undefined
+		let downed:   HTMLTableCellElement | undefined
+		let dragging: HTMLTableCellElement | undefined
 		let mouse     = new DOMRect()
 		let mouseFrom = new DOMRect()
 		Array.from(this.reorderCells).forEach(cell => {

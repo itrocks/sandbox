@@ -18,7 +18,7 @@ export default class Request
 		Object.assign(this, this.parsePath())
 	}
 
-	getModule(): object|string|undefined
+	getModule(): object | string | undefined
 	{
 		let route: { [name: string]: any } = routes
 		this.route.substring(1).split('/').reverse().forEach(name => {

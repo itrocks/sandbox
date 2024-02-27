@@ -1,9 +1,11 @@
 import { readFile } from 'node:fs/promises'
 import path         from 'path'
 
-const translations: Map<string, string> = new Map
+const parseCsv = require('papaparse').parse
+const translations: Map<string, string> = new Map();
+
 readFile(__dirname + path.sep + 'fr.csv', 'utf-8')
-	.then(data => require('papaparse').parse(data, { delimiter: ';' }).data as [string, string][])
+	.then(data => parseCsv(data, { delimiter: ';' }).data as [string, string][])
 	.then(data => data.forEach(row => translations.set(row[0], row[1])))
 
 export function tr(text: string, parts: string[])

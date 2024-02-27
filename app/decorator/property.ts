@@ -10,14 +10,14 @@ export function decorateCallback<T>(name: Symbol, callback: (target: Type, prope
 	return (target: Type, property: string) => Reflect.defineMetadata(name, callback(target, property), target, property)
 }
 
-export function decoratorOf<T>(target: object|Type, property: string, name: Symbol, undefinedValue: T): T
+export function decoratorOf<T>(target: object | Type, property: string, name: Symbol, undefinedValue: T): T
 {
 	const result = Reflect.getMetadata(name, objectOf(target), property)
 	return (result === undefined) ? undefinedValue : result
 }
 
 export function decoratorOfCallback<T>(
-	target: object|Type, property: string, name: Symbol, undefinedCallback: (target: object, property: string) => T
+	target: object | Type, property: string, name: Symbol, undefinedCallback: (target: object, property: string) => T
 ): T
 {
 	target = objectOf(target)

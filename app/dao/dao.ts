@@ -3,7 +3,7 @@ import config from '../../local/dao'
 export interface Dao
 {
 
-	read<T extends object>(type: new() => T, id: bigint|string): Promise<T>
+	read<T extends object>(type: new() => T, id: bigint | string): Promise<T>
 
 	search<T extends object>(type: new() => T, search?: object): Promise<T[]>
 

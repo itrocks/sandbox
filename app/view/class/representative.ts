@@ -20,7 +20,8 @@ export const Representative = (...properties: string[]) => decorateCallback<stri
 })
 export default Representative
 
-export const representativeOf = (target: object|Type) => decoratorOfCallback<string[]>(target, REPRESENTATIVE, defaultValue)
+export const representativeOf = (target: object | Type) =>
+	decoratorOfCallback<string[]>(target, REPRESENTATIVE, defaultValue)
 
 export const representativeValueOf = (target: { [property: string]: any }) =>
 	representativeOf(target).map(property => target[property]).filter(value => value.length).join(' ')
