@@ -1,53 +1,56 @@
-import Type          from '../class/type'
-import dao           from '../dao/dao'
-import ServerRequest from '../server/request'
-import Exception     from './exception'
-import formats       from './formats'
-import routes        from './routes'
+import { dao, Entity }    from '../dao/dao'
+import ServerRequest      from '../server/request'
+import Exception          from './exception'
+import formats            from './formats'
+import { Routes, routes } from './routes'
 
 export default class Request
 {
-	action:  string = ''
-	format:  string = ''
-	ids:     string[] = []
-	objects: object[] = []
-	route:   string = ''
+	action  = ''
+	format  = ''
+	ids     = [] as string[]
+	objects = [] as (object & Entity)[]
+	route   = ''
 
 	constructor(public request: ServerRequest)
 	{
 		Object.assign(this, this.parsePath())
 	}
 
-	getModule(): object | string | undefined
+	getModule()
 	{
-		let route: { [name: string]: any } = routes
-		this.route.substring(1).split('/').reverse().forEach(name => {
-			if (!route[name]) {
-				return false
-			}
-			route = route[name]
-		})
+		let route: Routes | string = routes
+		for (const name of this.route.substring(1).split('/').reverse()) {
+			if (typeof route === 'string') return undefined
+			const routeStep = route[name] as Routes | string | undefined
+			if (!routeStep) break
+			route = routeStep
+		}
 		if ((typeof route === 'object') && route[':']) {
 			route = route['-']
 		}
 		return (route === routes) ? undefined : route
 	}
 
-	get object(): { [property: string]: any }
+	get object()
 	{
 		return this.objects[0]
 	}
 
-	getType(): Type
+	getType()
 	{
 		const module = this.getModule()
 		if (!module) {
 			throw new Exception('Module ' + this.route.substring(1) + ' not found')
 		}
-		return require('..' + module).default
+		const type = require('..' + module).default
+		if (typeof type !== 'function') {
+			throw new Exception('Module ' + this.route.substring(1) + ' default is not a class')
+		}
+		return type
 	}
 
-	async getObjects(): Promise<object[]>
+	async getObjects()
 	{
 		this.objects = []
 		const type = this.getType()

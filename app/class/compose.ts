@@ -3,18 +3,20 @@ import config   from '../config/compose'
 import Type     from './type'
 import { uses } from './uses'
 
-const replacements: { [p: string]: string | string[] } = Object.fromEntries(
+type SubstitutionModule = { __esModule: true, default?: Type }
+
+const replacements = Object.fromEntries(
 	Object.entries(config).map(([module, replacement]) => [
 		path.normalize(require.resolve('..' + module)),
-		(typeof replacement === 'string')
-			? path.normalize(require.resolve('..' + replacement))
-			: replacement.map(replacement => path.normalize(require.resolve('..' + replacement)))
+		(typeof replacement === 'object')
+			? replacement.map(replacement => path.normalize(require.resolve('..' + replacement)))
+			: path.normalize(require.resolve('..' + replacement))
 	])
 )
 
-const cache: { [type: string]: any } = {}
-const Module = require('module')
-const superRequire: (...args: any) => any = Module.prototype.require
+const cache        = {} as { [type: string]: SubstitutionModule }
+const Module       = require('module')
+const superRequire = Module.prototype.require as (...args: any) => any
 
 Module.prototype.require = function(file: string)
 {
@@ -33,14 +35,14 @@ Module.prototype.require = function(file: string)
 		return cache[file]
 	}
 	// require parent
-	const module: { __esModule: true, default?: Type } = { __esModule: true }
-	cache[file] = module
+	const module = { __esModule: true } as SubstitutionModule
+	cache[file]  = module
 	const parentModule = superRequire.apply(this, arguments)
 	// compose
-	if (typeof replacementFiles === 'string') {
+	if (typeof replacementFiles !== 'object') {
 		replacementFiles = [replacementFiles]
 	}
-	const replacementTypes: Type[] = replacementFiles.map(file => superRequire.call(this, file).default)
+	const replacementTypes = replacementFiles.map(file => superRequire.call(this, file).default as Type)
 	module.default = uses(parentModule.default, replacementTypes)
 	return module
 }

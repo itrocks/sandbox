@@ -1,13 +1,13 @@
 import { readdir } from 'node:fs/promises'
-import path        from 'path'
+import { sep }     from 'path'
 
-const walk = async (path: string): Promise<string[]> =>
+const walk = async (directoryName: string): Promise<string[]> =>
 {
 	// @ts-ignore flat(Infinity) always returns string[]
 	return Promise.all(
-		await readdir(path, {withFileTypes: true}).then(entries =>
+		await readdir(directoryName, { withFileTypes: true }).then(entries =>
 			entries.map(entry => {
-				const child = path + '/' + entry.name
+				const child = directoryName + sep + entry.name
 				return entry.isDirectory() ? walk(child) : child
 			})
 		)
@@ -15,51 +15,47 @@ const walk = async (path: string): Promise<string[]> =>
 	.then(entries => entries.flat(Infinity))
 }
 
-const readDirRecursive = async (path: string): Promise<string[]> =>
-	walk(path)
-	.then(entries => entries.map(entry => entry.substring(path.length)))
+const readDirRecursive = async (directoryName: string) =>
+	walk(directoryName)
+	.then(entries => entries.map(entry => entry.substring(directoryName.length)))
 
-export const routes: { [name: string]: any } = {}
+export type    Routes = { [name: string]: Routes | string }
+export const   routes = {} as Routes
 export default routes
 
-readDirRecursive(__dirname.substring(0, __dirname.lastIndexOf(path.sep))).then(entries => {
-	entries.forEach(entry => {
-		if (!entry.endsWith('.ts')) {
-			return
-		}
+readDirRecursive(__dirname.substring(0, __dirname.lastIndexOf(sep))).then(entries => {
+	for (let entry of entries) {
+		if (!entry.endsWith('.ts')) continue
 		entry = entry.substring(0, entry.length - 3)
-		let route = routes
-		const names = entry.split('/').slice(1).reverse()
-		names.slice(0, names.length - 1).forEach(name => {
-			if (!route[name]) {
-				route[name] = {}
+		let   route  = routes
+		const names  = entry.split(sep).slice(1).reverse()
+		const length = names.length - 1
+		for (let index = 0; index < length; index ++) {
+			const name      = names[index]
+			let   routeStep = route[name]
+			if (!routeStep) {
+				routeStep = {}
 			}
-			if (typeof route[name] === 'string') {
-				route[name] = { ':': route[name] }
+			if (typeof routeStep === 'string') {
+				routeStep = { ':': routeStep }
 			}
-			route = route[name]
-		})
-		let name = names[names.length - 1]
-		if (route[name]) {
-			route[name][':'] = entry
+			route = route[name] = routeStep
 		}
-		else {
-			route[name] = entry
-		}
-	})
-	const simplify = (
-		routes: { [name: string]: any },
-		name: string,
-		route: { [name: string]: any }|string
-	) => {
+		const name = names[names.length - 1]
+		route[name]
+			? Object.assign(route[name], { ':': entry })
+			: (route[name] = entry)
+	}
+	const simplify = (routes: Routes, name: string, route: Routes | string) => {
 		if (typeof route === 'string') {
 			return
 		}
-		Object.entries(route).forEach(([name, subRoutes]) => simplify(route, name, subRoutes))
-		if (Object.values(route).length === 1) {
-			routes[name] = Object.values(route)[0]
+		for (const [name, subRoutes] of Object.entries(route)) simplify(route, name, subRoutes)
+		const values = Object.values(route)
+		if (values.length === 1) {
+			routes[name] = values[0]
 			return
 		}
 	}
-	Object.entries(routes).forEach(([name, route]) => simplify(routes, name, route))
+	for (const [name, route] of Object.entries(routes)) simplify(routes, name, route)
 })
