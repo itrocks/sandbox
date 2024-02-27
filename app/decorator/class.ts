@@ -20,6 +20,5 @@ export function decoratorOf<T>(target: object | Type, name: Symbol, undefinedVal
 export function decoratorOfCallback<T>(target: object | Type, name: Symbol, undefinedCallback: (target: object) => T): T
 {
 	target = objectOf(target)
-	const result = Reflect.getMetadata(name, target)
-	return (result === undefined) ? undefinedCallback(target) : result
+	return Reflect.getMetadata(name, target) ?? undefinedCallback(target)
 }

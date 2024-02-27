@@ -5,18 +5,20 @@ export class Request
 {
 
 	constructor(
-		public method:     Method,
-		public scheme:     string,
-		public host:       string,
-		public path:       string,
-		public headers:    { [index: string]: string } = {},
-		public parameters: { [index: string]: string } = {},
-		public data:       string = ''
+		public readonly method:     Method,
+		public readonly scheme:     string,
+		public readonly host:       string,
+		public readonly path:       string,
+		public readonly headers:    { [index: string]: string } = {},
+		public readonly parameters: { [index: string]: string } = {},
+		public readonly data:       string = ''
 	) {}
 
 	get url()
 	{
-		return new URL(this.scheme + '://' + this.host + this.path)
+		const value = new URL(this.scheme + '://' + this.host + this.path)
+		Object.defineProperty(this, 'url', { value, writable: false })
+		return value
 	}
 
 }

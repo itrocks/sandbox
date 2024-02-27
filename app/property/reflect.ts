@@ -3,9 +3,7 @@ import { Type }         from '../class/type'
 
 export class ReflectProperty
 {
-
-	#class: object | ReflectClass | Type
-
+	#class:        object | ReflectClass | Type
 	readonly name: string
 
 	constructor(object: object | ReflectClass | Type, name: string)
@@ -14,16 +12,20 @@ export class ReflectProperty
 		this.name   = name
 	}
 
-	get class() : ReflectClass
+	get class(): ReflectClass
 	{
-		return (this.#class instanceof ReflectClass)
+		const value = (this.#class instanceof ReflectClass)
 			? this.#class
-			: this.#class = new ReflectClass(this.#class)
+			: new ReflectClass(this.#class)
+		Object.defineProperty(this, 'class', { value, writable: false })
+		return value
 	}
 
-	get object()
+	get object(): object | undefined
 	{
-		return this.class.object
+		const value = this.class.object
+		Object.defineProperty(this, 'object', { value, writable: false })
+		return value
 	}
 
 }
