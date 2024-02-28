@@ -1,7 +1,10 @@
-import Template from './template'
+import '../../expand'
+
+import * as translate from '../../locale/translate'
+import Template       from './template'
 
 describe('parseExpression', () => {
-	const template = new Template()
+	const template     = new Template()
 	template.parsePath = (name: string) => ({
 
 		againValueThing: 'foo',
@@ -174,11 +177,157 @@ describe('parseVariable', () => {
 })
 
 describe('parseVars', () => {
-	const template = new Template()
+	const template           = new Template()
+	template.doTranslate     = false
 	template.parseExpression = () => ({ index: 0, start: 0, target: '' })
 
 	it('empty', () => {
 		template.setSource('')
 		expect(template.parseVars()).toEqual('')
+	})
+})
+
+describe('tr', () => {
+	const template = new Template()
+	jest.spyOn(translate, 'tr').mockImplementation((text: string) => {
+		switch (text) {
+			case 'example': return 'translated'
+		}
+		return '!'
+	})
+
+	it('simple', () => {
+		expect(template.tr('example')).toEqual('translated')
+	})
+	it('spacesAfter',() => {
+		expect(template.tr('example \n\t  ')).toEqual('translated \n\t  ')
+	})
+	it('spacesAround', () => {
+		expect(template.tr(' \n\t  example \n\t  ')).toEqual(' \n\t  translated \n\t  ')
+	})
+	it('spacesBefore', () => {
+		expect(template.tr(' \n\t  example')).toEqual(' \n\t  translated')
+	})
+})
+
+class TemplateMockTranslate extends Template
+{
+
+	parseVariable(name: string)
+	{
+		switch (name) {
+			case 'name':           return 'value'
+			case 'what':           return 'sama'
+			case 'valueRecursion': return 'valueExpressed'
+		}
+		return '?'
+	}
+
+	tr = (text: string, translateParts: string[] = []) =>
+	{
+		if (!text.trim()) return ''
+		switch (text) {
+			case 'a $1 here':   return `some ${translateParts[0]} there`
+			case 'example':     return 'translated'
+			case 'I am $1-san': return `You are ${translateParts[0]}-sama`
+			case 'I AM $1-$2':  return `You ARE ${translateParts[0]}-${translateParts[1]}`
+			case 'Text 1':      return 'Phrase one'
+			case 'Text 2':      return 'Phrase two'
+			case 'Text 3':      return 'Phrase three'
+			case 'Text 1 ':     return 'Phrase one '
+			case ' Text 3':     return ' Phrase three'
+		}
+		return '!'
+	}
+
+}
+
+describe('translateAttribute', () => {
+	const template = new TemplateMockTranslate()
+
+	it('no', () => {
+		expect(template.parseBuffer('<article class="example">'))
+			.toEqual('<article class="example">')
+	})
+	it('noExpression', () => {
+		expect(template.parseBuffer('<article class="I am {name}-san">'))
+			.toEqual('<article class="I am value-san">')
+	})
+	it('containsExpression', () => {
+		expect(template.parseBuffer('<article title="I am {name}-san">'))
+			.toEqual('<article title="You are value-sama">')
+	})
+	it('containsExpressions', () => {
+		expect(template.parseBuffer('<article title="I AM {name}-{what}">'))
+			.toEqual('<article title="You ARE value-sama">')
+	})
+	it('containsSubExpression', () => {
+		expect(template.parseBuffer('<article title="I am {{name}Recursion}-san">'))
+			.toEqual('<article title="You are valueExpressed-sama">')
+	})
+	it('isExpression', () => {
+		expect(template.parseBuffer('<article title="{name}">'))
+			.toEqual('<article title="value">')
+	})
+	it('isSubExpression', () => {
+		expect(template.parseBuffer('<article title="{{name}Recursion}">'))
+			.toEqual('<article title="valueExpressed">')
+	})
+	it('pureText', () => {
+		expect(template.parseBuffer('<article title="example">'))
+			.toEqual('<article title="translated">')
+	})
+})
+
+describe('translateBlock', () => {
+	const template = new TemplateMockTranslate()
+
+	it('blockComment', () => {
+		expect(template.parseBuffer('<body>Text 1<!-- comment 1 -->Text 2<!-- comment 2 -->Text 3</body>'))
+			.toEqual('<body>Phrase one<!-- comment 1 -->Phrase two<!-- comment 2 -->Phrase three</body>')
+	})
+	it('blockExpression', () => {
+		expect(template.parseBuffer('<body>Text 1 <!--BEGIN-->Text 2<!--END--> Text 3</body>'))
+			.toEqual('<body>Phrase one Phrase two Phrase three</body>')
+	})
+	it('containsExpression', () => {
+		expect(template.parseBuffer('<head><title>I am {name}-san</title></head>'))
+			.toEqual('<head><title>You are value-sama</title></head>')
+	})
+	it('containsSubExpression', () => {
+		expect(template.parseBuffer('<head><title>I am {{name}Recursion}-san</title></head>'))
+			.toEqual('<head><title>You are valueExpressed-sama</title></head>')
+	})
+	it('isExpression', () => {
+		expect(template.parseBuffer('<head><title>{name}</title></head>'))
+			.toEqual('<head><title>value</title></head>')
+	})
+	it('isSubExpression', () => {
+		expect(template.parseBuffer('<head><title>{{name}Recursion}</title></head>'))
+			.toEqual('<head><title>valueExpressed</title></head>')
+	})
+	it('simple', () => {
+		expect(template.parseBuffer('<head><title>example</title></head>'))
+			.toEqual('<head><title>translated</title></head>')
+	})
+})
+
+describe('translateMixes', () => {
+	const template = new TemplateMockTranslate()
+
+	it('attributeExpressionBlockExpression', () => {
+		const buffer = '<article title="I am {name}-san">a {name} here</article>'
+		expect(template.parseBuffer(buffer))
+			.toEqual('<article title="You are value-sama">some value there</article>')
+	})
+	it('attributeExpressionBlockExpressionInBlock', () => {
+		const buffer = '<main><article title="I am {name}-san">a {name} here</article></main>'
+		expect(template.parseBuffer(buffer))
+			.toEqual('<main><article title="You are value-sama">some value there</article></main>')
+	})
+	it('attributeExpressionBlockInBlock', () => {
+		const buffer = '<main><article title="I am {name}-san"></article></main>'
+		expect(template.parseBuffer(buffer))
+			.toEqual('<main><article title="You are value-sama"></article></main>')
 	})
 })

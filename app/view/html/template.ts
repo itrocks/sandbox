@@ -16,13 +16,14 @@ let start:  number
 let target: string
 let text:   string
 
-let translateCount = 0
-let translateParts = [] as string[]
-let translating    = false
+let targetStack:    string[]
+let translateParts: string[]
+let translating:    boolean
 
 export default class Template
 {
 	doExpression = true
+	doTranslate  = true
 
 	onAttribute?: ((name: string, value: string) => void)
 	onTagOpen?:   ((name: string) => void)
@@ -95,6 +96,10 @@ export default class Template
 		const indexOut  = index
 		let   open      = source[index]
 
+		if (translating && !translateParts.length) {
+			this.translateStack()
+		}
+
 		if (open === '<') {
 			index += 3
 			open   = '{'
@@ -135,11 +140,11 @@ export default class Template
 					target += targetStack.shift()
 				}
 				if (translating && !targetStack.length) {
-					translateCount ++
 					translateParts.push(parsed)
-					target += lastTarget + '$' + translateCount
+					target += lastTarget + '$' + translateParts.length
+					return
 				}
-				else if ((lastTarget === '') && (target === '')) {
+				if ((lastTarget === '') && (target === '')) {
 					target = parsed
 				}
 				else {
@@ -189,6 +194,11 @@ export default class Template
 		) {
 			return variable.substring(1, variable.length - 1)
 		}
+		if (variable[0] === '@') {
+			if ((typeof data !== 'function') && (typeof data !== 'object')) {
+				console.error('Bad data for variable', variable, 'data', data)
+			}
+		}
 		switch (variable) {
 			case 'BEGIN':
 				return data
@@ -224,7 +234,6 @@ export default class Template
 		let   iteration   = 0
 		let   iterations  = 0
 		const tagStack    = [] as { tagName: string, translating: boolean }[]
-		const targetStack = [] as string[]
 
 		while (index < length) {
 			let char = source[index]
@@ -243,19 +252,21 @@ export default class Template
 
 			char = source[++index]
 			if (char === '!') {
+				if (translating) {
+					this.translateTarget(index - 1)
+				}
 				char = source[++index]
 				index ++
 
 				// comment tag
 				if ((char === '-') && (source[index] === '-')) {
 					index ++
-					if (!this.doExpression) {
+					if (!(/[a-z0-9@%{]/i.test(source[index]) && this.doExpression)) {
 						index = source.indexOf('-->', index) + 3
 						if (index === 2) break
-						continue
-					}
-
-					if (!source[index].match(/[a-z0-9@%{]/i)) {
+						if (translating) {
+							this.translateStart()
+						}
 						continue
 					}
 
@@ -267,12 +278,18 @@ export default class Template
 						if (iteration < iterations) {
 							data  = collection[iteration]
 							index = start = blockStart
+							if (translating) {
+								this.translateStart()
+							}
 							continue
 						}
 						({ blockStart, collection, data, iteration, iterations } = blockStack.pop()
 							?? { blockStart: 0, collection: [], data: undefined, iteration: 0, iterations: 0 })
 						index += 6
 						start  = index
+						if (translating) {
+							this.translateStart()
+						}
 						continue
 					}
 
@@ -283,14 +300,17 @@ export default class Template
 						target += this.trimEndLine(source.substring(start, indexOut))
 						start   = indexOut
 					}
-					const backTarget = target
-					index  = indexOut
-					target = ''
+					const backTarget      = target
+					const backTranslating = translating
+					index       = indexOut
+					target      = ''
+					translating = false
 					this.parseExpression(data, '}', '-->')
-					blockData  = target
-					blockStart = start = index
-					iteration  = 0
-					target     = backTarget
+					blockData   = target
+					blockStart  = index
+					iteration   = 0
+					target      = backTarget
+					translating = backTranslating
 					if (Array.isArray(blockData)) {
 						collection = blockData
 						data       = collection[0]
@@ -301,38 +321,78 @@ export default class Template
 						data       = blockData
 						iterations = data ? 1 : 0
 					}
+					if (translating) {
+						this.translateStart()
+					}
+					continue
 				}
 
 				// cdata section
-				if ((char === '[') && (source.substring(index, index + 6) === 'CDATA[') && !this.doExpression) {
+				if ((char === '[') && (source.substring(index, index + 6) === 'CDATA[')) {
 					index = source.indexOf(']]>', index + 6) + 3
 					if (index === 2) break
+					if (translating) {
+						this.translateStart()
+					}
 					continue
 				}
 
 				// DOCTYPE
+				if (translating) {
+					this.translateStart()
+				}
 				continue
 			}
 
 			// tag close
 			if (char === '/') {
+				const indexOut = index - 1
 				index ++
 				const closeTagName = source.substring(index, source.indexOf('>', index))
 				index += closeTagName.length + 1
 				if (this.onText)     this.onText.call(this, text)
 				if (this.onTagClose) this.onTagClose.call(this, closeTagName)
+				let shouldTranslate = false
 				let tagName: string
-				do ({ tagName, translating } = tagStack.pop() ?? { tagName: '', translating: false })
+				do {
+					shouldTranslate ||= translating;
+					({ tagName, translating } = tagStack.pop() ?? { tagName: '', translating: false })
+				}
 				while ((tagName !== closeTagName) && (tagName !== ''))
+				if (shouldTranslate) {
+					this.translateTarget(indexOut)
+				}
+				if (translating) {
+					this.translateStart()
+				}
 				continue
 			}
 
 			// tag open
-			const position = index
+			const tagIndex = index
 			while ((index < length) && !' >\n\r\t\f'.includes(source[index])) index ++
-			const tagName = source.substring(position, index)
+			const tagName = source.substring(tagIndex, index)
 			if (this.onTagOpen) this.onTagOpen.call(this, tagName)
 			while (' \n\r\t\f'.includes(source[index])) index ++
+
+			// script
+			if (tagName === 'script') {
+				if (translating) {
+					this.translateTarget(tagIndex - 1)
+				}
+				if (this.onTagClose) this.onTagClose.call(this, 'script')
+				index = source.indexOf('</script>', index) + 9
+				if (index === 8) break
+				if (translating) {
+					this.translateStart()
+				}
+				continue
+			}
+
+			tagStack.push({ tagName, translating })
+			if (translating) {
+				this.translateTarget(tagIndex - 1)
+			}
 
 			// attributes
 			while (source[index] !== '>') {
@@ -358,28 +418,19 @@ export default class Template
 						quote = ' >'
 					}
 
-					translating = this.translateAttributes.orderedIncludes(attributeName)
+					translating = this.doTranslate && this.translateAttributes.orderedIncludes(attributeName)
 					if (translating) {
-						if (index > start) {
-							target += source.substring(start, index)
-							start   = index
-						}
-						targetStack.push(target)
-						target  = ''
+						this.translateStart()
 					}
 
 					const position   = index
 					const shortQuote = !(quote.length - 1)
 					while (index < length) {
 						const char = source[index]
+						// end of attribute value
 						if (shortQuote ? (char === quote) : quote.includes(char)) {
 							if (translating) {
-								target += source.substring(start, index)
-								start   = index
-								target  = targetStack.pop() as string + tr(target, translateParts)
-								translateCount = 0
-								translateParts = []
-								translating    = false
+								this.translateTarget(index)
 							}
 							if (this.onAttribute) this.onAttribute(attributeName, source.substring(position, index))
 							if (char !== '>') index ++
@@ -401,27 +452,9 @@ export default class Template
 			index ++
 			if (this.onTagOpened) this.onTagOpened.call(this, tagName)
 
-			// script
-			if (tagName === 'script') {
-				if (this.onTagClose) this.onTagClose.call(this, 'script')
-				index = source.indexOf('</script>', index) + 9
-				if (index === 8) break
-				continue
-			}
-
-			const wasTranslating = translating
-			tagStack.push({ tagName, translating })
-			translating = this.translateElements.orderedIncludes(tagName)
+			translating = this.doTranslate && this.translateElements.orderedIncludes(tagName)
 			if (translating) {
-				if (wasTranslating) {
-					if (this.translateComponents.orderedIncludes(tagName)) {
-						console.log('inside translation component')
-					}
-					else {
-						console.log('next translation block')
-					}
-				}
-				translating = false // during development, to avoid side effects
+				this.translateStart()
 			}
 		}
 		return target + source.substring(start)
@@ -435,6 +468,50 @@ export default class Template
 		start  = setStart  ?? index
 		target = setTarget ?? ''
 		text   = setText   ?? ''
+
+		targetStack    = []
+		translateParts = []
+		translating    = false
+	}
+
+	tr(text: string, parts?: string[])
+	{
+		const original = text
+		text           = text.trimEnd()
+		let right      = text.length
+		let left       = text.length
+		text           = text.trimStart()
+		left          -= text.length
+		return original.substring(0, left) + ((text === '') ? '' : tr(text, parts)) + original.substring(right)
+	}
+
+	translateStart()
+	{
+		target += source.substring(start, index)
+		start   = index
+	}
+
+	translateStack()
+	{
+		targetStack.push(target)
+		target  = ''
+	}
+
+	translateTarget(index: number)
+	{
+		if (!translateParts.length) {
+			target += this.tr(source.substring(start, index))
+			start   = index
+			return
+		}
+		target += source.substring(start, index)
+		start   = index
+		target  = targetStack.pop() as string + (
+			target.match(/^(\$[1-9][0-9]*)+$/)
+				? translateParts.join('')
+				: this.tr(target, translateParts)
+		)
+		translateParts = []
 	}
 
 	trimEndLine(string: string)
