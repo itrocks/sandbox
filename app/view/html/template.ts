@@ -29,31 +29,33 @@ export default class Template
 	onTagOpened?: ((name: string) => void)
 	onTagClose?:  ((name: string) => void)
 
-	// Translate these attribute content.
+	// Translate these attribute contents.
 	translateAttributes = ['alt', 'enterkeyhint', 'label', 'placeholder', 'srcdoc', 'title']
 
-	// Translate these element content. They are marks into the translated parent element phrase.
+	// Translate these element contents. They are marks into the translated parent element phrase.
 	translateComponents = [
-		'a', 'big', 'button', 'data', 'font', 'label', 'meter', 'optgroup', 'option', 'select', 'span', 'strike', 'time'
+		'a', 'big', 'button', 'data', 'font', 'label', 'meter', 'optgroup', 'option', 'select', 'span', 'strike',
+		'time', 'tspan'
 	]
 
-	// Translate these element content.
+	// Translate these element contents.
 	translateElements = [
 		'a', 'abbr', 'acronym', 'article', 'aside', 'bdi', 'bdo', 'big', 'blockquote', 'body', 'br', 'button',
-		'caption', 'center', 'data', 'datalist', 'dd', 'details', 'dfn', 'dialog', 'div', 'dt',
+		'caption', 'center', 'data', 'datalist', 'dd', 'desc', 'details', 'dfn', 'dialog', 'div', 'dt',
 		'fieldset', 'figcaption', 'figure', 'font', 'footer', 'form',
 		'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hr', 'iframe', 'keygen', 'label', 'legend', 'li',
 		'main', 'menuitem', 'meter', 'nav', 'noframes', 'noscript', 'option', 'optgroup', 'option', 'p', 'pre', 'rb',
-		's', 'section', 'select', 'span', 'strike', 'summary', 'td', 'template', 'textarea', 'th', 'time', 'title'
+		's', 'section', 'select', 'span', 'strike', 'summary',
+		'td', 'template', 'text', 'textarea', 'textpath', 'th', 'time', 'title'
 	]
 
 	// These tags are ignored: they are part of the translated text.
 	translateIgnore = ['b', 'cite', 'del', 'em', 'i', 'ins', 'mark', 'q', 'small', 'strong', 'sub', 'sup', 'u', 'wbr']
 
-	// Do not translate these element content. They are marks into the translated parent element phrase.
+	// Do not translate these element contents. They are marks into the translated parent element phrase.
 	translateMark = ['code', 'kbd', 'img', 'input', 'picture', 'output', 'rt', 'samp', 'svg', 'var']
 
-	// Do not translate these element content. When they are closed, gets the parent element translation status back.
+	// Do not translate these element contents. When they are closed, gets the parent element translation status back.
 	translateNotElements = [
 		'address', 'applet', 'area', 'audio', 'base', 'basefont', 'canvas', 'col', 'colgroup', 'dir', 'dl', 'embed',
 		'frame', 'frameset', 'head', 'html', 'link', 'map', 'menu', 'meta', 'object', 'ol', 'param', 'progress',
@@ -61,7 +63,7 @@ export default class Template
 	]
 
 	// These elements have no closing tag.
-	unclosing = [
+	unclosingTags = [
 		'area', 'base', 'basefont', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source',
 		'track'
 	]
@@ -260,6 +262,7 @@ export default class Template
 		let   blockStart  = 0
 		let   collection  = []
 		let   data        = this.data
+		let   transLock   = false
 		let   iteration   = 0
 		let   iterations  = 0
 		const tagStack    = [] as { tagName: string, translating: boolean }[]
@@ -388,6 +391,7 @@ export default class Template
 				}
 				while ((tagName !== closeTagName) && tagName.length)
 				if (shouldTranslate) {
+					transLock = false
 					this.translateTarget(indexOut)
 				}
 				if (translating) {
@@ -402,9 +406,10 @@ export default class Template
 			const tagName = source.substring(tagIndex, index)
 			if (this.onTagOpen) this.onTagOpen.call(this, tagName)
 			while (' \n\r\t\f'.includes(source[index])) index ++
+			char = tagName[0]
 
 			// script
-			if (tagName === 'script') {
+			if ((char === 's') && (tagName === 'script')) {
 				if (translating) {
 					this.translateTarget(tagIndex - 1)
 				}
@@ -417,12 +422,18 @@ export default class Template
 				continue
 			}
 
-			tagStack.push({ tagName, translating })
+			const unclosingTag = this.unclosingTags.orderedIncludes(tagName)
+			if (!unclosingTag) {
+				tagStack.push({tagName, translating})
+			}
 			if (translating) {
 				this.translateTarget(tagIndex - 1)
 			}
+			const elementTranslating = translating
 
 			// attributes
+			let   hasTypeSubmit = false
+			const inInput       = (char === 'i') && (tagName === 'input')
 			while (source[index] !== '>') {
 
 				// attribute name
@@ -447,6 +458,8 @@ export default class Template
 					}
 
 					translating = this.doTranslate && this.translateAttributes.orderedIncludes(attributeName)
+						|| (hasTypeSubmit && (attributeName[0] === 'v') && (attributeName === 'value'))
+
 					if (translating) {
 						this.translateStart()
 					}
@@ -457,10 +470,16 @@ export default class Template
 						const char = source[index]
 						// end of attribute value
 						if (shortQuote ? (char === quote) : quote.includes(char)) {
+							const attributeValue = source.substring(position, index)
+							if (inInput) {
+								hasTypeSubmit ||= (
+									(attributeName[0] === 't') && (attributeName === 'type') && (attributeValue === 'submit')
+								)
+							}
 							if (translating) {
 								this.translateTarget(index)
 							}
-							if (this.onAttribute) this.onAttribute(attributeName, source.substring(position, index))
+							if (this.onAttribute) this.onAttribute(attributeName, attributeValue)
 							if (char !== '>') index ++
 							break
 						}
@@ -477,17 +496,26 @@ export default class Template
 				// next attribute
 				while (' \n\r\t\f'.includes(source[index])) index ++
 			}
+			translating = elementTranslating
 			index ++
 			if (this.onTagOpened) this.onTagOpened.call(this, tagName)
 
-			translating = this.doTranslate && this.translateElements.orderedIncludes(tagName)
+			if (!unclosingTag) {
+				transLock ||= (tagName === 'address')
+				translating = this.doTranslate && !transLock && this.translateElements.orderedIncludes(tagName)
+			}
 			if (translating) {
 				this.translateStart()
 			}
 		}
 		if (!tagStack.length) {
-			target += source.substring(start)
-			start   = source.length
+			if (translating && (index > start)) {
+				this.translateTarget(index)
+			}
+			if (start < source.length) {
+				target += source.substring(start)
+				start   = source.length
+			}
 			return target
 		}
 		let shouldTranslate = false

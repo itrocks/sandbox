@@ -232,9 +232,11 @@ class TemplateMockTranslate extends Template
 			case 'example':     return 'translated'
 			case 'I am $1-san': return `You are ${translateParts[0]}-sama`
 			case 'I AM $1-$2':  return `You ARE ${translateParts[0]}-${translateParts[1]}`
+			case 'send':        return 'do it!'
 			case 'Text 1':      return 'Phrase one'
 			case 'Text 2':      return 'Phrase two'
 			case 'Text 3':      return 'Phrase three'
+			case 'Text 4':      return 'Phrase four'
 			case 'Text 1 ':     return 'Phrase one '
 			case ' Text 3':     return ' Phrase three'
 		}
@@ -359,6 +361,26 @@ describe('translateBlock', () => {
 	})
 })
 
+describe('translateBlockYesNo', () => {
+	const template = new TemplateMockTranslate()
+
+	it('noInYes', () => {
+		testBuffer(template,
+			'<div>Text 1<code>Text 2</code>Text 3</div>',
+			'<div>Phrase one<code>Text 2</code>Phrase three</div>')
+	})
+	it('yesInNo', () => {
+		testBuffer(template,
+			'<head><title>Text 2</title></head>',
+			'<head><title>Phrase two</title></head>')
+	})
+	it('yesThenNo', () => {
+		testBuffer(template,
+			'<div>Text 1</div><code>Text 2</code><div>Text 3</div><code>Text 4</code>',
+			'<div>Phrase one</div><code>Text 2</code><div>Phrase three</div><code>Text 4</code>')
+	})
+})
+
 describe('translateMixes', () => {
 	const template = new TemplateMockTranslate()
 
@@ -377,5 +399,35 @@ describe('translateMixes', () => {
 		testBuffer(template,
 			'<main><article title="I am {name}-san"></article></main>',
 			'<main><article title="You are value-sama"></article></main>')
+	})
+})
+
+describe('translateSpecials', () => {
+	const template = new TemplateMockTranslate()
+
+	it('inputSubmitValue', () => {
+		testBuffer(template,
+			'<input type="submit" value="send">',
+			'<input type="submit" value="do it!">')
+	})
+	it('inputValue', () => {
+		testBuffer(template,
+			'<input value="send">',
+			'<input value="send">')
+	})
+	it('inputValueSubmit', () => {
+		testBuffer(template,
+			'<input value="send" type="submit">',
+			'<input value="send" type="submit">')
+	})
+	it('lockAddress', () => {
+		testBuffer(template,
+			'<address>Text 1<div>Text 2</div>Text 3</address>Text 4',
+			'<address>Text 1<div>Text 2</div>Text 3</address>Phrase four')
+	})
+	it('unlockAddress', () => {
+		testBuffer(template,
+			'<div>Text 1<address>Text 1<div>Text 2</div>Text 3</address>Text 4</div>',
+			'<div>Phrase one<address>Text 1<div>Text 2</div>Text 3</address>Phrase four</div>')
 	})
 })
