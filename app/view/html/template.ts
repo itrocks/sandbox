@@ -106,7 +106,7 @@ export default class Template
 		}
 
 		index ++
-		if ((index >= length) || !source[index].match(new RegExp('[a-z0-9@%"\'' + open + close + ']', 'i'))) {
+		if ((index >= length) || !new RegExp('[a-z0-9@%"\'' + open + close + ']', 'i').test(source[index])) {
 			return
 		}
 
@@ -507,7 +507,7 @@ export default class Template
 		target += source.substring(start, index)
 		start   = index
 		target  = targetStack.pop() as string + (
-			target.match(/^(\$[1-9][0-9]*)+$/)
+			/^(\$[1-9][0-9]*)+$/.test(target)
 				? translateParts.join('')
 				: this.tr(target, translateParts)
 		)
