@@ -6,7 +6,7 @@ const DISPLAY = Symbol('display')
 
 export const Display = (name = '') => decorateCallback<string>(
 	DISPLAY,
-	(_target, property) => (name === '') ? toDisplay(property) : name
+	(_target, property) => name.length ? name : toDisplay(property)
 )
 export default Display
 

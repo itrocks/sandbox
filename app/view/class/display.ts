@@ -6,14 +6,14 @@ const DISPLAY = Symbol('display')
 
 export const Display = (name = '') => decorateCallback<string>(
 	DISPLAY,
-	target => toDisplay((name === '') ? target.name : name)
+	target => toDisplay(name.length ? name : target.name)
 )
 export default Display
 
 export const displayOf = (target: object | Type) => decoratorOfCallback<string>(target, DISPLAY, target =>
 {
 	let constr = target.constructor
-	while ((constr.name === '') || (constr.name === 'builtClass')) {
+	while (!constr.name.length || (constr.name === 'builtClass')) {
 		constr = Object.getPrototypeOf(constr)
 	}
 	return toDisplay(constr.name)

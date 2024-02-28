@@ -131,7 +131,7 @@ export default class Template
 				|| ((char === finalChar) && (source.substring(index, index + finalClose.length) === finalClose))
 			) {
 				const expression = target + source.substring(start, index)
-				const lastTarget = targetStack.pop()
+				const lastTarget = targetStack.pop() as string
 				const parsed     = this.parsePath(expression, data)
 				index           += (char === close) ? 1 : finalClose.length
 				start            = index
@@ -144,11 +144,11 @@ export default class Template
 					target += lastTarget + '$' + translateParts.length
 					return
 				}
-				if ((lastTarget === '') && (target === '')) {
-					target = parsed
+				if (lastTarget.length || target.length) {
+					target += lastTarget + parsed
 				}
 				else {
-					target += lastTarget + parsed
+					target = parsed
 				}
 				if (!targetStack.length) {
 					return
@@ -358,7 +358,7 @@ export default class Template
 					shouldTranslate ||= translating;
 					({ tagName, translating } = tagStack.pop() ?? { tagName: '', translating: false })
 				}
-				while ((tagName !== closeTagName) && (tagName !== ''))
+				while ((tagName !== closeTagName) && tagName.length)
 				if (shouldTranslate) {
 					this.translateTarget(indexOut)
 				}
@@ -460,14 +460,14 @@ export default class Template
 		return target + source.substring(start)
 	}
 
-	setSource(setSource: string, setIndex = 0, setStart?: number, setTarget?: string, setText?: string)
+	setSource(setSource: string, setIndex = 0, setStart?: number, setTarget = '', setText = '')
 	{
 		index  = setIndex
 		length = setSource.length
 		source = setSource
-		start  = setStart  ?? index
-		target = setTarget ?? ''
-		text   = setText   ?? ''
+		start  = setStart ?? index
+		target = setTarget
+		text   = setText
 
 		targetStack    = []
 		translateParts = []
@@ -482,7 +482,7 @@ export default class Template
 		let left       = text.length
 		text           = text.trimStart()
 		left          -= text.length
-		return original.substring(0, left) + ((text === '') ? '' : tr(text, parts)) + original.substring(right)
+		return original.substring(0, left) + (text.length ? tr(text, parts) : '') + original.substring(right)
 	}
 
 	translateStart()
@@ -494,7 +494,7 @@ export default class Template
 	translateStack()
 	{
 		targetStack.push(target)
-		target  = ''
+		target = ''
 	}
 
 	translateTarget(index: number)
