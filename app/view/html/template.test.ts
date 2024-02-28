@@ -4,8 +4,9 @@ import * as translate from '../../locale/translate'
 import Template       from './template'
 
 describe('parseExpression', () => {
-	const template     = new Template()
-	template.parsePath = (name: string) => ({
+	const template       = new Template()
+	template.doTranslate = false
+	template.parsePath   = (name: string) => ({
 
 		againValueThing: 'foo',
 		array:           ['one', 'two'],
@@ -340,6 +341,21 @@ describe('translateBlock', () => {
 		testBuffer(template,
 			'<head><title>example</title></head>',
 			'<head><title>translated</title></head>')
+	})
+	it('unclosingElements', () => {
+		testBuffer(template,
+			'Text 1<hr>Text 2<hr>Text 3',
+			'Phrase one<hr>Phrase two<hr>Phrase three')
+	})
+	it('unclosingElementsIn', () => {
+		testBuffer(template,
+			'<div>Text 1<hr>Text 2<hr>Text 3</div>',
+			'<div>Phrase one<hr>Phrase two<hr>Phrase three</div>')
+	})
+	it('verySimple', () => {
+		testBuffer(template,
+			'<title>example</title>',
+			'<title>translated</title>')
 	})
 })
 

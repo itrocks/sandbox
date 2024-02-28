@@ -87,7 +87,7 @@ export default class Template
 			target:         target,
 			targetStack:    [] as string[],
 			translateParts: [] as string[],
-			translating:    false
+			translating:    this.doTranslate
 		}
 	}
 
@@ -485,9 +485,9 @@ export default class Template
 				this.translateStart()
 			}
 		}
-		target += source.substring(start)
-		start   = source.length
 		if (!tagStack.length) {
+			target += source.substring(start)
+			start   = source.length
 			return target
 		}
 		let shouldTranslate = false
@@ -498,7 +498,7 @@ export default class Template
 			if (this.onTagClose) this.onTagClose.call(this, tagName)
 		}
 		if (shouldTranslate) {
-			this.translateTarget(start)
+			this.translateTarget(source.length)
 		}
 		return target
 	}
@@ -513,7 +513,7 @@ export default class Template
 
 		targetStack    = []
 		translateParts = []
-		translating    = false
+		translating    = this.doTranslate
 	}
 
 	tr(text: string, parts?: string[])
