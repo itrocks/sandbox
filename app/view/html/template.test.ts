@@ -242,48 +242,54 @@ class TemplateMockTranslate extends Template
 
 }
 
+function testBuffer(template: Template, source: string, target: string)
+{
+	expect(template.parseBuffer(source)).toEqual(target)
+	expect(template.getContext()).toEqual(template.getCleanContext())
+}
+
 describe('translateAttribute', () => {
 	const template = new TemplateMockTranslate()
 
 	it('no', () => {
-		expect(template.parseBuffer('<article class="example"></article>'))
-			.toEqual('<article class="example"></article>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<article class="example"></article>',
+			'<article class="example"></article>')
 	})
 	it('noExpression', () => {
-		expect(template.parseBuffer('<article class="I am {name}-san"></article>'))
-			.toEqual('<article class="I am value-san"></article>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<article class="I am {name}-san"></article>',
+			'<article class="I am value-san"></article>')
 	})
 	it('containsExpression', () => {
-		expect(template.parseBuffer('<article title="I am {name}-san"></article>'))
-			.toEqual('<article title="You are value-sama"></article>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<article title="I am {name}-san"></article>',
+			'<article title="You are value-sama"></article>')
 	})
 	it('containsExpressions', () => {
-		expect(template.parseBuffer('<article title="I AM {name}-{what}"></article>'))
-			.toEqual('<article title="You ARE value-sama"></article>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<article title="I AM {name}-{what}"></article>',
+			'<article title="You ARE value-sama"></article>')
 	})
 	it('containsSubExpression', () => {
-		expect(template.parseBuffer('<article title="I am {{name}Recursion}-san"></article>'))
-			.toEqual('<article title="You are valueExpressed-sama"></article>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<article title="I am {{name}Recursion}-san"></article>',
+			'<article title="You are valueExpressed-sama"></article>')
 	})
 	it('isExpression', () => {
-		expect(template.parseBuffer('<article title="{name}"></article>'))
-			.toEqual('<article title="value"></article>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<article title="{name}"></article>',
+			'<article title="value"></article>')
 	})
 	it('isSubExpression', () => {
-		expect(template.parseBuffer('<article title="{{name}Recursion}"></article>'))
-			.toEqual('<article title="valueExpressed"></article>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<article title="{{name}Recursion}"></article>',
+			'<article title="valueExpressed"></article>')
 	})
 	it('pureText', () => {
-		expect(template.parseBuffer('<article title="example"></article>'))
-			.toEqual('<article title="translated"></article>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<article title="example"></article>',
+			'<article title="translated"></article>')
 	})
 })
 
@@ -291,49 +297,49 @@ describe('translateBlock', () => {
 	const template = new TemplateMockTranslate()
 
 	it('blockComment', () => {
-		expect(template.parseBuffer('<body>Text 1<!-- comment 1 -->Text 2<!-- comment 2 -->Text 3</body>'))
-			.toEqual('<body>Phrase one<!-- comment 1 -->Phrase two<!-- comment 2 -->Phrase three</body>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<body>Text 1<!-- comment 1 -->Text 2<!-- comment 2 -->Text 3</body>',
+			'<body>Phrase one<!-- comment 1 -->Phrase two<!-- comment 2 -->Phrase three</body>')
 	})
 	it('blockExpression', () => {
-		expect(template.parseBuffer('<body>Text 1 <!--BEGIN-->Text 2<!--END--> Text 3</body>'))
-			.toEqual('<body>Phrase one Phrase two Phrase three</body>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<body>Text 1 <!--BEGIN-->Text 2<!--END--> Text 3</body>',
+			'<body>Phrase one Phrase two Phrase three</body>')
 	})
 	it('containsExpression', () => {
-		expect(template.parseBuffer('<head><title>I am {name}-san</title></head>'))
-			.toEqual('<head><title>You are value-sama</title></head>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<head><title>I am {name}-san</title></head>',
+			'<head><title>You are value-sama</title></head>')
 	})
 	it('containsSubExpression', () => {
-		expect(template.parseBuffer('<head><title>I am {{name}Recursion}-san</title></head>'))
-			.toEqual('<head><title>You are valueExpressed-sama</title></head>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<head><title>I am {{name}Recursion}-san</title></head>',
+			'<head><title>You are valueExpressed-sama</title></head>')
 	})
 	it('isExpression', () => {
-		expect(template.parseBuffer('<head><title>{name}</title></head>'))
-			.toEqual('<head><title>value</title></head>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<head><title>{name}</title></head>',
+			'<head><title>value</title></head>')
 	})
 	it('isSubExpression', () => {
-		expect(template.parseBuffer('<head><title>{{name}Recursion}</title></head>'))
-			.toEqual('<head><title>valueExpressed</title></head>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<head><title>{{name}Recursion}</title></head>',
+			'<head><title>valueExpressed</title></head>')
 	})
 	it('multipleBlocks', () => {
-		expect(template.parseBuffer('<body><header>Text 1</header><main>Text 2</main><footer>Text 3</footer></body>'))
-			.toEqual('<body><header>Phrase one</header><main>Phrase two</main><footer>Phrase three</footer></body>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<body><header>Text 1</header><main>Text 2</main><footer>Text 3</footer></body>',
+			'<body><header>Phrase one</header><main>Phrase two</main><footer>Phrase three</footer></body>')
 	})
 	it('sameBlocks', () => {
-		expect(template.parseBuffer('<ul><li>Text 1</li><li>Text 2</li><li>Text 3</li></ul>'))
-			.toEqual('<ul><li>Phrase one</li><li>Phrase two</li><li>Phrase three</li></ul>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<ul><li>Text 1</li><li>Text 2</li><li>Text 3</li></ul>',
+			'<ul><li>Phrase one</li><li>Phrase two</li><li>Phrase three</li></ul>')
 	})
 	it('simple', () => {
-		expect(template.parseBuffer('<head><title>example</title></head>'))
-			.toEqual('<head><title>translated</title></head>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<head><title>example</title></head>',
+			'<head><title>translated</title></head>')
 	})
 })
 
@@ -341,21 +347,19 @@ describe('translateMixes', () => {
 	const template = new TemplateMockTranslate()
 
 	it('attributeExpressionBlockExpression', () => {
-		const buffer = '<article title="I am {name}-san">a {name} here</article>'
-		expect(template.parseBuffer(buffer))
-			.toEqual('<article title="You are value-sama">some value there</article>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<article title="I am {name}-san">a {name} here</article>',
+			'<article title="You are value-sama">some value there</article>')
 	})
 	it('attributeExpressionBlockExpressionInBlock', () => {
-		const buffer = '<main><article title="I am {name}-san">a {name} here</article></main>'
-		expect(template.parseBuffer(buffer))
-			.toEqual('<main><article title="You are value-sama">some value there</article></main>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<main><article title="I am {name}-san">a {name} here</article></main>',
+			'<main><article title="You are value-sama">some value there</article></main>'
+		)
 	})
 	it('attributeExpressionBlockInBlock', () => {
-		const buffer = '<main><article title="I am {name}-san"></article></main>'
-		expect(template.parseBuffer(buffer))
-			.toEqual('<main><article title="You are value-sama"></article></main>')
-		expect(template.getContext()).toEqual(template.getCleanContext())
+		testBuffer(template,
+			'<main><article title="I am {name}-san"></article></main>',
+			'<main><article title="You are value-sama"></article></main>')
 	})
 })
