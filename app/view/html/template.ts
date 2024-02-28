@@ -14,7 +14,6 @@ let length: number
 let source: string
 let start:  number
 let target: string
-let text:   string
 
 let targetStack:    string[]
 let translateParts: string[]
@@ -29,7 +28,6 @@ export default class Template
 	onTagOpen?:   ((name: string) => void)
 	onTagOpened?: ((name: string) => void)
 	onTagClose?:  ((name: string) => void)
-	onText?:      ((text: string) => void)
 
 	// Translate these attribute content.
 	translateAttributes = ['alt', 'enterkeyhint', 'label', 'placeholder', 'srcdoc', 'title']
@@ -79,9 +77,40 @@ export default class Template
 		this.onTagClose  = (name: string) => console.log('tag.closed =', name)
 	}
 
+	getCleanContext()
+	{
+		return {
+			index:          length,
+			length:         source.length,
+			source:         source,
+			start:          length,
+			target:         target,
+			targetStack:    [] as string[],
+			translateParts: [] as string[],
+			translating:    false
+		}
+	}
+
 	getPosition()
 	{
 		return { index, start, target }
+	}
+
+	getContext()
+	{
+		return { index, length, source, start, target, targetStack, translateParts, translating }
+	}
+
+	isContextClean()
+	{
+		const clean   = this.getCleanContext()
+		const context = this.getContext()
+		return context.index               === clean.index
+			&& context.length                === clean.length
+			&& context.start                 === clean.start
+			&& context.targetStack.length    === clean.targetStack.length
+			&& context.translateParts.length === clean.translateParts.length
+			&& context.translating           === clean.translating
 	}
 
 	parseBuffer(buffer: string)
@@ -350,13 +379,12 @@ export default class Template
 				index ++
 				const closeTagName = source.substring(index, source.indexOf('>', index))
 				index += closeTagName.length + 1
-				if (this.onText)     this.onText.call(this, text)
-				if (this.onTagClose) this.onTagClose.call(this, closeTagName)
 				let shouldTranslate = false
 				let tagName: string
 				do {
 					shouldTranslate ||= translating;
 					({ tagName, translating } = tagStack.pop() ?? { tagName: '', translating: false })
+					if (this.onTagClose) this.onTagClose.call(this, tagName)
 				}
 				while ((tagName !== closeTagName) && tagName.length)
 				if (shouldTranslate) {
@@ -457,17 +485,31 @@ export default class Template
 				this.translateStart()
 			}
 		}
-		return target + source.substring(start)
+		target += source.substring(start)
+		start   = source.length
+		if (!tagStack.length) {
+			return target
+		}
+		let shouldTranslate = false
+		while (tagStack.length) {
+			let tagName: string
+			shouldTranslate ||= translating;
+			({ tagName, translating } = tagStack.pop() ?? { tagName: '', translating: false })
+			if (this.onTagClose) this.onTagClose.call(this, tagName)
+		}
+		if (shouldTranslate) {
+			this.translateTarget(start)
+		}
+		return target
 	}
 
-	setSource(setSource: string, setIndex = 0, setStart?: number, setTarget = '', setText = '')
+	setSource(setSource: string, setIndex = 0, setStart?: number, setTarget = '')
 	{
 		index  = setIndex
 		length = setSource.length
 		source = setSource
 		start  = setStart ?? index
 		target = setTarget
-		text   = setText
 
 		targetStack    = []
 		translateParts = []
