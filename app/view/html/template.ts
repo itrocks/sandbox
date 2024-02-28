@@ -503,6 +503,7 @@ export default class Template
 			if (!unclosingTag) {
 				transLock ||= (tagName === 'address')
 				translating = this.doTranslate && !transLock && this.translateElements.orderedIncludes(tagName)
+				if (this.onTagClose) this.onTagClose.call(this, tagName)
 			}
 			if (translating) {
 				this.translateStart()
