@@ -1,38 +1,29 @@
-let b
-let s = 'salut'
-
-console.time('===')
-for (let i = 0; i < 100000000; i ++) {
-	s === ''
+let s = 'salut les copains, ça va bien ? Je fais un texte suffisamment long pour que ce soit intéressant'
+for (let n = 0; n < 10; n ++) {
+	s += s
 }
-console.timeEnd('===')
+console.log(s.length)
+let c: string
 
-console.time('==')
-for (let i = 0; i < 100000000; i ++) {
-	s == ''
-}
-console.timeEnd('==')
+console.time('for index')
+const length = s.length
+for (let n = 0; n < 1000; n ++)
+	for (let i = 0; i < length; i ++)
+		c = s[i]
+console.timeEnd('for index')
 
-console.time('length')
-for (let i = 0; i < 100000000; i ++) {
-	s.length
-}
-console.timeEnd('length')
+console.time('for char')
+for (let n = 0; n < 1000; n ++)
+	for (const x of s)
+		c = x
+console.timeEnd('for char')
 
-console.time('===')
-for (let i = 0; i < 100000000; i ++) {
-	s === ''
-}
-console.timeEnd('===')
+console.time('forEach')
+for (let n = 0; n < 1000; n ++)
+	Array.from(s).forEach(x => c = x)
+console.timeEnd('forEach')
 
-console.time('==')
-for (let i = 0; i < 100000000; i ++) {
-	s == ''
-}
-console.timeEnd('==')
-
-console.time('length')
-for (let i = 0; i < 100000000; i ++) {
-	s.length
-}
-console.timeEnd('length')
+console.time('split')
+for (let n = 0; n < 1000; n ++)
+	s.split('').forEach(x => c = x)
+console.timeEnd('split')

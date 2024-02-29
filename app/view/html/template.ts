@@ -29,43 +29,41 @@ export default class Template
 	onTagOpened?: ((name: string) => void)
 	onTagClose?:  ((name: string) => void)
 
-	// Translate these attribute contents.
-	translateAttributes = ['alt', 'enterkeyhint', 'label', 'placeholder', 'srcdoc', 'title']
-
-	// Translate these element contents. They are marks into the translated parent element phrase.
-	translateComponents = [
-		'a', 'big', 'button', 'data', 'font', 'label', 'meter', 'optgroup', 'option', 'select', 'span', 'strike',
-		'time', 'tspan'
-	]
-
-	// Translate these element contents.
-	translateElements = [
-		'a', 'abbr', 'acronym', 'article', 'aside', 'bdi', 'bdo', 'big', 'blockquote', 'body', 'br', 'button',
-		'caption', 'center', 'data', 'datalist', 'dd', 'desc', 'details', 'dfn', 'dialog', 'div', 'dt',
-		'fieldset', 'figcaption', 'figure', 'font', 'footer', 'form',
-		'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hr', 'iframe', 'keygen', 'label', 'legend', 'li',
-		'main', 'menuitem', 'meter', 'nav', 'noframes', 'noscript', 'option', 'optgroup', 'option', 'p', 'pre', 'rb',
-		's', 'section', 'select', 'span', 'strike', 'summary',
-		'td', 'template', 'text', 'textarea', 'textpath', 'th', 'time', 'title'
-	]
-
-	// These tags are ignored: they are part of the translated text.
-	translateIgnore = ['b', 'cite', 'del', 'em', 'i', 'ins', 'mark', 'q', 'small', 'strong', 'sub', 'sup', 'u', 'wbr']
-
-	// Do not translate these element contents. They are marks into the translated parent element phrase.
-	translateMark = ['code', 'kbd', 'img', 'input', 'picture', 'output', 'rt', 'samp', 'svg', 'var']
+	// Translate these attribute values.
+	attributeTranslate = ['alt', 'enterkeyhint', 'label', 'placeholder', 'srcdoc', 'title']
 
 	// Do not translate these element contents. When they are closed, gets the parent element translation status back.
-	translateNotElements = [
+	elementNoTranslate = [
 		'address', 'applet', 'area', 'audio', 'base', 'basefont', 'canvas', 'col', 'colgroup', 'dir', 'dl', 'embed',
 		'frame', 'frameset', 'head', 'html', 'link', 'map', 'menu', 'meta', 'object', 'ol', 'param', 'progress',
 		'ruby', 'script', 'source', 'style', 'table', 'tbody', 'tfoot', 'thead', 'track', 'ul', 'video'
 	]
 
+	// Translate these element contents.
+	elementTranslate = [
+		'a', 'abbr', 'acronym', 'article', 'aside', 'b', 'bdi', 'bdo', 'big', 'blockquote', 'body', 'br', 'button',
+		'caption', 'center', 'cite', 'data', 'datalist', 'dd', 'del', 'desc', 'details', 'dfn', 'dialog', 'div', 'dt',
+		'em', 'font', 'fieldset', 'figcaption', 'figure', 'font', 'footer', 'form',
+		'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hr', 'i', 'iframe', 'ins', 'keygen', 'label', 'legend', 'li',
+		'main', 'mark', 'menuitem', 'meter', 'nav', 'noframes', 'noscript', 'option', 'optgroup', 'option', 'p', 'pre',
+		'q', 'rb', 's', 'section', 'select', 'small', 'span', 'strike', 'strong', 'sub', 'summary', 'sup',
+		'td', 'template', 'text', 'textarea', 'textpath', 'th', 'time', 'title', 'tspan', 'u', 'wbr'
+	]
+
+	// Replace these elements by marks into parent text to translate. Do not translate content.
+	markNoTranslate = ['code', 'img', 'input', 'kbd', 'output', 'picture', 'rt', 'samp', 'svg', 'var']
+
+	// Replace these elements by marks into parent text to translate. Translate content.
+	markTranslate = [
+		'a', 'b', 'big', 'button', 'cite', 'data', 'del', 'em', 'font', 'i', 'ins', 'label', 'mark', 'meter',
+		'optgroup', 'option', 'q', 'select', 'small', 'span', 'strike', 'strong', 'sub', 'sup',
+		'time', 'tspan', 'u', 'wbr'
+	]
+
 	// These elements have no closing tag.
 	unclosingTags = [
-		'area', 'base', 'basefont', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source',
-		'track'
+		'area', 'base', 'basefont', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param',
+		'source', 'track'
 	]
 
 	constructor(public data?: any)
@@ -189,8 +187,9 @@ export default class Template
 
 			if ((char === '"') || (char === "'")) {
 				index ++
-				while ((index < length) && (source[index] !== char)) {
-					if (source[index] === '\\') index ++
+				let c: string
+				while ((index < length) && ((c = source[index]) !== char)) {
+					if (c === '\\') index ++
 					index ++
 				}
 			}
@@ -382,14 +381,16 @@ export default class Template
 				index ++
 				const closeTagName = source.substring(index, source.indexOf('>', index))
 				index += closeTagName.length + 1
-				let shouldTranslate = false
-				let tagName: string
-				do {
-					shouldTranslate ||= translating;
-					({ tagName, translating } = tagStack.pop() ?? { tagName: '', translating: false })
-					if (this.onTagClose) this.onTagClose.call(this, tagName)
+				let shouldTranslate = translating
+				if (!this.unclosingTags.includes('closeTagName')) {
+					let tagName: string
+					do {
+						shouldTranslate ||= translating;
+						({ tagName, translating } = tagStack.pop() ?? { tagName: '', translating: false })
+						if (this.onTagClose) this.onTagClose.call(this, tagName)
+					}
+					while ((tagName !== closeTagName) && tagName.length)
 				}
-				while ((tagName !== closeTagName) && tagName.length)
 				if (shouldTranslate) {
 					transLock = false
 					this.translateTarget(indexOut)
@@ -457,7 +458,7 @@ export default class Template
 						quote = ' >'
 					}
 
-					translating = this.doTranslate && this.translateAttributes.orderedIncludes(attributeName)
+					translating = this.doTranslate && this.attributeTranslate.orderedIncludes(attributeName)
 						|| (hasTypeSubmit && (attributeName[0] === 'v') && (attributeName === 'value'))
 
 					if (translating) {
@@ -500,10 +501,12 @@ export default class Template
 			index ++
 			if (this.onTagOpened) this.onTagOpened.call(this, tagName)
 
-			if (!unclosingTag) {
-				transLock ||= (tagName === 'address')
-				translating = this.doTranslate && !transLock && this.translateElements.orderedIncludes(tagName)
+			if (unclosingTag) {
 				if (this.onTagClose) this.onTagClose.call(this, tagName)
+			}
+			else {
+				transLock ||= (tagName[0] === 'a') && (tagName === 'address')
+				translating = this.doTranslate && !transLock && this.elementTranslate.orderedIncludes(tagName)
 			}
 			if (translating) {
 				this.translateStart()

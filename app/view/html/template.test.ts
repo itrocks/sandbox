@@ -220,6 +220,7 @@ class TemplateMockTranslate extends Template
 			case 'name':           return 'value'
 			case 'what':           return 'sama'
 			case 'valueRecursion': return 'valueExpressed'
+			case 'verb':           return 'am'
 		}
 		return '?'
 	}
@@ -228,10 +229,13 @@ class TemplateMockTranslate extends Template
 	{
 		if (!text.trim()) return ''
 		switch (text) {
+			case '$1 is $2 me': return `${translateParts[0]} will ${translateParts[1]} you`
 			case 'a $1 here':   return `some ${translateParts[0]} there`
+			case 'am':          return 'are'
 			case 'example':     return 'translated'
 			case 'I am $1-san': return `You are ${translateParts[0]}-sama`
 			case 'I AM $1-$2':  return `You ARE ${translateParts[0]}-${translateParts[1]}`
+			case 'I $1 a $2-san': return `You ${translateParts[0]} a ${translateParts[1]}-sama`
 			case 'send':        return 'do it!'
 			case 'Text 1':      return 'Phrase one'
 			case 'Text 2':      return 'Phrase two'
@@ -329,6 +333,26 @@ describe('translateBlock', () => {
 			'<head><title>{{name}Recursion}</title></head>',
 			'<head><title>valueExpressed</title></head>')
 	})
+	it('markNoTranslate', () => {
+		testBuffer(template,
+			'<div>I am <code>name</code>-san</div>',
+			'<div>You are <code>name</code>-sama</div>')
+	})
+	it('markNoTranslate2', () => {
+		testBuffer(template,
+			'<div>I <code>am</code> <code>name</code>-san</div>',
+			'<div>You <code>am</code> <code>name</code>-sama</div>')
+	})
+	it('markTranslate', () => {
+		testBuffer(template,
+			'<div>I am <b>name</b>-san</div>',
+			'<div>You are <b>value</b>-sama</div>')
+	})
+	it('markTranslate2', () => {
+		testBuffer(template,
+			'<div>I <b>am</b> <b>name</b>-san</div>',
+			'<div>You <b>are</b> <b>value</b>-sama</div>')
+	})
 	it('multipleBlocks', () => {
 		testBuffer(template,
 			'<body><header>Text 1</header><main>Text 2</main><footer>Text 3</footer></body>',
@@ -343,6 +367,16 @@ describe('translateBlock', () => {
 		testBuffer(template,
 			'<head><title>example</title></head>',
 			'<head><title>translated</title></head>')
+	})
+	it('stackExpressionsAfter', () => {
+		testBuffer(template,
+			'I {verb} a {{name}Recursion}-san',
+			'You am a valueExpressed-sama')
+	})
+	it('stackExpressionsBefore', () => {
+		testBuffer(template,
+			'<div>{{name}Recursion} is {verb} me</div>',
+			'<div>valueExpressed will am you</div>')
 	})
 	it('unclosingElements', () => {
 		testBuffer(template,
