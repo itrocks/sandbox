@@ -335,23 +335,23 @@ describe('translateBlock', () => {
 	})
 	it('markNoTranslate', () => {
 		testBuffer(template,
-			'<div>I am <code>name</code>-san</div>',
-			'<div>You are <code>name</code>-sama</div>')
+			'<div>I am <code>example</code>-san</div>',
+			'<div>You are <code>example</code>-sama</div>')
 	})
 	it('markNoTranslate2', () => {
 		testBuffer(template,
-			'<div>I <code>am</code> <code>name</code>-san</div>',
-			'<div>You <code>am</code> <code>name</code>-sama</div>')
+			'<div>I <code>am</code> a <code>example</code>-san</div>',
+			'<div>You <code>am</code> a <code>example</code>-sama</div>')
 	})
 	it('markTranslate', () => {
 		testBuffer(template,
-			'<div>I am <b>name</b>-san</div>',
-			'<div>You are <b>value</b>-sama</div>')
+			'<div>I am <b>example</b>-san</div>',
+			'<div>You are <b>translated</b>-sama</div>')
 	})
 	it('markTranslate2', () => {
 		testBuffer(template,
-			'<div>I <b>am</b> <b>name</b>-san</div>',
-			'<div>You <b>are</b> <b>value</b>-sama</div>')
+			'<div>I <b>am</b> a <b>example</b>-san</div>',
+			'<div>You <b>are</b> a <b>translated</b>-sama</div>')
 	})
 	it('multipleBlocks', () => {
 		testBuffer(template,

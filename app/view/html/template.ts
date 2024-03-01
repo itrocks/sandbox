@@ -15,9 +15,10 @@ let source: string
 let start:  number
 let target: string
 
-let targetStack:    string[]
-let translateParts: string[]
-let translating:    boolean
+let targetStack:        string[]
+let translateParts:     string[]
+let translatePartStack: string[][]
+let translating:        boolean
 
 export default class Template
 {
@@ -80,14 +81,15 @@ export default class Template
 	getCleanContext()
 	{
 		return {
-			index:          length,
-			length:         source.length,
-			source:         source,
-			start:          length,
-			target:         target,
-			targetStack:    [] as string[],
-			translateParts: [] as string[],
-			translating:    this.doTranslate
+			index:              length,
+			length:             source.length,
+			source:             source,
+			start:              length,
+			target:             target,
+			targetStack:        [] as string[],
+			translatePartStack: [] as string[][],
+			translateParts:     [] as string[],
+			translating:        this.doTranslate
 		}
 	}
 
@@ -98,19 +100,20 @@ export default class Template
 
 	getContext()
 	{
-		return { index, length, source, start, target, targetStack, translateParts, translating }
+		return { index, length, source, start, target, targetStack, translatePartStack, translateParts, translating }
 	}
 
 	isContextClean()
 	{
 		const clean   = this.getCleanContext()
 		const context = this.getContext()
-		return context.index               === clean.index
-			&& context.length                === clean.length
-			&& context.start                 === clean.start
-			&& context.targetStack.length    === clean.targetStack.length
-			&& context.translateParts.length === clean.translateParts.length
-			&& context.translating           === clean.translating
+		return context.index                   === clean.index
+			&& context.length                    === clean.length
+			&& context.start                     === clean.start
+			&& context.targetStack.length        === clean.targetStack.length
+			&& context.translatePartStack.length === clean.translatePartStack.length
+			&& context.translateParts.length     === clean.translateParts.length
+			&& context.translating               === clean.translating
 	}
 
 	parseBuffer(buffer: string)
@@ -376,18 +379,26 @@ export default class Template
 			}
 
 			// tag close
+			const indexOut = index - 1
 			if (char === '/') {
-				const indexOut = index - 1
 				index ++
 				const closeTagName = source.substring(index, source.indexOf('>', index))
 				index += closeTagName.length + 1
 				let shouldTranslate = translating
-				if (!this.unclosingTags.includes('closeTagName')) {
+				if (!this.unclosingTags.includes(closeTagName)) {
 					let tagName: string
 					do {
 						shouldTranslate ||= translating;
 						({ tagName, translating } = tagStack.pop() ?? { tagName: '', translating: false })
 						if (this.onTagClose) this.onTagClose.call(this, tagName)
+						if (translating && this.markTranslate.orderedIncludes(tagName)) {
+							this.translateTarget(indexOut)
+							translateParts = translatePartStack.pop() as string[]
+							translateParts.push(target + source.substring(start, index))
+							start           = index
+							target          = targetStack.pop() + '$' + translateParts.length
+							shouldTranslate = false
+						}
 					}
 					while ((tagName !== closeTagName) && tagName.length)
 				}
@@ -428,7 +439,23 @@ export default class Template
 				tagStack.push({tagName, translating})
 			}
 			if (translating) {
-				this.translateTarget(tagIndex - 1)
+				if (this.markTranslate.orderedIncludes(tagName)) {
+					if (translateParts.length) {
+						target += source.substring(start, indexOut)
+						start   = indexOut
+					}
+					targetStack.push(target)
+					target = ''
+					if (!translateParts.length) {
+						targetStack.push(source.substring(start, indexOut))
+						start = indexOut
+					}
+					translatePartStack.push(translateParts)
+					translateParts = []
+				}
+				else {
+					this.translateTarget(tagIndex - 1)
+				}
 			}
 			const elementTranslating = translating
 
@@ -497,11 +524,11 @@ export default class Template
 				// next attribute
 				while (' \n\r\t\f'.includes(source[index])) index ++
 			}
-			translating = elementTranslating
 			index ++
 			if (this.onTagOpened) this.onTagOpened.call(this, tagName)
 
 			if (unclosingTag) {
+				translating = elementTranslating
 				if (this.onTagClose) this.onTagClose.call(this, tagName)
 			}
 			else {
@@ -543,9 +570,10 @@ export default class Template
 		start  = setStart ?? index
 		target = setTarget
 
-		targetStack    = []
-		translateParts = []
-		translating    = this.doTranslate
+		targetStack        = []
+		translatePartStack = []
+		translateParts     = []
+		translating        = this.doTranslate
 	}
 
 	tr(text: string, parts?: string[])
