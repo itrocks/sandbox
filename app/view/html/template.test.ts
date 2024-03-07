@@ -229,6 +229,8 @@ class TemplateMockTranslate extends Template
 	{
 		if (!text.trim()) return ''
 		switch (text) {
+			case ' $1 ':        return ` ${translateParts[0]} `
+			case '$1':          return translateParts[0]
 			case '$1 is $2 me': return `${translateParts[0]} will ${translateParts[1]} you`
 			case 'a $1 here':   return `some ${translateParts[0]} there`
 			case 'am':          return 'are'
@@ -333,25 +335,30 @@ describe('translateBlock', () => {
 			'<head><title>{{name}Recursion}</title></head>',
 			'<head><title>valueExpressed</title></head>')
 	})
-	it('markNoTranslate', () => {
+	it('inlineNoTranslate', () => {
 		testBuffer(template,
 			'<div>I am <code>example</code>-san</div>',
 			'<div>You are <code>example</code>-sama</div>')
 	})
-	it('markNoTranslate2', () => {
+	it('inlineNoTranslate2', () => {
 		testBuffer(template,
 			'<div>I <code>am</code> a <code>example</code>-san</div>',
 			'<div>You <code>am</code> a <code>example</code>-sama</div>')
 	})
-	it('markTranslate', () => {
+	it('inlineTranslate', () => {
 		testBuffer(template,
 			'<div>I am <b>example</b>-san</div>',
 			'<div>You are <b>translated</b>-sama</div>')
 	})
-	it('markTranslate2', () => {
+	it('inlineTranslate2', () => {
 		testBuffer(template,
 			'<div>I <b>am</b> a <b>example</b>-san</div>',
 			'<div>You <b>are</b> a <b>translated</b>-sama</div>')
+	})
+	it('inlineYesThenNo', () => {
+		testBuffer(template,
+			'<div>Text 1</div><code>Text 2</code><div>Text 3</div><code>Text 4</code>',
+			'<div>Phrase one</div><code>Text 2</code><div>Phrase three</div><code>Text 4</code>')
 	})
 	it('multipleBlocks', () => {
 		testBuffer(template,
@@ -400,18 +407,23 @@ describe('translateBlockYesNo', () => {
 
 	it('noInYes', () => {
 		testBuffer(template,
-			'<div>Text 1<code>Text 2</code>Text 3</div>',
-			'<div>Phrase one<code>Text 2</code>Phrase three</div>')
+			'<div>Text 1<address>Text 2</address>Text 3</div>',
+			'<div>Phrase one<address>Text 2</address>Phrase three</div>')
 	})
 	it('yesInNo', () => {
 		testBuffer(template,
 			'<head><title>Text 2</title></head>',
 			'<head><title>Phrase two</title></head>')
 	})
-	it('yesThenNo', () => {
+	it('noThenYesThenNoThenYes', () => {
 		testBuffer(template,
-			'<div>Text 1</div><code>Text 2</code><div>Text 3</div><code>Text 4</code>',
-			'<div>Phrase one</div><code>Text 2</code><div>Phrase three</div><code>Text 4</code>')
+			'<address>Text 1</address><div>Text 2</div><address>Text 3</address><div>Text 4</div>',
+			'<address>Text 1</address><div>Phrase two</div><address>Text 3</address><div>Phrase four</div>')
+	})
+	it('yesThenNoThenYesThenNo', () => {
+		testBuffer(template,
+			'<div>Text 1</div><address>Text 2</address><div>Text 3</div><address>Text 4</address>',
+			'<div>Phrase one</div><address>Text 2</address><div>Phrase three</div><address>Text 4</address>')
 	})
 })
 
@@ -441,8 +453,8 @@ describe('translateSpecials', () => {
 
 	it('inputSubmitValue', () => {
 		testBuffer(template,
-			'<input type="submit" value="send">',
-			'<input type="submit" value="do it!">')
+			' <input type="submit" value="send"> ',
+			' <input type="submit" value="do it!"> ')
 	})
 	it('inputValue', () => {
 		testBuffer(template,

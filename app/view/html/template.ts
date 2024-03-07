@@ -9,13 +9,16 @@ import Str                                from '../str'
 
 type BlockStack = Array<{ blockStart: number, collection: any[], data: any, iteration: number, iterations: number }>
 
-let index:  number
-let length: number
-let source: string
-let start:  number
-let target: string
+let index:    number
+let length:   number
+let source:   string
+let start:    number
+let tagName:  string
+let tagStack: { tagName: string, translating: boolean }[]
+let target:   string
 
 let targetStack:        string[]
+let transLock:          boolean
 let translateParts:     string[]
 let translatePartStack: string[][]
 let translating:        boolean
@@ -33,11 +36,12 @@ export default class Template
 	// Translate these attribute values.
 	attributeTranslate = ['alt', 'enterkeyhint', 'label', 'placeholder', 'srcdoc', 'title']
 
-	// Do not translate these element contents. When they are closed, gets the parent element translation status back.
-	elementNoTranslate = [
-		'address', 'applet', 'area', 'audio', 'base', 'basefont', 'canvas', 'col', 'colgroup', 'dir', 'dl', 'embed',
-		'frame', 'frameset', 'head', 'html', 'link', 'map', 'menu', 'meta', 'object', 'ol', 'param', 'progress',
-		'ruby', 'script', 'source', 'style', 'table', 'tbody', 'tfoot', 'thead', 'track', 'ul', 'video'
+	// Inline elements are replaced by $1 when in translated phrase.
+	// TODO check if this really matches elements displayed inline
+	elementInline = [
+		'a', 'b', 'big', 'button', 'cite', 'code', 'data', 'del', 'em', 'font', 'i', 'img', 'input', 'ins',
+		'kbd', 'label', 'mark', 'meter', 'optgroup', 'option', 'output', 'picture', 'q', 'rt',
+		'samp', 'select', 'small', 'span', 'strike', 'strong', 'sub', 'sup', 'svg', 'time', 'tspan', 'u', 'var', 'wbr'
 	]
 
 	// Translate these element contents.
@@ -51,16 +55,6 @@ export default class Template
 		'td', 'template', 'text', 'textarea', 'textpath', 'th', 'time', 'title', 'tspan', 'u', 'wbr'
 	]
 
-	// Replace these elements by marks into parent text to translate. Do not translate content.
-	markNoTranslate = ['code', 'img', 'input', 'kbd', 'output', 'picture', 'rt', 'samp', 'svg', 'var']
-
-	// Replace these elements by marks into parent text to translate. Translate content.
-	markTranslate = [
-		'a', 'b', 'big', 'button', 'cite', 'data', 'del', 'em', 'font', 'i', 'ins', 'label', 'mark', 'meter',
-		'optgroup', 'option', 'q', 'select', 'small', 'span', 'strike', 'strong', 'sub', 'sup',
-		'time', 'tspan', 'u', 'wbr'
-	]
-
 	// These elements have no closing tag.
 	unclosingTags = [
 		'area', 'base', 'basefont', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param',
@@ -69,6 +63,27 @@ export default class Template
 
 	constructor(public data?: any)
 	{}
+
+	closeTag(shouldTranslate: boolean, targetIndex: number)
+	{
+		shouldTranslate ||= translating;
+		({ tagName, translating } = tagStack.pop() ?? { tagName: '', translating: false })
+		if (this.onTagClose) this.onTagClose.call(this, tagName)
+		if ((tagName[0] === 'a') && (tagName === 'address')) {
+			transLock = false
+		}
+		if (translating && this.elementInline.orderedIncludes(tagName)) {
+			if (this.elementTranslate.orderedIncludes(tagName)) {
+				this.translateTarget(targetIndex)
+			}
+			translateParts = translatePartStack.pop() as string[]
+			translateParts.push(target + source.substring(start, index))
+			start           = index
+			target          = targetStack.pop() + '$' + translateParts.length
+			shouldTranslate = false
+		}
+		return shouldTranslate
+	}
 
 	debugEvents()
 	{
@@ -129,7 +144,8 @@ export default class Template
 		let   open      = source[index]
 
 		if (translating && !translateParts.length) {
-			this.translateStack()
+			targetStack.push(target)
+			target = ''
 		}
 
 		if (open === '<') {
@@ -142,7 +158,7 @@ export default class Template
 			return
 		}
 
-		const targetStack = [] as string[]
+		let stackPos = targetStack.length
 		targetStack.push(target + source.substring(start, indexOut))
 		start  = index
 		target = ''
@@ -168,10 +184,10 @@ export default class Template
 				index           += (char === close) ? 1 : finalClose.length
 				start            = index
 				target           = ''
-				if (char === finalChar) while (targetStack.length) {
+				if (char === finalChar) while (targetStack.length > stackPos) {
 					target += targetStack.shift()
 				}
-				if (translating && !targetStack.length) {
+				if (translating && (targetStack.length === stackPos)) {
 					translateParts.push(parsed)
 					target += lastTarget + '$' + translateParts.length
 					return
@@ -182,7 +198,7 @@ export default class Template
 				else {
 					target = parsed
 				}
-				if (!targetStack.length) {
+				if (targetStack.length === stackPos) {
 					return
 				}
 				continue
@@ -200,7 +216,8 @@ export default class Template
 			index ++
 		}
 		// bad close
-		while (targetStack.length > 1) {
+		stackPos ++
+		while (targetStack.length > stackPos) {
 			target = targetStack.pop() + open + target
 		}
 		target = targetStack.pop() + (finalClose.length ? '<!--' : open) + target
@@ -264,10 +281,8 @@ export default class Template
 		let   blockStart  = 0
 		let   collection  = []
 		let   data        = this.data
-		let   transLock   = false
 		let   iteration   = 0
 		let   iterations  = 0
-		const tagStack    = [] as { tagName: string, translating: boolean }[]
 
 		while (index < length) {
 			let char = source[index]
@@ -284,6 +299,7 @@ export default class Template
 				continue
 			}
 
+			const tagIndex = index
 			char = source[++index]
 			if (char === '!') {
 				if (translating) {
@@ -379,32 +395,20 @@ export default class Template
 			}
 
 			// tag close
-			const indexOut = index - 1
 			if (char === '/') {
 				index ++
 				const closeTagName = source.substring(index, source.indexOf('>', index))
 				index += closeTagName.length + 1
 				let shouldTranslate = translating
 				if (!this.unclosingTags.includes(closeTagName)) {
-					let tagName: string
 					do {
-						shouldTranslate ||= translating;
-						({ tagName, translating } = tagStack.pop() ?? { tagName: '', translating: false })
-						if (this.onTagClose) this.onTagClose.call(this, tagName)
-						if (translating && this.markTranslate.orderedIncludes(tagName)) {
-							this.translateTarget(indexOut)
-							translateParts = translatePartStack.pop() as string[]
-							translateParts.push(target + source.substring(start, index))
-							start           = index
-							target          = targetStack.pop() + '$' + translateParts.length
-							shouldTranslate = false
-						}
+						shouldTranslate = this.closeTag(shouldTranslate, tagIndex)
 					}
 					while ((tagName !== closeTagName) && tagName.length)
 				}
 				if (shouldTranslate) {
 					transLock = false
-					this.translateTarget(indexOut)
+					this.translateTarget(tagIndex)
 				}
 				if (translating) {
 					this.translateStart()
@@ -413,9 +417,8 @@ export default class Template
 			}
 
 			// tag open
-			const tagIndex = index
 			while ((index < length) && !' >\n\r\t\f'.includes(source[index])) index ++
-			const tagName = source.substring(tagIndex, index)
+			tagName = source.substring(tagIndex + 1, index)
 			if (this.onTagOpen) this.onTagOpen.call(this, tagName)
 			while (' \n\r\t\f'.includes(source[index])) index ++
 			char = tagName[0]
@@ -423,7 +426,7 @@ export default class Template
 			// script
 			if ((char === 's') && (tagName === 'script')) {
 				if (translating) {
-					this.translateTarget(tagIndex - 1)
+					this.translateTarget(tagIndex)
 				}
 				if (this.onTagClose) this.onTagClose.call(this, 'script')
 				index = source.indexOf('</script>', index) + 9
@@ -436,25 +439,27 @@ export default class Template
 
 			const unclosingTag = this.unclosingTags.orderedIncludes(tagName)
 			if (!unclosingTag) {
-				tagStack.push({tagName, translating})
+				tagStack.push({ tagName, translating })
 			}
+			let inlineElement = false
 			if (translating) {
-				if (this.markTranslate.orderedIncludes(tagName)) {
+				inlineElement = this.elementInline.orderedIncludes(tagName)
+				if (inlineElement) {
 					if (translateParts.length) {
-						target += source.substring(start, indexOut)
-						start   = indexOut
+						targetStack.push(target + source.substring(start, tagIndex))
 					}
-					targetStack.push(target)
+					else {
+						targetStack.push(target, source.substring(start, tagIndex))
+					}
+					start  = tagIndex
 					target = ''
-					if (!translateParts.length) {
-						targetStack.push(source.substring(start, indexOut))
-						start = indexOut
+					if (!unclosingTag) {
+						translatePartStack.push(translateParts)
+						translateParts = []
 					}
-					translatePartStack.push(translateParts)
-					translateParts = []
 				}
 				else {
-					this.translateTarget(tagIndex - 1)
+					this.translateTarget(tagIndex)
 				}
 			}
 			const elementTranslating = translating
@@ -530,47 +535,55 @@ export default class Template
 			if (unclosingTag) {
 				translating = elementTranslating
 				if (this.onTagClose) this.onTagClose.call(this, tagName)
+				if (translating) {
+					target += source.substring(start, index)
+					start   = index
+					if (inlineElement) {
+						translateParts.push(target)
+						target = targetStack.pop() + '$' + translateParts.length
+					}
+				}
 			}
 			else {
 				transLock ||= (tagName[0] === 'a') && (tagName === 'address')
 				translating = this.doTranslate && !transLock && this.elementTranslate.orderedIncludes(tagName)
-			}
-			if (translating) {
-				this.translateStart()
+				if (translating) {
+					this.translateStart()
+				}
 			}
 		}
-		if (!tagStack.length) {
-			if (translating && (index > start)) {
-				this.translateTarget(index)
+		if (tagStack.length) {
+			let shouldTranslate = translating
+			while (tagStack.length) {
+				shouldTranslate = this.closeTag(shouldTranslate, length)
 			}
-			if (start < source.length) {
-				target += source.substring(start)
-				start   = source.length
+			if (shouldTranslate) {
+				this.translateTarget(length)
 			}
 			return target
 		}
-		let shouldTranslate = false
-		while (tagStack.length) {
-			let tagName: string
-			shouldTranslate ||= translating;
-			({ tagName, translating } = tagStack.pop() ?? { tagName: '', translating: false })
-			if (this.onTagClose) this.onTagClose.call(this, tagName)
+		if (translating) {
+			this.translateTarget(index)
 		}
-		if (shouldTranslate) {
-			this.translateTarget(source.length)
+		if (start < length) {
+			target += source.substring(start)
+			start   = length
 		}
 		return target
 	}
 
 	setSource(setSource: string, setIndex = 0, setStart?: number, setTarget = '')
 	{
-		index  = setIndex
-		length = setSource.length
-		source = setSource
-		start  = setStart ?? index
-		target = setTarget
+		index    = setIndex
+		length   = setSource.length
+		source   = setSource
+		start    = setStart ?? index
+		tagName  = ''
+		tagStack = []
+		target   = setTarget
 
 		targetStack        = []
+		transLock          = false
 		translatePartStack = []
 		translateParts     = []
 		translating        = this.doTranslate
@@ -580,23 +593,18 @@ export default class Template
 	{
 		const original = text
 		text           = text.trimEnd()
-		let right      = text.length
+		const right    = text.length
 		let left       = text.length
 		text           = text.trimStart()
 		left          -= text.length
-		return original.substring(0, left) + (text.length ? tr(text, parts) : '') + original.substring(right)
+		text           = parts && /^(\$[1-9][0-9]*)+$/.test(text) ? parts.join('') : text.length ? tr(text, parts) : text
+		return original.substring(0, left) + text + original.substring(right)
 	}
 
 	translateStart()
 	{
 		target += source.substring(start, index)
 		start   = index
-	}
-
-	translateStack()
-	{
-		targetStack.push(target)
-		target = ''
 	}
 
 	translateTarget(index: number)
@@ -606,13 +614,9 @@ export default class Template
 			start   = index
 			return
 		}
-		target += source.substring(start, index)
-		start   = index
-		target  = targetStack.pop() as string + (
-			/^(\$[1-9][0-9]*)+$/.test(target)
-				? translateParts.join('')
-				: this.tr(target, translateParts)
-		)
+		target        += source.substring(start, index)
+		start          = index
+		target         = (targetStack.pop() ?? '') + this.tr(target, translateParts)
 		translateParts = []
 	}
 
