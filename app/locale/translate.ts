@@ -8,6 +8,8 @@ readFile(__dirname + sep + 'fr.csv', 'utf-8')
 	.then(data => parseCsv(data, { delimiter: ';' }).data as [string, string][])
 	.then(data => data.forEach(row => translations.set(row[0], row[1])))
 
+export const lang = 'fr'
+
 export function tr(text: string, parts = [] as string[])
 {
 	let   partsCount = parts.length

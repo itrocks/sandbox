@@ -34,7 +34,7 @@ export default class Template
 	onTagClose?:  ((name: string) => void)
 
 	// Translate these attribute values.
-	attributeTranslate = ['alt', 'enterkeyhint', 'label', 'placeholder', 'srcdoc', 'title']
+	attributeTranslate = ['alt', 'enterkeyhint', 'label', 'lang', 'placeholder', 'srcdoc', 'title']
 
 	// Inline elements are replaced by $1 when in translated phrase.
 	// TODO check if this really matches elements displayed inline
