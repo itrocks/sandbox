@@ -1,5 +1,6 @@
 import { readFile }                       from 'node:fs/promises'
 import { properties }                     from '../../class/reflect'
+import                                         '../../expand'
 import { tr }                             from '../../locale/translate'
 import ReflectProperty                    from '../../property/reflect'
 import { displayOf as classDisplayOf }    from '../class/display'
@@ -63,7 +64,12 @@ export default class Template
 	]
 
 	constructor(public data?: any)
-	{}
+	{
+		this.attributeTranslate.ordered(false)
+		this.elementInline.ordered(false)
+		this.elementTranslate.ordered(false)
+		this.unclosingTags.ordered(false)
+	}
 
 	closeTag(shouldTranslate: boolean, targetIndex: number)
 	{
@@ -73,8 +79,8 @@ export default class Template
 		if ((tagName[0] === 'a') && (tagName === 'address')) {
 			transLock = false
 		}
-		if (translating && this.elementInline.orderedIncludes(tagName)) {
-			if (this.elementTranslate.orderedIncludes(tagName)) {
+		if (translating && this.elementInline.includes(tagName)) {
+			if (this.elementTranslate.includes(tagName)) {
 				this.translateTarget(targetIndex)
 			}
 			translateParts = translatePartStack.pop() as string[]
@@ -157,7 +163,7 @@ export default class Template
 		}
 
 		index ++
-		if ((index >= length) || !new RegExp('[a-z0-9@%"\'' + open + close + ']', 'i').test(source[index])) {
+		if ((index >= length) || !new RegExp('[a-z0-9@%."\'' + open + close + ']', 'i').test(source[index])) {
 			return
 		}
 
@@ -237,6 +243,9 @@ export default class Template
 
 	parsePath(expression: string, data: any)
 	{
+		if (expression === '') {
+			return undefined
+		}
 		for (const variable of expression.split('.')) {
 			data = this.parseVariable(variable, data)
 		}
@@ -257,6 +266,7 @@ export default class Template
 			}
 		}
 		switch (variable) {
+			case '':
 			case 'BEGIN':
 				return data
 			case '@title':
@@ -439,13 +449,13 @@ export default class Template
 				continue
 			}
 
-			const unclosingTag = this.unclosingTags.orderedIncludes(tagName)
+			const unclosingTag = this.unclosingTags.includes(tagName)
 			if (!unclosingTag) {
 				tagStack.push({ tagName, translating })
 			}
 			let inlineElement = false
 			if (translating) {
-				inlineElement = this.elementInline.orderedIncludes(tagName)
+				inlineElement = this.elementInline.includes(tagName)
 				if (inlineElement) {
 					if (translateParts.length) {
 						if (target.length) doIt ++
@@ -496,7 +506,7 @@ export default class Template
 						quote = ' >'
 					}
 
-					translating = this.doTranslate && this.attributeTranslate.orderedIncludes(attributeName)
+					translating = this.doTranslate && this.attributeTranslate.includes(attributeName)
 						|| (hasTypeSubmit && (attributeName[0] === 'v') && (attributeName === 'value'))
 
 					if (translating && (index > start)) {
@@ -553,7 +563,7 @@ export default class Template
 			}
 			else {
 				transLock ||= (tagName[0] === 'a') && (tagName === 'address')
-				translating = this.doTranslate && !transLock && this.elementTranslate.orderedIncludes(tagName)
+				translating = this.doTranslate && !transLock && this.elementTranslate.includes(tagName)
 				if (translating && (index > start)) {
 					this.sourceToTarget()
 				}
