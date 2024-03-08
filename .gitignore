@@ -1,6 +1,7 @@
 .idea
 node_modules
 
+/coverage
 /local
 
 *.css.map

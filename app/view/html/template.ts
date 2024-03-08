@@ -9,6 +9,7 @@ import Str                                from '../str'
 
 type BlockStack = Array<{ blockStart: number, collection: any[], data: any, iteration: number, iterations: number }>
 
+let doIt = 0
 let index:    number
 let length:   number
 let source:   string
@@ -77,6 +78,8 @@ export default class Template
 				this.translateTarget(targetIndex)
 			}
 			translateParts = translatePartStack.pop() as string[]
+			if (target.length) doIt ++
+			if (index > start) doIt ++
 			translateParts.push(target + source.substring(start, index))
 			start           = index
 			target          = targetStack.pop() + '$' + translateParts.length
@@ -159,6 +162,8 @@ export default class Template
 		}
 
 		let stackPos = targetStack.length
+		if (target.length) doIt ++
+		if (indexOut > start) doIt ++
 		targetStack.push(target + source.substring(start, indexOut))
 		start  = index
 		target = ''
@@ -167,6 +172,8 @@ export default class Template
 			const char = source[index]
 
 			if (char === open) {
+				if (target.length) doIt ++
+				if (index > start) doIt ++
 				targetStack.push(target + source.substring(start, index))
 				index  ++
 				start  = index
@@ -314,22 +321,21 @@ export default class Template
 					if (!(/[a-z0-9@%{]/i.test(source[index]) && this.doExpression)) {
 						index = source.indexOf('-->', index) + 3
 						if (index === 2) break
-						if (translating) {
-							this.translateStart()
+						if (translating && (index > start)) {
+							this.sourceToTarget()
 						}
 						continue
 					}
 
 					// end condition / loop
-					const indexOut = index - 4
 					if (['end-->', 'END-->'].includes(source.substring(index, index + 6))) {
-						target += this.trimEndLine(source.substring(start, indexOut))
+						target += this.trimEndLine(source.substring(start, tagIndex))
 						iteration ++
 						if (iteration < iterations) {
 							data  = collection[iteration]
 							index = start = blockStart
-							if (translating) {
-								this.translateStart()
+							if (translating && (index > start)) {
+								this.sourceToTarget()
 							}
 							continue
 						}
@@ -337,8 +343,8 @@ export default class Template
 							?? { blockStart: 0, collection: [], data: undefined, iteration: 0, iterations: 0 })
 						index += 6
 						start  = index
-						if (translating) {
-							this.translateStart()
+						if (translating && (index > start)) {
+							this.sourceToTarget()
 						}
 						continue
 					}
@@ -346,13 +352,13 @@ export default class Template
 					// begin condition / loop
 					blockStack.push({ blockStart, collection, data, iteration, iterations })
 					let blockData: any
-					if (indexOut > start) {
-						target += this.trimEndLine(source.substring(start, indexOut))
-						start   = indexOut
+					if (tagIndex > start) {
+						target += this.trimEndLine(source.substring(start, tagIndex))
+						start   = tagIndex
 					}
 					const backTarget      = target
 					const backTranslating = translating
-					index       = indexOut
+					index       = tagIndex
 					target      = ''
 					translating = false
 					this.parseExpression(data, '}', '-->')
@@ -371,8 +377,8 @@ export default class Template
 						data       = blockData
 						iterations = data ? 1 : 0
 					}
-					if (translating) {
-						this.translateStart()
+					if (translating && (index > start)) {
+						this.sourceToTarget()
 					}
 					continue
 				}
@@ -381,15 +387,11 @@ export default class Template
 				if ((char === '[') && (source.substring(index, index + 6) === 'CDATA[')) {
 					index = source.indexOf(']]>', index + 6) + 3
 					if (index === 2) break
-					if (translating) {
-						this.translateStart()
-					}
-					continue
 				}
 
 				// DOCTYPE
 				if (translating) {
-					this.translateStart()
+					this.sourceToTarget()
 				}
 				continue
 			}
@@ -410,8 +412,8 @@ export default class Template
 					transLock = false
 					this.translateTarget(tagIndex)
 				}
-				if (translating) {
-					this.translateStart()
+				if (translating && (index > start)) {
+					this.sourceToTarget()
 				}
 				continue
 			}
@@ -431,8 +433,8 @@ export default class Template
 				if (this.onTagClose) this.onTagClose.call(this, 'script')
 				index = source.indexOf('</script>', index) + 9
 				if (index === 8) break
-				if (translating) {
-					this.translateStart()
+				if (translating && (index > start)) {
+					this.sourceToTarget()
 				}
 				continue
 			}
@@ -446,9 +448,13 @@ export default class Template
 				inlineElement = this.elementInline.orderedIncludes(tagName)
 				if (inlineElement) {
 					if (translateParts.length) {
+						if (target.length) doIt ++
+						if (tagIndex > start) doIt ++
 						targetStack.push(target + source.substring(start, tagIndex))
 					}
 					else {
+						if (target.length) doIt ++
+						if (tagIndex > start) doIt ++
 						targetStack.push(target, source.substring(start, tagIndex))
 					}
 					start  = tagIndex
@@ -493,8 +499,8 @@ export default class Template
 					translating = this.doTranslate && this.attributeTranslate.orderedIncludes(attributeName)
 						|| (hasTypeSubmit && (attributeName[0] === 'v') && (attributeName === 'value'))
 
-					if (translating) {
-						this.translateStart()
+					if (translating && (index > start)) {
+						this.sourceToTarget()
 					}
 
 					const position   = index
@@ -536,8 +542,9 @@ export default class Template
 				translating = elementTranslating
 				if (this.onTagClose) this.onTagClose.call(this, tagName)
 				if (translating) {
-					target += source.substring(start, index)
-					start   = index
+					if (index > start) {
+						this.sourceToTarget()
+					}
 					if (inlineElement) {
 						translateParts.push(target)
 						target = targetStack.pop() + '$' + translateParts.length
@@ -547,8 +554,8 @@ export default class Template
 			else {
 				transLock ||= (tagName[0] === 'a') && (tagName === 'address')
 				translating = this.doTranslate && !transLock && this.elementTranslate.orderedIncludes(tagName)
-				if (translating) {
-					this.translateStart()
+				if (translating && (index > start)) {
+					this.sourceToTarget()
 				}
 			}
 		}
@@ -589,6 +596,12 @@ export default class Template
 		translating        = this.doTranslate
 	}
 
+	sourceToTarget()
+	{
+		target += source.substring(start, index)
+		start   = index
+	}
+
 	tr(text: string, parts?: string[])
 	{
 		const original = text
@@ -599,12 +612,6 @@ export default class Template
 		left          -= text.length
 		text           = parts && /^(\$[1-9][0-9]*)+$/.test(text) ? parts.join('') : text.length ? tr(text, parts) : text
 		return original.substring(0, left) + text + original.substring(right)
-	}
-
-	translateStart()
-	{
-		target += source.substring(start, index)
-		start   = index
 	}
 
 	translateTarget(index: number)
