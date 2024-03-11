@@ -1,8 +1,8 @@
-import { dao, Entity }    from '../dao/dao'
-import ServerRequest      from '../server/request'
-import Exception          from './exception'
-import formats            from './formats'
-import { Routes, routes } from './routes'
+import { dao, Entity } from '../dao/dao'
+import ServerRequest   from '../server/request'
+import Exception       from './exception'
+import formats         from './formats'
+import { getModule }   from './routes'
 
 export default class Request
 {
@@ -17,21 +17,6 @@ export default class Request
 		Object.assign(this, this.parsePath())
 	}
 
-	getModule()
-	{
-		let route: Routes | string = routes
-		for (const name of this.route.substring(1).split('/').reverse()) {
-			if (typeof route === 'string') return undefined
-			const routeStep = route[name] as Routes | string | undefined
-			if (!routeStep) break
-			route = routeStep
-		}
-		if ((typeof route === 'object') && route[':']) {
-			route = route['-']
-		}
-		return (route === routes) ? undefined : route
-	}
-
 	get object()
 	{
 		return this.objects[0]
@@ -39,7 +24,7 @@ export default class Request
 
 	getType()
 	{
-		const module = this.getModule()
+		const module = getModule(this.route)
 		if (!module) {
 			throw new Exception('Module ' + this.route.substring(1) + ' not found')
 		}

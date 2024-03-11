@@ -19,13 +19,43 @@ const readDirRecursive = async (directoryName: string) =>
 	walk(directoryName)
 	.then(entries => entries.map(entry => entry.substring(directoryName.length)))
 
-export type    Routes = { [name: string]: Routes | string }
-export const   routes = {} as Routes
-export default routes
+export function getModule(ofRoute: string)
+{
+	let route: Routes | string = routes
+	for (const name of ofRoute.substring(1).split('/').reverse()) {
+		if (typeof route === 'string') return undefined
+		const routeStep = route[name] as Routes | string | undefined
+		if (!routeStep) break
+		route = routeStep
+	}
+	if ((typeof route === 'object') && route[':']) {
+		route = route[':']
+	}
+	return (route === routes) ? undefined : route
+}
+
+export function getRoute(ofModule: string)
+{
+	let route: Routes | string = routes
+	for (const name of ofModule.substring(1).split('/').reverse()) {
+		if (typeof route === 'string') return route
+		const routeStep = route[name] as Routes | string | undefined
+		if (!routeStep) break
+		route = routeStep
+	}
+	if ((typeof route === 'object') && route[':']) {
+		route = route[':']
+	}
+	return (typeof route === 'string') ? route : undefined
+}
+
+export type Routes = { [name: string]: Routes | string }
+
+export const routes = {} as Routes
 
 readDirRecursive(__dirname.substring(0, __dirname.lastIndexOf(sep))).then(entries => {
 	for (let entry of entries) {
-		if (!entry.endsWith('.ts')) continue
+		if (!entry.endsWith('.ts') || entry.endsWith('.d.ts') || entry.endsWith('.test.ts')) continue
 		entry = entry.substring(0, entry.length - 3)
 		let   route  = routes
 		const names  = entry.split(sep).slice(1).reverse()
