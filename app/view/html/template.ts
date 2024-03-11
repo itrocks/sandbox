@@ -1,12 +1,9 @@
 import { readFile }                       from 'node:fs/promises'
-import { properties }                     from '../../class/reflect'
 import                                         '../../expand'
 import { tr }                             from '../../locale/translate'
-import ReflectProperty                    from '../../property/reflect'
-import { displayOf as classDisplayOf }    from '../class/display'
-import { outputOf }                       from '../class/output'
-import { displayOf as propertyDisplayOf } from '../property/display'
 import Str                                from '../str'
+import parseDecorator from './parseDecorator'
+import parseReflect from './parseReflect'
 
 type BlockStack = Array<{ blockStart: number, collection: any[], data: any, iteration: number, iterations: number }>
 
@@ -260,27 +257,12 @@ export default class Template
 		) {
 			return variable.substring(1, variable.length - 1)
 		}
-		if (variable[0] === '@') {
-			if ((typeof data !== 'function') && (typeof data !== 'object')) {
-				console.error('Bad data for variable', variable, 'data', data)
-			}
-		}
+		if (variable[0] === '@') return parseDecorator(variable, data)
+		if (variable[0] === '%') return parseReflect(variable, data)
 		switch (variable) {
 			case '':
 			case 'BEGIN':
 				return data
-			case '@title':
-				return 'title'
-			case '@display':
-				return (data instanceof ReflectProperty)
-					? propertyDisplayOf(data.class.object ?? data.class.type, data.name)
-					: classDisplayOf(data)
-			case '@output':
-				return outputOf(data)
-			case '@route':
-				return 'a/route'
-			case '%properties':
-				return properties(data)
 			default:
 				if (data[variable] === undefined) {
 					data = new Str(data)
