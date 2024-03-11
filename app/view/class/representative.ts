@@ -7,7 +7,7 @@ const defaultValue = (target: object) =>
 
 const REPRESENTATIVE = Symbol('representative')
 
-export const Representative = (...properties: string[]) => decorateCallback<string[]>(REPRESENTATIVE, target =>
+export const Representative = (...properties: string[]) => decorateCallback(REPRESENTATIVE, target =>
 {
 	if (!target.prototype.hasOwnProperty('toString')) {
 		target.prototype.toString = function() {

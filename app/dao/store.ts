@@ -3,7 +3,7 @@ import { decorateCallback, decoratorOf } from '../decorator/class'
 
 const STORE = Symbol('store')
 
-export const Store = (name: false | string = '') => decorateCallback<false | string>(
+export const Store = (name: false | string = '') => decorateCallback(
 	STORE,
 	target => ((name === '') ? target.name.toLowerCase() : name)
 )
