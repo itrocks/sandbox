@@ -1,9 +1,25 @@
-import path     from 'path'
-import config   from '../config/compose'
-import Type     from './type'
-import { uses } from './uses'
+import path         from 'path'
+import Route        from '../action/route'
+import { getRoute } from '../action/routes'
+import config       from '../config/compose'
+import Type         from './type'
+import { uses }     from './uses'
 
 type SubstitutionModule = { __esModule: true, default?: Type }
+
+function addRouteToModule(module: any, file: string)
+{
+	if (
+		(typeof module.default === 'function')
+		&& (module.default.toString().startsWith('class '))
+	) {
+		const route = getRoute(file.substring(0, file.length - 3))
+		if (route) {
+			Route(route)(module.default)
+		}
+	}
+	return module
+}
 
 const replacements = Object.fromEntries(
 	Object.entries(config).map(([module, replacement]) => [
@@ -28,7 +44,7 @@ Module.prototype.require = function(file: string)
 	// no replacement
 	let replacementFiles = replacements[file]
 	if (!replacementFiles) {
-		return superRequire.apply(this, arguments)
+		return addRouteToModule(superRequire.apply(this, arguments), file)
 	}
 	// from cache
 	if (cache[file]) {
