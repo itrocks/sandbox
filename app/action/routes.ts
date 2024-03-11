@@ -21,9 +21,9 @@ const readDirRecursive = async (directoryName: string) =>
 
 export function getModule(ofRoute: string)
 {
-	let route: Routes | string = routes
+	let route = routes as Routes | string
 	for (const name of ofRoute.substring(1).split('/').reverse()) {
-		if (typeof route === 'string') return undefined
+		if (typeof route === 'string') return route
 		const routeStep = route[name] as Routes | string | undefined
 		if (!routeStep) break
 		route = routeStep
@@ -36,17 +36,19 @@ export function getModule(ofRoute: string)
 
 export function getRoute(ofModule: string)
 {
-	let route: Routes | string = routes
+	let getRoute = ''
+	let route    = routes as Routes | string
 	for (const name of ofModule.substring(1).split('/').reverse()) {
-		if (typeof route === 'string') return route
+		if (typeof route === 'string') return getRoute
 		const routeStep = route[name] as Routes | string | undefined
 		if (!routeStep) break
+		getRoute += '/' + name
 		route = routeStep
 	}
 	if ((typeof route === 'object') && route[':']) {
 		route = route[':']
 	}
-	return (typeof route === 'string') ? route : undefined
+	return (typeof route === 'string') ? getRoute : undefined
 }
 
 export type Routes = { [name: string]: Routes | string }
