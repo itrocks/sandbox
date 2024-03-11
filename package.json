@@ -3,6 +3,7 @@
 	"dependencies": {
 		"fastify": "^4.25.2",
 		"mariadb": "^3.2.3",
+		"normalize.css": "^8.0.1",
 		"papaparse": "^5.4.1",
 		"reflect-metadata": "^0.1.13"
 	},
