@@ -1,4 +1,4 @@
-import Action from '../../action/action'
+import Action from '../../../action/action'
 
 export default class New extends Action
 {

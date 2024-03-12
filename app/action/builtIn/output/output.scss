@@ -1,0 +1,12 @@
+
+ul.object {
+	display: table;
+
+	> li[class] {
+		display: table-row;
+
+		> * {
+			display: table-cell;
+		}
+	}
+}

@@ -1,8 +1,8 @@
-import Action                    from '../../action/action'
-import Need                      from '../../action/need'
-import Request                   from '../../action/request'
-import { displayOf }             from '../../view/class/display'
-import { representativeValueOf } from '../../view/class/representative'
+import Action                    from '../../../action/action'
+import Need                      from '../../../action/need'
+import Request                   from '../../../action/request'
+import { displayOf }             from '../../../view/class/display'
+import { representativeValueOf } from '../../../view/class/representative'
 
 @Need('object')
 export default class Edit extends Action
