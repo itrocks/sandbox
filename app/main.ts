@@ -3,10 +3,12 @@ import './expand'
 import 'reflect-metadata'
 
 import fastify                             from 'fastify'
+import { readFile }                        from 'node:fs/promises'
 import Action                              from './action/action'
 import Exception                           from './action/exception'
 import { needOf }                          from './action/need'
 import ActionRequest                       from './action/request'
+import { appPath }                         from './app'
 import { fastifyRequest, fastifyResponse } from './server/fastify'
 import Response                            from './server/response'
 
@@ -17,8 +19,10 @@ async function execute(request: ActionRequest)
 		throw new Exception('Action is missing')
 	}
 	try {
-		action = new (require('./action/builtIn/' + request.action).default)()
-	} catch {
+		action = new (require('./action/builtIn/' + request.action + '/' + request.action).default)()
+	}
+	catch (exception) {
+		console.error(exception)
 		throw new Exception('Action ' + request.action + ' not found')
 	}
 	if (!action[request.format]) {
@@ -37,6 +41,10 @@ server.get<{ Params: { [index: string]: string, '*': string } }>('/*', async (or
 {
 	const request = fastifyRequest(originRequest)
 	if (request.path === '/favicon.ico') return
+	if (request.path.endsWith('.css') && !request.path.includes('./')) {
+		const headers = { 'Content-Type': 'text/css; charset=utf-8' }
+		return fastifyResponse(finalResponse, new Response(await readFile(appPath + request.path, 'utf-8'), 200, headers))
+	}
 	let response: Response
 	try {
 		response = await execute(new ActionRequest(request))
