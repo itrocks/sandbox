@@ -1,9 +1,11 @@
-import { readFile }                       from 'node:fs/promises'
-import                                         '../../expand'
-import { tr }                             from '../../locale/translate'
-import Str                                from '../str'
+import { readFile }   from 'node:fs/promises'
+import path           from 'path'
+import { appPath }    from '../../app'
+import                     '../../expand'
+import { tr }         from '../../locale/translate'
+import Str            from '../str'
 import parseDecorator from './parseDecorator'
-import parseReflect from './parseReflect'
+import parseReflect   from './parseReflect'
 
 type BlockStack = Array<{ blockStart: number, collection: any[], data: any, iteration: number, iterations: number }>
 
@@ -26,6 +28,9 @@ export default class Template
 {
 	doExpression = true
 	doTranslate  = true
+
+	fileName?: string
+	filePath?: string
 
 	onAttribute?: ((name: string, value: string) => void)
 	onTagOpen?:   ((name: string) => void)
@@ -235,6 +240,8 @@ export default class Template
 
 	async parseFile(fileName: string)
 	{
+		this.fileName = fileName.substring(fileName.lastIndexOf('/') + 1)
+		this.filePath = fileName.substring(0, fileName.lastIndexOf('/'))
 		return this.parseBuffer(await readFile(fileName, 'utf-8'))
 	}
 
@@ -465,6 +472,7 @@ export default class Template
 			// attributes
 			let   hasTypeSubmit = false
 			const inInput       = (char === 'i') && (tagName === 'input')
+			const inLink        = (char === 'l') && (tagName === 'link')
 			while (source[index] !== '>') {
 
 				// attribute name
@@ -477,8 +485,11 @@ export default class Template
 				if (source[index] === '=') {
 					index ++
 					while (' \n\r\t\f'.includes(source[index])) index ++
-					const [open, close] = ['action', 'href', 'location'].includes(attributeName)
-						? ['(', ')']
+					const attributeChar = attributeName[0]
+					const [open, close] = (
+						((attributeChar === 'a') || (attributeChar === 'h') || (attributeChar === 'l'))
+						&& ['action', 'href', 'location'].includes(attributeName)
+					) ? ['(', ')']
 						: ['{', '}']
 					let quote = source[index]
 					if ((quote === '"') || (quote === "'")) {
@@ -489,9 +500,10 @@ export default class Template
 					}
 
 					translating = this.doTranslate && this.attributeTranslate.includes(attributeName)
-						|| (hasTypeSubmit && (attributeName[0] === 'v') && (attributeName === 'value'))
+						|| (hasTypeSubmit && (attributeChar === 'v') && (attributeName === 'value'))
 
-					if (translating && (index > start)) {
+					const inLinkHRef = inLink && (attributeChar === 'h') && (attributeName === 'href')
+					if ((inLinkHRef || translating) && (index > start) ) {
 						this.sourceToTarget()
 					}
 
@@ -504,11 +516,16 @@ export default class Template
 							const attributeValue = source.substring(position, index)
 							if (inInput) {
 								hasTypeSubmit ||= (
-									(attributeName[0] === 't') && (attributeName === 'type') && (attributeValue === 'submit')
+									(attributeChar === 't') && (attributeValue[0] === 's')
+									&& (attributeName === 'type') && (attributeValue === 'submit')
 								)
 							}
 							if (translating) {
 								this.translateTarget(index)
+							}
+							if (inLinkHRef && attributeValue.endsWith('.css')) {
+								target += path.normalize(this.filePath + '/' + source.substring(start, index)).substring(appPath.length)
+								start   = index
 							}
 							if (this.onAttribute) this.onAttribute(attributeName, attributeValue)
 							if (char !== '>') index ++
