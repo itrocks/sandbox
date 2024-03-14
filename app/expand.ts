@@ -1,6 +1,7 @@
 
 declare global
 {
+
 	interface Array<T> {
 		isOrdered(): boolean
 		ordered(sort?: boolean): void
@@ -10,6 +11,11 @@ declare global
 		orderedPush(items: any[]): number
 		unordered(): void
 	}
+
+	interface RegExp {
+		replaceIn(text: string, replacements: string[]): string
+	}
+
 }
 
 export const isOrdered = Array.prototype.isOrdered = function()
@@ -69,6 +75,29 @@ export const orderedPush = Array.prototype.orderedPush = function(...items: any[
 {
 	for (const item of items) this.orderedInsert(item)
 	return this.length
+}
+
+export const replaceIn = RegExp.prototype.replaceIn = function(text: string, replacements: string[])
+{
+	let   groupAll  = ''
+	let   lastIndex = 0
+	const source    = this.source
+	const reGroup   = /\(.*?\)/g
+	let   match
+	while (match = reGroup.exec(source)) {
+		groupAll += '(' + source.substring(lastIndex, match.index) + ')'
+		groupAll += match[0]
+		lastIndex = match.index + match[0].length
+	}
+	return text.replace(new RegExp(groupAll), function() {
+		const length = arguments.length - 2
+		let   result = ''
+		for (let i = 1, j = 0; i < length; i += 2, j ++) {
+			result += arguments[i]
+			result += replacements[j]
+		}
+		return result
+	})
 }
 
 export const unordered = Array.prototype.unordered = function()
