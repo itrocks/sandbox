@@ -309,7 +309,7 @@ export default class Template
 			char = source[++index]
 			if (char === '!') {
 				if (translating) {
-					this.translateTarget(index - 1)
+					this.translateTarget(tagIndex)
 				}
 				char = source[++index]
 				index ++
@@ -389,6 +389,10 @@ export default class Template
 				}
 
 				// DOCTYPE
+				else {
+					index = source.indexOf('>', index) + 1
+				}
+
 				if (translating) {
 					this.sourceToTarget()
 				}
