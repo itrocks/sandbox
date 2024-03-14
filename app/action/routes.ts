@@ -58,7 +58,7 @@ export const routes = {} as Routes
 readDirRecursive(__dirname.substring(0, __dirname.lastIndexOf(sep))).then(entries => {
 	for (let entry of entries) {
 		if (!entry.endsWith('.ts') || entry.endsWith('.d.ts') || entry.endsWith('.test.ts')) continue
-		entry = entry.substring(0, entry.length - 3)
+		entry = entry.slice(0, -3)
 		let   route  = routes
 		const names  = entry.split(sep).slice(1).reverse()
 		const length = names.length - 1

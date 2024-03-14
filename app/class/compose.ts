@@ -13,7 +13,7 @@ function addRouteToModule(module: any, file: string)
 		(typeof module.default === 'function')
 		&& (module.default.toString().startsWith('class '))
 	) {
-		const route = getRoute(file.substring(0, file.length - 3))
+		const route = getRoute(file.slice(0, -3))
 		if (route) {
 			Route(route)(module.default)
 		}
