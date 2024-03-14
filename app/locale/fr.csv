@@ -1,12 +1,22 @@
+$1 list;$1s
 active;actif
+add;ajouter
+add $1;ajouter $1
 close;fermer
 delete;supprimer
+delete $1;supprimer $1
+display $1;afficher $1
 edit;modifier
+edit $1;modifier $1
 email;mail
 en;fr
 id;id
 login;identifiant
+new;nouveau
+new $1;nouveau $1
 password;mot de passe
+save;enregistrer
+save $1;enregistrer $1
 send;envoyer
 this is the $1 I love;c'est le $1 que j'aime
 user;utilisateur
