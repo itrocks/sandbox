@@ -1,28 +1,35 @@
 ul.actions {
-  background-image: linear-gradient(to bottom, #f8f8f8 50%, #efefef);
   list-style: none;
   margin: 0;
   padding: 0; }
   ul.actions.general {
     border-bottom: 1px solid #ccc; }
   ul.actions > li {
-    background: #f8f8f8 left center no-repeat;
+    background: left center no-repeat;
     background-size: 24px;
     border: 1px solid #d0d0d0;
     border-radius: 4px;
     display: inline-block;
-    margin: .5em .3em;
+    margin: 5px 0 5px 5px;
     transition: background-color .2s; }
     ul.actions > li:hover {
-      background-color: #efefef; }
+      background-color: #f4f4f4; }
+    ul.actions > li > * {
+      line-height: 16px;
+      padding: 4px 8px 4px 26px; }
     ul.actions > li > a {
-      display: inline-block;
-      padding: .5em .7em .5em 26px; }
+      display: inline-block; }
+    ul.actions > li > input {
+      background: inherit;
+      border: none;
+      cursor: pointer; }
     ul.actions > li.close {
       background-image: url("action/close.svg"); }
     ul.actions > li.delete {
       background-image: url("action/delete.svg"); }
     ul.actions > li.edit {
       background-image: url("action/edit.svg"); }
+    ul.actions > li.save {
+      background-image: url("action/save.svg"); }
 
 /*# sourceMappingURL=action.css.map */

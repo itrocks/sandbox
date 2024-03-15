@@ -5,7 +5,7 @@ nav.app.menu ul {
   margin: 0;
   padding: 0; }
 nav.app.menu > ul > li > h3 {
-  background: #f4f4f4 10px center no-repeat;
+  background: #ddd 10px center no-repeat;
   background-size: 24px;
   font-weight: normal;
   margin: 2px 0;

@@ -1,14 +1,14 @@
 
-article {
+article, form { &[data-action="edit"], &[data-action="output"] {
 
 	> header {
 
 		> h2 {
-			background: #eaeaea;
+			background: #eee;
 			border-bottom: 1px solid #ccc;
 			font-size: inherit;
 			margin: 0;
-			padding: .5em .6em;
+			padding: 6px 8px;
 		}
 	}
-}
+}}

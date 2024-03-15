@@ -3,7 +3,7 @@ ul.object.properties {
 	border-collapse: separate;
 	border-spacing: .6em;
 	display: table;
-	margin: .6em 0;
+	margin: .2em 0;
 	padding: 0;
 
 	> li[class] {
@@ -12,7 +12,7 @@ ul.object.properties {
 		> * {
 			border: 1px solid;
 			display: table-cell;
-			line-height: 1.25em;
+			line-height: 16px;
 		}
 
 		> label {
@@ -23,12 +23,19 @@ ul.object.properties {
 			vertical-align: top;
 		}
 
+		> input {
+			border-color: #ddd;
+		}
+
 		> :not(label) {
-			background: #eee;
-			border-color: #eee;
 			border-radius: 4px;
 			padding: .5em .6em;
 			white-space: pre-line;
+
+			&:not(input) {
+				background: #f4f4f4;
+				border-color: #f8f8f8;
+			}
 		}
 	}
 }

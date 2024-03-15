@@ -10,18 +10,18 @@ body {
 	height: 100vh;
 
 	> header {
-		border-bottom: 2px solid #d8d8d8;
-		border-right: 2px solid #d8d8d8;
+		background-color: #eee;
 		grid-area: header;
 	}
 
 	> nav {
-		border-right: 2px solid #d8d8d8;
+		background-color: #eee;
 		grid-area: nav;
 		position: relative;
 	}
 
 	> main {
+		border-left: 1px solid #ccc;
 		grid-area: main;
 	}
 
@@ -51,7 +51,7 @@ body {
 	height: 56px;
 	padding: 0;
 	position: absolute;
-	right: -2px;
+	right: 0;
 	top: -66px;
 	width: 36px;
 
