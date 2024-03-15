@@ -491,8 +491,8 @@ export default class Template
 					while (' \n\r\t\f'.includes(source[index])) index ++
 					const attributeChar = attributeName[0]
 					const [open, close] = (
-						((attributeChar === 'a') || (attributeChar === 'h') || (attributeChar === 'l'))
-						&& ['action', 'href', 'location'].includes(attributeName)
+						((attributeChar === 'a') || (attributeChar === 'f') || (attributeChar === 'h') || (attributeChar === 'l'))
+						&& ['action', 'formaction', 'href', 'location'].includes(attributeName)
 					) ? ['(', ')']
 						: ['{', '}']
 					let quote = source[index]
