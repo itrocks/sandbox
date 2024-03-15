@@ -9,7 +9,7 @@ import Exception                           from './action/exception'
 import { needOf }                          from './action/need'
 import ActionRequest                       from './action/request'
 import { appPath }                         from './app'
-import mimeTypes                           from './mime'
+import { mimeTypes, utf8Types }            from './mime'
 import { fastifyRequest, fastifyResponse } from './server/fastify'
 import Response                            from './server/response'
 
@@ -45,8 +45,13 @@ server.get<{ Params: { [index: string]: string, '*': string } }>('/*', async (or
 	if ((dot > request.path.length - 7) && !request.path.includes('./')) {
 		const mimeType = mimeTypes.get(request.path.substring(dot + 1))
 		if (mimeType) {
-			const headers = { 'Content-Type': mimeType + '; charset=utf-8' }
-			return fastifyResponse(finalResponse, new Response(await readFile(appPath + request.path, 'utf-8'), 200, headers))
+			const utf8Type = utf8Types.has(mimeType)
+			const headers  = { 'Content-Type': mimeType + (utf8Type ? '; charset=utf-8' : '') }
+			const path     = (request.path === '/favicon.ico') ? '/app/style/2020/logo/favicon.ico' : request.path
+			return fastifyResponse(
+				finalResponse,
+				new Response(await readFile(appPath + path, utf8Type ? 'utf-8' : undefined), 200, headers)
+			)
 		}
 	}
 	let response: Response
