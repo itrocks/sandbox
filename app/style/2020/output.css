@@ -1,0 +1,26 @@
+ul.object.properties {
+  border-collapse: separate;
+  border-spacing: .6em;
+  display: table;
+  margin: .6em 0;
+  padding: 0; }
+  ul.object.properties > li[class] {
+    display: table-row; }
+    ul.object.properties > li[class] > * {
+      border: 1px solid;
+      display: table-cell;
+      line-height: 1.25em; }
+    ul.object.properties > li[class] > label {
+      border-color: transparent;
+      font-weight: 500;
+      padding: .5em 0;
+      text-align: right;
+      vertical-align: top; }
+    ul.object.properties > li[class] > :not(label) {
+      background: #eee;
+      border-color: #eee;
+      border-radius: 4px;
+      padding: .5em .6em;
+      white-space: pre-line; }
+
+/*# sourceMappingURL=output.css.map */

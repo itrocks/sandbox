@@ -1,8 +1,0 @@
-ul.object {
-  display: table; }
-  ul.object > li[class] {
-    display: table-row; }
-    ul.object > li[class] > * {
-      display: table-cell; }
-
-/*# sourceMappingURL=output.css.map */

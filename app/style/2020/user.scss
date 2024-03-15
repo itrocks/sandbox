@@ -1,0 +1,20 @@
+
+.connected.user {
+
+	> .name {
+		display: none;
+	}
+
+	> a {
+		background: url('icon/user.svg') 12px center no-repeat;
+		background-size: 20px;
+		display: inline-block;
+		font-size: 1.17em;
+		padding: 1em 0 1em 40px;
+		transition: background-color .2s;
+
+		&:hover {
+			background-color: #f8f8f8;
+		}
+	}
+}

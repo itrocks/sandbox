@@ -1,0 +1,14 @@
+
+form[name=global-search] {
+	padding: .8em 1em;
+
+	input {
+		box-sizing: border-box;
+		margin: auto;
+		width: 100%;
+	}
+
+	label {
+		display: none;
+	}
+}

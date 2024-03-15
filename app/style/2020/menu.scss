@@ -1,0 +1,44 @@
+
+nav.app.menu {
+
+	a {
+		display: block;
+	}
+
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	> ul {
+
+		> li {
+
+			> h3 {
+				background: #f4f4f4 10px center no-repeat;
+				background-size: 24px;
+				font-weight: normal;
+				margin: 2px 0;
+				padding: 1em 0 1em 40px;
+			}
+
+			> ul > li {
+				margin: 2px 0;
+				transition: background-color .2s;
+
+				&:hover {
+					background-color: #f4f4f4;
+				}
+
+				> a {
+					padding: .8em 0 .8em 10px;
+				}
+			}
+
+			&.administration > h3 {
+				background-image: url('module/administration.svg');
+			}
+		}
+	}
+}

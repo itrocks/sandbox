@@ -1,29 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<link href="output.css" rel="stylesheet">
+	<link href="../../../../node_modules/normalize.css/normalize.css" rel="stylesheet">
+	<link href="../../../style/2020/action.css" rel="stylesheet">
+	<link href="../../../style/2020/article.css" rel="stylesheet">
+	<link href="../../../style/2020/body.css" rel="stylesheet">
+	<link href="../../../style/2020/global.css" rel="stylesheet">
+	<link href="../../../style/2020/global-search.css" rel="stylesheet">
+	<link href="../../../style/2020/menu.css" rel="stylesheet">
+	<link href="../../../style/2020/output.css" rel="stylesheet">
+	<link href="../../../style/2020/user.css" rel="stylesheet">
+	<link href="../../../style/font/roboto/roboto.css" rel="stylesheet">
 	<meta charset="utf-8">
 	<title>{@output.ucFirst}</title>
 </head>
 <body>
+
+<header>
+	<div class="main logo"></div>
+</header>
+
+<nav class="app menu">
+	<button class="collapse">collapse</button>
+	<form name="global-search">
+		<label for="global-search">Global search</label>
+		<input id="global-search" name="global-search">
+	</form>
+	<div class="connected user">
+		<div class="name">Baptiste Pillot</div>
+		<a href="/">Disconnect</a>
+	</div>
+	<ul>
+		<li class="administration">
+			<h3>Main module</h3>
+			<ul>
+				<li><a href="/user/list">User list</a></li>
+			</ul>
+		</li>
+	</ul>
+</nav>
+
+<main>
 <!--BEGIN-->
 
 	<article data-action="output" data-class="{%name}" data-id="{id}" data-route="{@route}">
 		<header>
 			<h2>{@output.ucFirst}</h2>
 			<ul class="general actions">
-				<li class="list"><a href="(@route)/list">close</a></li>
-				<li class="edit"><a href="(@route)/(id)/edit">edit</a></li>
-				<li class="delete"><a href="(@route)/(id)/delete">delete</a></li>
+				<li class="close"><a href="(@route)/list">Close</a></li>
+				<li class="edit"><a href="(@route)/(id)/edit">Edit</a></li>
+				<li class="delete"><a href="(@route)/(id)/delete">Delete</a></li>
 			</ul>
 		</header>
-		<ul class="object">
+		<ul class="object properties">
 			<!--%properties-->
 			<li class="{name}"><label>{@display}</label><div>{object.{name}}</div></li>
 			<!--end-->
 		</ul>
+		<footer>
+		</footer>
 	</article>
 
 <!--END-->
+</main>
+
+<aside>
+</aside>
+
+<footer>
+</footer>
+
 </body>
 </html>

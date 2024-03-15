@@ -5,13 +5,16 @@ add $1;ajouter $1
 close;fermer
 delete;supprimer
 delete $1;supprimer $1
+disconnect;déconnecter
 display $1;afficher $1
 edit;modifier
 edit $1;modifier $1
 email;mail
 en;fr
+global search;recherche globale
 id;id
 login;identifiant
+main module;module principal
 new;nouveau
 new $1;nouveau $1
 password;mot de passe

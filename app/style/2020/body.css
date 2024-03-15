@@ -1,0 +1,44 @@
+body {
+  display: grid;
+  grid-template-areas: "header main   aside " "nav    main   aside " "footer footer footer";
+  grid-template-columns: 200px auto min-content;
+  grid-template-rows: 64px auto min-content;
+  height: 100vh; }
+  body > header {
+    border-bottom: 2px solid #d8d8d8;
+    border-right: 2px solid #d8d8d8;
+    grid-area: header; }
+  body > nav {
+    border-right: 2px solid #d8d8d8;
+    grid-area: nav;
+    position: relative; }
+  body > main {
+    grid-area: main; }
+  body > aside {
+    grid-area: aside; }
+  body > footer {
+    grid-area: footer; }
+
+.main.logo {
+  background: url("logo/itrocks.svg") center no-repeat;
+  background-size: auto calc(100% - 1em);
+  height: 100%; }
+
+.collapse {
+  transition: background-size .1s;
+  background: url("part/collapse.svg") right no-repeat;
+  background-size: 25%;
+  border: 0;
+  cursor: pointer;
+  display: block;
+  font-size: 0;
+  height: 56px;
+  padding: 0;
+  position: absolute;
+  right: -2px;
+  top: -66px;
+  width: 36px; }
+  .collapse:hover {
+    background-size: 50%; }
+
+/*# sourceMappingURL=body.css.map */

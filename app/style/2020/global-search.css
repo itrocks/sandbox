@@ -1,0 +1,10 @@
+form[name=global-search] {
+  padding: .8em 1em; }
+  form[name=global-search] input {
+    box-sizing: border-box;
+    margin: auto;
+    width: 100%; }
+  form[name=global-search] label {
+    display: none; }
+
+/*# sourceMappingURL=global-search.css.map */

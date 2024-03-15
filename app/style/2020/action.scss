@@ -1,0 +1,41 @@
+ul.actions {
+	background-image: linear-gradient(to bottom, #f8f8f8 50%, #efefef);
+	list-style: none;
+	margin: 0;
+	padding: 0;
+
+	&.general {
+		border-bottom: 1px solid #ccc;
+	}
+
+	> li {
+		background: #f8f8f8 left center no-repeat;
+		background-size: 24px;
+		border: 1px solid #d0d0d0;
+		border-radius: 2px;
+		display: inline-block;
+		margin: .5em .3em;
+		transition: background-color .2s;
+
+		&:hover {
+			background-color: #efefef;
+		}
+
+		> a {
+			display: inline-block;
+			padding: .5em .7em .5em 26px;
+		}
+
+		&.close {
+			background-image: url('action/close.svg')
+		}
+
+		&.delete {
+			background-image: url('action/delete.svg')
+		}
+
+		&.edit {
+			background-image: url('action/edit.svg')
+		}
+	}
+}
