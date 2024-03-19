@@ -447,6 +447,7 @@ export default class Template
 				tagStack.push({ tagName, translating })
 			}
 			let inlineElement = false
+			let pushedParts   = false
 			if (translating) {
 				inlineElement = this.elementInline.includes(tagName)
 				if (inlineElement) {
@@ -465,6 +466,7 @@ export default class Template
 					if (!unclosingTag) {
 						translatePartStack.push(translateParts)
 						translateParts = []
+						pushedParts    = true
 					}
 				}
 				else {
@@ -505,6 +507,11 @@ export default class Template
 
 					translating = this.doTranslate && this.attributeTranslate.includes(attributeName)
 						|| (hasTypeSubmit && (attributeChar === 'v') && (attributeName === 'value'))
+					if (translating && !pushedParts && unclosingTag && translateParts.length) {
+						translatePartStack.push(translateParts)
+						translateParts = []
+						pushedParts    = true
+					}
 
 					const inLinkHRef = inLink && (attributeChar === 'h') && (attributeName === 'href')
 					if ((inLinkHRef || translating) && (index > start) ) {
@@ -552,6 +559,9 @@ export default class Template
 			if (this.onTagOpened) this.onTagOpened.call(this, tagName)
 
 			if (unclosingTag) {
+				if (pushedParts) {
+					translateParts = translatePartStack.pop() as string[]
+				}
 				translating = elementTranslating
 				if (this.onTagClose) this.onTagClose.call(this, tagName)
 				if (translating) {
