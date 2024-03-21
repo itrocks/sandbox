@@ -19,7 +19,7 @@ class Callback
 	{
 		for (const element of this.matchingElementsInto(containerElement)) {
 			if (this.event === CALL) {
-				this.callback.apply(element, this.parameters)
+				this.callback(element, ...this.parameters)
 			}
 			else {
 				element.addEventListener(this.event, this.callback)
@@ -38,7 +38,7 @@ class Callback
 			if (element.matches(selector)) {
 				elements.add(element)
 			}
-			element.querySelectorAll(selector).forEach(found => elements.add(found))
+			element.querySelectorAll(selector).forEach(element => elements.add(element))
 		}
 		return elements
 	}
@@ -66,7 +66,7 @@ const chainedSelectors = (selector: string[]) =>
 	return selectors
 }
 
-const observer = new MutationObserver((mutations) => {
+const observer = new MutationObserver(mutations => {
 	for (const mutation of mutations) {
 		mutation.addedNodes.forEach(addedNode => {
 			if (addedNode instanceof Element) {
