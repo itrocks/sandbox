@@ -48,7 +48,7 @@ function testBuffer(template: Template, source: string, target: string)
 }
 
 describe('tr', () => {
-	const template = new Template()
+	const template = new Template
 	jest.spyOn(translate, 'tr').mockImplementation((text: string) => {
 		switch (text) {
 			case 'example': return 'translated'
@@ -71,7 +71,7 @@ describe('tr', () => {
 })
 
 describe('translateAttribute', () => {
-	const template = new TemplateMockTranslate()
+	const template = new TemplateMockTranslate
 
 	it('no', () => {
 		testBuffer(template,
@@ -116,7 +116,7 @@ describe('translateAttribute', () => {
 })
 
 describe('translateBlock', () => {
-	const template = new TemplateMockTranslate()
+	const template = new TemplateMockTranslate
 
 	it('blockComment', () => {
 		testBuffer(template,
@@ -216,7 +216,7 @@ describe('translateBlock', () => {
 })
 
 describe('translateBlockYesNo', () => {
-	const template = new TemplateMockTranslate()
+	const template = new TemplateMockTranslate
 
 	it('noInYes', () => {
 		testBuffer(template,
@@ -241,7 +241,7 @@ describe('translateBlockYesNo', () => {
 })
 
 describe('translateMixes', () => {
-	const template = new TemplateMockTranslate()
+	const template = new TemplateMockTranslate
 
 	it('attributeExpressionBlockExpression', () => {
 		testBuffer(template,
@@ -262,7 +262,7 @@ describe('translateMixes', () => {
 })
 
 describe('translateSpecials', () => {
-	const template = new TemplateMockTranslate()
+	const template = new TemplateMockTranslate
 
 	it('inputSubmitValue', () => {
 		testBuffer(template,

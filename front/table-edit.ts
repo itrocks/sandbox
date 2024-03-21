@@ -24,7 +24,7 @@ export class RangeCopy
 
 	toRange()
 	{
-		const range = new Range()
+		const range = new Range
 		range.setStart(this.startContainer, this.startOffset)
 		range.setEnd(this.endContainer, this.endOffset)
 		return range
@@ -108,7 +108,7 @@ export class TableEdit extends Plugin
 		while (node.lastChild && !(node.nodeType === Node.TEXT_NODE)) {
 			node = node.lastChild as Node
 		}
-		const newRange = new Range()
+		const newRange = new Range
 		newRange.setStartAfter(node)
 		newRange.setEndAfter(node)
 		return newRange
@@ -116,7 +116,7 @@ export class TableEdit extends Plugin
 
 	editableFullRange(node: Node | Range | RangeCopy)
 	{
-		const newRange = new Range()
+		const newRange = new Range
 		newRange.selectNodeContents(this.closestEditable(node))
 		return newRange
 	}

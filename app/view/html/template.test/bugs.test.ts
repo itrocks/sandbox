@@ -1,7 +1,7 @@
 import Template from '../template'
 
 describe('translation', () => {
-	const template = new Template()
+	const template = new Template
 	template.tr = (text, parts) => {
 		if (parts && text.includes('$2')) {
 			return text.replace('$1', parts[0]).replace('$2', parts[1])

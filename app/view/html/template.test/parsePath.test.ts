@@ -1,6 +1,6 @@
 import Template from '../template';
 
-const template = new Template()
+const template = new Template
 template.parseVariable = (variable: string, data: any): any =>
 {
 	return (variable === '')

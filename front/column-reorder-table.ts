@@ -12,8 +12,8 @@ export class ColumnReorderTable extends Plugin
 
 		let downed:   HTMLTableCellElement | undefined
 		let dragging: HTMLTableCellElement | undefined
-		let mouse     = new DOMRect()
-		let mouseFrom = new DOMRect()
+		let mouse     = new DOMRect
+		let mouseFrom = new DOMRect
 		for (const cell of Array.from(this.reorderCells)) {
 			table.addEventListener(cell, 'mousedown', event => {
 				console.log('mousedown', event.target)

@@ -1,6 +1,6 @@
 import Template from '../template'
 
-const template       = new Template()
+const template       = new Template
 template.doTranslate = false
 template.parsePath   = (name: string) => ({
 

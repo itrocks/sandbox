@@ -1,5 +1,4 @@
 import './class/compose'
-import './expand'
 import 'reflect-metadata'
 
 import fastify                             from 'fastify'
@@ -20,7 +19,7 @@ async function execute(request: ActionRequest)
 		throw new Exception('Action is missing')
 	}
 	try {
-		action = new (require('./action/builtIn/' + request.action + '/' + request.action).default)()
+		action = new (require('./action/builtIn/' + request.action + '/' + request.action).default)
 	}
 	catch (exception) {
 		console.error(exception)

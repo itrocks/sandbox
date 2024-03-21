@@ -37,7 +37,7 @@ class Class extends Parent {
 
 describe('mixinOverride', () => {
 	it('mixinOverrideIt', () => {
-		const object = new Class() as Class & Mixin
+		const object = new Class as Class & Mixin
 		expect(object.method()).toEqual('parentMethod2-method2-mixinParentMethod2-mixinMethod2')
 	})
 })

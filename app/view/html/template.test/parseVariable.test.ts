@@ -1,7 +1,7 @@
 import Template from '../template';
 
 describe('parseVariable', () => {
-	const template = new Template()
+	const template = new Template
 
 	it('empty', () => {
 		expect(template.parseVariable('', 'data')).toEqual('data')

@@ -139,7 +139,7 @@ export class TableEditMove extends Plugin
 	textContentAfterRange(range: Range)
 	{
 		const editable = this.tableEdit.closestEditable(range.commonAncestorContainer)
-		const next     = new Range()
+		const next     = new Range
 		next.setStart(range.endContainer, range.endOffset)
 		editable.lastChild
 			? next.setEndAfter(editable.lastChild)
@@ -150,7 +150,7 @@ export class TableEditMove extends Plugin
 	textContentBeforeRange(range: Range)
 	{
 		const editable = this.tableEdit.closestEditable(range.commonAncestorContainer)
-		const previous = new Range()
+		const previous = new Range
 		previous.setStart(editable, 0)
 		previous.setEnd(range.startContainer, range.startOffset)
 		return this.rangeTextContent(previous)
