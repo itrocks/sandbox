@@ -1,11 +1,11 @@
-import { readFile }   from 'node:fs/promises'
-import path           from 'path'
-import { appPath }    from '../../app'
-import                     '../../expand'
-import { tr }         from '../../locale/translate'
-import Str            from '../str'
-import parseDecorator from './parseDecorator'
-import parseReflect   from './parseReflect'
+import { readFile }    from 'node:fs/promises'
+import path            from 'path'
+import { appPath }     from '../../app'
+import { tr }          from '../../locale/translate'
+import { SortedArray } from '../../sorted-array'
+import Str             from '../str'
+import parseDecorator  from './parseDecorator'
+import parseReflect    from './parseReflect'
 
 type BlockStack = Array<{ blockStart: number, collection: any[], data: any, iteration: number, iterations: number }>
 
@@ -38,39 +38,35 @@ export default class Template
 	onTagClose?:  ((name: string) => void)
 
 	// Translate these attribute values.
-	attributeTranslate = ['alt', 'enterkeyhint', 'label', 'lang', 'placeholder', 'srcdoc', 'title']
+	attributeTranslate = new SortedArray('alt', 'enterkeyhint', 'label', 'lang', 'placeholder', 'srcdoc', 'title')
 
 	// Inline elements are replaced by $1 when in translated phrase.
 	// TODO check if this really matches elements displayed inline
-	elementInline = [
+	elementInline = new SortedArray(
 		'a', 'b', 'big', 'button', 'cite', 'code', 'data', 'del', 'em', 'font', 'i', 'img', 'input', 'ins',
 		'kbd', 'label', 'mark', 'meter', 'optgroup', 'option', 'output', 'picture', 'q', 'rt',
 		'samp', 'select', 'small', 'span', 'strike', 'strong', 'sub', 'sup', 'svg', 'time', 'tspan', 'u', 'var', 'wbr'
-	]
+	)
 
 	// Translate these element contents.
-	elementTranslate = [
+	elementTranslate = new SortedArray(
 		'a', 'abbr', 'acronym', 'article', 'aside', 'b', 'bdi', 'bdo', 'big', 'blockquote', 'body', 'br', 'button',
 		'caption', 'center', 'cite', 'data', 'datalist', 'dd', 'del', 'desc', 'details', 'dfn', 'dialog', 'div', 'dt',
-		'em', 'font', 'fieldset', 'figcaption', 'figure', 'font', 'footer', 'form',
+		'em', 'fieldset', 'figcaption', 'figure', 'font', 'footer', 'form',
 		'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hr', 'i', 'iframe', 'ins', 'keygen', 'label', 'legend', 'li',
-		'main', 'mark', 'menuitem', 'meter', 'nav', 'noframes', 'noscript', 'option', 'optgroup', 'option', 'p', 'pre',
+		'main', 'mark', 'menuitem', 'meter', 'nav', 'noframes', 'noscript', 'optgroup', 'option', 'p', 'pre',
 		'q', 'rb', 's', 'section', 'select', 'small', 'span', 'strike', 'strong', 'sub', 'summary', 'sup',
 		'td', 'template', 'text', 'textarea', 'textpath', 'th', 'time', 'title', 'tspan', 'u', 'wbr'
-	]
+	)
 
 	// These elements have no closing tag.
-	unclosingTags = [
+	unclosingTags = new SortedArray(
 		'area', 'base', 'basefont', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param',
 		'source', 'track'
-	]
+	)
 
 	constructor(public data?: any)
 	{
-		this.attributeTranslate.ordered(false)
-		this.elementInline.ordered(false)
-		this.elementTranslate.ordered(false)
-		this.unclosingTags.ordered(false)
 	}
 
 	closeTag(shouldTranslate: boolean, targetIndex: number)
