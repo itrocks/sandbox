@@ -1,7 +1,7 @@
 import { SortedArrayKey } from './sorted-array.js'
 
-export const CALL = 'call'
-export const EVER = 'ever'
+export const ALWAYS = 'always'
+export const CALL   = 'call'
 
 class Callback
 {
@@ -31,7 +31,7 @@ class Callback
 	{
 		const elements = new Set<Element>
 		for (const selector of this.selectors) {
-			if ((selector[0] === 'E') && (selector === EVER)) {
+			if ((selector[0] === ALWAYS[0]) && (selector === ALWAYS)) {
 				elements.add(element)
 				continue
 			}
@@ -82,28 +82,39 @@ observer.observe(document.body, { childList: true, subtree: true })
 
 type BuildElementCallback = (element: Element) => void
 type BuildEventCallback   = (event:   Event)   => void
-type BuildCallback        = BuildEventCallback | BuildElementCallback
-type BuildEventName       = keyof GlobalEventHandlersEventMap | typeof CALL
+type BuildEventCall       = typeof CALL
+type BuildEventName       = keyof GlobalEventHandlersEventMap
 
 export type BuildEvent = {
-	callback:    BuildCallback,
-	name?:       BuildEventName,
+	callback:    BuildElementCallback | BuildEventCallback,
+	name?:       BuildEventCall | BuildEventName,
 	parameters?: any[],
 	priority?:   number,
 	selector?:   string | string[]
 }
 
+export function build(callback: BuildElementCallback): void
 export function build(event: BuildEvent): void
 export function build(selector: string | string[], callback: BuildElementCallback): void
-export function build(event: BuildEvent | string | string[], callback?: BuildElementCallback)
-{
-	if ((typeof event === 'string') || Array.isArray(event)) {
-		event = { callback, selector: event } as BuildEvent
+export function build(selector: string | string[], event: BuildEventCall, callback: BuildElementCallback): void
+export function build(selector: string | string[], event: BuildEventName, callback: BuildEventCallback): void
+export function build(
+	event:     BuildElementCallback | BuildEvent | string | string[],
+	name?:     BuildElementCallback | BuildEventCall | BuildEventName,
+	callback?: BuildElementCallback | BuildEventCallback
+) {
+	if (typeof event === 'function') {
+		event = { callback: event }
+	}
+	else if ((typeof event === 'string') || Array.isArray(event)) {
+		event = callback
+			? { callback, name, selector: event } as BuildEvent
+			: { callback: name, selector: event } as BuildEvent
 	}
 	if (!event.name)       event.name       = CALL
 	if (!event.parameters) event.parameters = []
 	if (!event.priority)   event.priority   = 1000
-	if (!event.selector)   event.selector   = EVER
+	if (!event.selector)   event.selector   = ALWAYS
 
 	event.priority = (event.priority * 1000000) + callbacks.length
 	event.selector = (typeof event.selector === 'string') ? [event.selector] : chainedSelectors(event.selector)
@@ -113,8 +124,3 @@ export function build(event: BuildEvent | string | string[], callback?: BuildEle
 	callbacks.push(buildCallback)
 }
 export default build
-
-export function buildEvent(eventName: BuildEventName, selector: string | string[], callback: BuildCallback)
-{
-	build({ callback, name: eventName, selector })
-}
