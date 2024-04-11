@@ -23,12 +23,13 @@ export default formFetch
 
 export function formFetchOnSubmit(
 	form:     HTMLFormElement,
-	callback: (response: Response) => void,
+	callback: (response: Response, target: string, form: HTMLFormElement) => void,
 	init:     RequestInit = {}
 ) {
-	form.addEventListener('submit', (event: Event) => {
-		const submitter = (event as SubmitEvent).submitter as HTMLButtonElement | HTMLInputElement | null
-		formFetch(event.currentTarget as HTMLFormElement, submitter?.formAction, init).then(callback)
+	form.addEventListener('submit', event => {
 		event.preventDefault()
+		const submitter = event.submitter as HTMLButtonElement | HTMLInputElement | null
+		formFetch(event.currentTarget as HTMLFormElement, submitter?.formAction, init)
+			.then(response => callback(response, submitter?.formTarget ?? form.target, form))
 	})
 }

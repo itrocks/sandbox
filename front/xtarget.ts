@@ -1,4 +1,4 @@
-import formFetch from './form-fetch.js'
+import { formFetchOnSubmit } from './form-fetch.js'
 
 export type XhrSize = {
 	screenHeight:  number,
@@ -27,7 +27,7 @@ export function requestHeaders(request: Headers, target?: HTMLElement)
 	return request
 }
 
-async function setResponse(targetString: string, response: Response)
+async function setResponse(response: Response, targetString: string)
 {
 	const target = document.getElementById(targetString.substring(1))
 	if (!target) return undefined
@@ -40,11 +40,8 @@ export function xTarget(element: XTargetElement)
 	if (!element.getAttribute('target')?.startsWith('#')) return
 	if (element instanceof HTMLAnchorElement) element.addEventListener('click', async function(event) {
 		event.preventDefault()
-		await setResponse(this.target, await fetch(this.href, { headers: requestHeaders(new Headers) }))
+		await setResponse(await fetch(this.href, { headers: requestHeaders(new Headers) }), this.target)
 	})
-	if (element instanceof HTMLFormElement) element.addEventListener('submit', async function(event) {
-		event.preventDefault()
-		await setResponse(this.target, await formFetch(this, this.action, { headers: requestHeaders(new Headers) }))
-	})
+	if (element instanceof HTMLFormElement) formFetchOnSubmit(element, setResponse)
 }
 export default xTarget
