@@ -1,6 +1,6 @@
-import formFetch from '../form-fetch.js'
+import { formFetchOnSubmit } from '../form-fetch.js'
 
-document.querySelectorAll('form').forEach(form => formFetch(form, response => {
+document.querySelectorAll('form').forEach(form => formFetchOnSubmit(form, response => {
 	alert('Response status ' + response.status)
 	console.log(response)
 }))
