@@ -3,8 +3,8 @@ import { sep }      from 'path'
 
 const parseCsv     = require('papaparse').parse
 
-const expressions  = new Set<RegExp>()
-const translations = new Map<string, string>()
+const expressions  = new Set<RegExp>
+const translations = new Map<string, string>
 
 readFile(__dirname + sep + 'fr.csv', 'utf-8')
 	.then(data => parseCsv(data, { delimiter: ';' }).data as [string, string][])
