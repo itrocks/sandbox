@@ -1,6 +1,6 @@
 import { formFetchOnSubmit } from './form-fetch.js'
 
-export type XhrSize = {
+export type XhrInfo = {
 	screenHeight:  number,
 	screenWidth:   number,
 	targetHeight?: number,
@@ -11,25 +11,27 @@ export type XhrSize = {
 
 export type XTargetElement = HTMLAnchorElement | HTMLFormElement
 
-export function requestHeaders(request: Headers, target?: HTMLElement)
+export function requestHeaders(headers: Headers, target?: HTMLElement)
 {
-	const size: XhrSize = {
+	const info: XhrInfo = {
 		screenHeight: screen.height,
 		screenWidth:  screen.width,
 		windowHeight: window.innerHeight,
 		windowWidth:  window.innerWidth
 	}
 	if (target) {
-		size.targetHeight = target.clientHeight
-		size.targetWidth  = target.clientWidth
+		info.targetHeight = target.clientHeight
+		info.targetWidth  = target.clientWidth
 	}
-	request.set('XHR-Size', JSON.stringify(size))
-	return request
+	headers.set('XHR-Info', JSON.stringify(info))
+	return headers
 }
 
 async function setResponse(response: Response, targetString: string)
 {
-	const target = document.getElementById(targetString.substring(1))
+	const target = targetString.startsWith('#')
+		? document.getElementById(targetString.substring(1))
+		: document.querySelector<HTMLElement>(targetString)
 	if (!target) return undefined
 	target.innerHTML = await response.text()
 	return target
@@ -37,7 +39,6 @@ async function setResponse(response: Response, targetString: string)
 
 export function xTarget(element: XTargetElement)
 {
-	if (!element.getAttribute('target')?.startsWith('#')) return
 	if (element instanceof HTMLAnchorElement) element.addEventListener('click', async function(event) {
 		event.preventDefault()
 		await setResponse(await fetch(this.href, { headers: requestHeaders(new Headers) }), this.target)
