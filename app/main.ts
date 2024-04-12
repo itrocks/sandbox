@@ -40,34 +40,36 @@ const server = fastify()
 server.get<{ Params: { [index: string]: string, '*': string } }>('/*', async (originRequest, finalResponse) =>
 {
 	const request = fastifyRequest(originRequest)
-	const dot     = request.path.lastIndexOf('.')
-	if ((dot > request.path.length - 7) && !request.path.includes('./')) {
-		const mimeType = mimeTypes.get(request.path.substring(dot + 1))
+	const dot     = request.path.lastIndexOf('.') + 1
+	if ((dot > request.path.length - 6) && !request.path.includes('./')) {
+		const fileExtension = request.path.substring(dot)
+		const mimeType      = mimeTypes.get(fileExtension)
 		if (mimeType) {
 			const utf8Type = utf8Types.has(mimeType)
 			const headers  = { 'Content-Type': mimeType + (utf8Type ? '; charset=utf-8' : '') }
 			const path     = (request.path === '/favicon.ico') ? '/app/style/2020/logo/favicon.ico' : request.path
-			return fastifyResponse(
-				finalResponse,
-				new Response(await readFile(appPath + path, utf8Type ? 'utf-8' : undefined), 200, headers)
-			)
+			const response = new Response(await readFile(appPath + path, utf8Type ? 'utf-8' : undefined), 200, headers)
+			return fastifyResponse(finalResponse, response)
+		}
+		if (request.path.startsWith('/front/') && (fileExtension === 'js')) {
+			const headers  = { 'Content-Type': 'text/javascript; charset=utf-8' }
+			const response = new Response(await readFile(appPath + request.path, 'utf-8'), 200, headers)
+			return fastifyResponse(finalResponse, response)
 		}
 	}
-	let response: Response
 	try {
-		response = await execute(new ActionRequest(request))
+		return fastifyResponse(finalResponse, await execute(new ActionRequest(request)))
 	}
 	catch(exception) {
 		console.error(request.path)
 		console.error(exception)
 		if (exception instanceof Exception) {
-			response = exception.response
+			return fastifyResponse(finalResponse, exception.response)
 		}
 		else {
 			throw exception
 		}
 	}
-	return fastifyResponse(finalResponse, response)
 })
 
 server.listen({ port: 3000 }).then()
