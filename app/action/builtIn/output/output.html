@@ -12,6 +12,7 @@
 	<link href="../../../style/2020/user.css" rel="stylesheet">
 	<link href="../../../style/font/roboto/roboto.css" rel="stylesheet">
 	<meta charset="utf-8">
+	<script src="../../../../front/app.js" type="module"></script>
 	<title>{@output.ucFirst}</title>
 </head>
 <body>
@@ -47,9 +48,9 @@
 		<header>
 			<h2>{@output.ucFirst}</h2>
 			<ul class="general actions">
-				<li class="close"><a href="(@route)/list">Close</a></li>
-				<li class="edit"><a href="(@route)/(id)/edit">Edit</a></li>
-				<li class="delete"><a href="(@route)/(id)/delete">Delete</a></li>
+				<li class="close"><a href="(@route)/list" target="main">Close</a></li>
+				<li class="edit"><a href="(@route)/(id)/edit" target="main">Edit</a></li>
+				<li class="delete"><a href="(@route)/(id)/delete" target="main">Delete</a></li>
 			</ul>
 		</header>
 		<ul class="object properties">

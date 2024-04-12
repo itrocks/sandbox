@@ -47,9 +47,9 @@
 		<header>
 			<h2>Edit {@output}</h2>
 			<ul class="general actions">
-				<li class="close"><a href="(@route)/(id)">Close</a></li>
-				<li class="save"><input formaction="(@route)/(id)" type="submit" value="Save"></li>
-				<li class="delete"><a href="(@route)/(id)/delete">Delete</a></li>
+				<li class="close"><a href="(@route)/(id)" target="main">Close</a></li>
+				<li class="save"><input formaction="(@route)/(id)/save" formtarget="#notification" type="submit" value="Save"></li>
+				<li class="delete"><a href="(@route)/(id)/delete" target="#notification">Delete</a></li>
 			</ul>
 		</header>
 		<ul class="object properties">
