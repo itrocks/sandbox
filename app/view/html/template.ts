@@ -424,20 +424,6 @@ export default class Template
 			while (' \n\r\t\f'.includes(source[index])) index ++
 			char = tagName[0]
 
-			// script
-			if ((char === 's') && (tagName === 'script')) {
-				if (translating) {
-					this.translateTarget(tagIndex)
-				}
-				if (this.onTagClose) this.onTagClose.call(this, 'script')
-				index = source.indexOf('</script>', index) + 9
-				if (index === 8) break
-				if (translating && (index > start)) {
-					this.sourceToTarget()
-				}
-				continue
-			}
-
 			const unclosingTag = this.unclosingTags.includes(tagName)
 			if (!unclosingTag) {
 				tagStack.push({ tagName, translating })
@@ -475,6 +461,7 @@ export default class Template
 			let   hasTypeSubmit = false
 			const inInput       = (char === 'i') && (tagName === 'input')
 			const inLink        = (char === 'l') && (tagName === 'link')
+			const inScript      = (char === 's') && (tagName === 'script')
 			while (source[index] !== '>') {
 
 				// attribute name
@@ -489,8 +476,8 @@ export default class Template
 					while (' \n\r\t\f'.includes(source[index])) index ++
 					const attributeChar = attributeName[0]
 					const [open, close] = (
-						((attributeChar === 'a') || (attributeChar === 'f') || (attributeChar === 'h') || (attributeChar === 'l'))
-						&& ['action', 'formaction', 'href', 'location'].includes(attributeName)
+						'afhls'.includes(attributeChar)
+						&& ['action', 'formaction', 'href', 'location', 'src'].includes(attributeName)
 					) ? ['(', ')']
 						: ['{', '}']
 					let quote = source[index]
@@ -509,8 +496,9 @@ export default class Template
 						pushedParts    = true
 					}
 
-					const inLinkHRef = inLink && (attributeChar === 'h') && (attributeName === 'href')
-					if ((inLinkHRef || translating) && (index > start) ) {
+					const inLinkHRef  = inLink   && (attributeChar === 'h') && (attributeName === 'href')
+					const inScriptSrc = inScript && (attributeChar === 's') && (attributeName === 'src')
+					if ((inLinkHRef || inScriptSrc || translating) && (index > start)) {
 						this.sourceToTarget()
 					}
 
@@ -534,6 +522,11 @@ export default class Template
 								target += path.normalize(this.filePath + '/' + source.substring(start, index)).substring(appPath.length)
 								start   = index
 							}
+							if (inScriptSrc && attributeValue.endsWith('.js')) {
+								console.log('js path ' + path.normalize(this.filePath + '/' + source.substring(start, index)).substring(appPath.length))
+								target += path.normalize(this.filePath + '/' + source.substring(start, index)).substring(appPath.length)
+								start   = index
+							}
 							if (this.onAttribute) this.onAttribute(attributeName, attributeValue)
 							if (char !== '>') index ++
 							break
@@ -553,6 +546,17 @@ export default class Template
 			}
 			index ++
 			if (this.onTagOpened) this.onTagOpened.call(this, tagName)
+
+			// skip script content
+			if (inScript) {
+				if (this.onTagClose) this.onTagClose.call(this, 'script')
+				index = source.indexOf('</script>', index) + 9
+				if (index === 8) break
+				if (translating && (index > start)) {
+					this.sourceToTarget()
+				}
+				continue
+			}
 
 			if (unclosingTag) {
 				if (pushedParts) {
