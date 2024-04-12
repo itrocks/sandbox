@@ -9,7 +9,7 @@ export type XhrInfo = {
 	windowWidth:   number
 }
 
-export type XTargetElement = HTMLAnchorElement | HTMLFormElement
+export type XTargetElement = HTMLAnchorElement | HTMLButtonElement | HTMLFormElement | HTMLInputElement
 
 export function requestHeaders(headers: Headers, target?: HTMLElement)
 {
@@ -43,6 +43,6 @@ export function xTarget(element: XTargetElement)
 		event.preventDefault()
 		await setResponse(await fetch(this.href, { headers: requestHeaders(new Headers) }), this.target)
 	})
-	if (element instanceof HTMLFormElement) formFetchOnSubmit(element, setResponse)
+	else formFetchOnSubmit(element, setResponse)
 }
 export default xTarget

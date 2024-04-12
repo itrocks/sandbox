@@ -22,14 +22,18 @@ export function formFetch(form: HTMLFormElement, action?: string, init: RequestI
 export default formFetch
 
 export function formFetchOnSubmit(
-	form:     HTMLFormElement,
+	element:  HTMLButtonElement | HTMLFormElement | HTMLInputElement,
 	callback: (response: Response, target: string, form: HTMLFormElement) => void,
 	init:     RequestInit = {}
 ) {
+	const form = element instanceof HTMLFormElement ? element : element.form
+	if (!form) return
 	form.addEventListener('submit', event => {
+		const submitter = event.submitter
+		if (submitter !== element) return
+		if (!(submitter instanceof HTMLButtonElement) && !(submitter instanceof HTMLInputElement)) return
 		event.preventDefault()
-		const submitter = event.submitter as HTMLButtonElement | HTMLInputElement | null
-		formFetch(event.currentTarget as HTMLFormElement, submitter?.formAction, init)
-			.then(response => callback(response, submitter?.formTarget ?? form.target, form))
+		formFetch(event.currentTarget as HTMLFormElement, submitter.formAction, init)
+			.then(response => callback(response, submitter.formTarget ?? form.target, form))
 	})
 }
