@@ -32,6 +32,8 @@ export default class Template
 	fileName?: string
 	filePath?: string
 
+	included = false
+
 	onAttribute?: ((name: string, value: string) => void)
 	onTagOpen?:   ((name: string) => void)
 	onTagOpened?: ((name: string) => void)
@@ -313,7 +315,12 @@ export default class Template
 				// comment tag
 				if ((char === '-') && (source[index] === '-')) {
 					index ++
-					if (!(/[a-z0-9@%{]/i.test(source[index]) && this.doExpression)) {
+					if (
+						!/[a-z0-9@%{]/i.test(source[index])
+						|| !this.doExpression
+						|| ((source[index] === 'B') && this.included && (source.substring(index, index + 8) === 'BEGIN-->'))
+						|| ((source[index] === 'E') && this.included && (source.substring(index, index + 6) === 'END-->'))
+					) {
 						index = source.indexOf('-->', index) + 3
 						if (index === 2) break
 						if (translating && (index > start)) {
