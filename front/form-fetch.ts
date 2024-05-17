@@ -22,9 +22,9 @@ export function formFetch(form: HTMLFormElement, action?: string, init: RequestI
 export default formFetch
 
 export function formFetchOnSubmit(
-	element:  HTMLButtonElement | HTMLFormElement | HTMLInputElement,
-	callback: (response: Response, target: string, form: HTMLFormElement) => void,
-	init:     RequestInit = {}
+	element:     HTMLButtonElement | HTMLFormElement | HTMLInputElement,
+	setResponse: (response: Response, targetString: string, form: HTMLFormElement) => void,
+	init:        RequestInit = {}
 ) {
 	const form = element instanceof HTMLFormElement ? element : element.form
 	if (!form) return
@@ -34,6 +34,6 @@ export function formFetchOnSubmit(
 		if (!(submitter instanceof HTMLButtonElement) && !(submitter instanceof HTMLInputElement)) return
 		event.preventDefault()
 		formFetch(event.currentTarget as HTMLFormElement, submitter.formAction, init)
-			.then(response => callback(response, submitter.formTarget ?? form.target, form))
+			.then(response => setResponse(response, submitter.formTarget ?? form.target, form))
 	})
 }
