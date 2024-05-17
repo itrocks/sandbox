@@ -24,6 +24,8 @@ let translateParts:     string[]
 let translatePartStack: string[][]
 let translating:        boolean
 
+export const frontScripts = new Array<string>
+
 export default class Template
 {
 	doExpression = true
@@ -530,8 +532,13 @@ export default class Template
 								start   = index
 							}
 							if (inScriptSrc && attributeValue.endsWith('.js')) {
-								console.log('js path ' + path.normalize(this.filePath + '/' + source.substring(start, index)).substring(appPath.length))
-								target += path.normalize(this.filePath + '/' + source.substring(start, index)).substring(appPath.length)
+								const frontScript = path.normalize(this.filePath + '/' + source.substring(start, index)).substring(
+									appPath.length
+								)
+								if (!frontScripts.includes(frontScript)) {
+									frontScripts.push(frontScript)
+								}
+								target += frontScript
 								start   = index
 							}
 							if (this.onAttribute) this.onAttribute(attributeName, attributeValue)

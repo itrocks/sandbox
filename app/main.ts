@@ -11,6 +11,7 @@ import { appPath }                         from './app'
 import { mimeTypes, utf8Types }            from './mime'
 import { fastifyRequest, fastifyResponse } from './server/fastify'
 import Response                            from './server/response'
+import { frontScripts }                    from './view/html/template'
 
 async function execute(request: ActionRequest)
 {
@@ -51,7 +52,10 @@ server.get<{ Params: { [index: string]: string, '*': string } }>('/*', async (or
 			const response = new Response(await readFile(appPath + path, utf8Type ? 'utf-8' : undefined), 200, headers)
 			return fastifyResponse(finalResponse, response)
 		}
-		if (request.path.startsWith('/front/') && (fileExtension === 'js')) {
+		if (
+			(fileExtension === 'js')
+			&& (request.path.startsWith('/front/') || frontScripts.includes(request.path))
+		) {
 			const headers  = { 'Content-Type': 'text/javascript; charset=utf-8' }
 			const response = new Response(await readFile(appPath + request.path, 'utf-8'), 200, headers)
 			return fastifyResponse(finalResponse, response)
