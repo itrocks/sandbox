@@ -1,7 +1,8 @@
-import { Plugin, Table } from './table.js'
-import TableEdit         from './table-edit.js'
+import Plugin    from './plugin.js'
+import Table     from './table.js'
+import TableEdit from './table-edit.js'
 
-export class TableEditMove extends Plugin
+export class TableEditMove extends Plugin<Table>
 {
 	tableEdit: TableEdit
 
@@ -78,7 +79,7 @@ export class TableEditMove extends Plugin
 			siblingRow           = siblingSection[elementChild] ?? undefined
 		}
 		if (siblingRow) {
-			const selector = ':scope > :nth-child(' + (this.table.cellColumnNumber(selected) + 1).toString() + ')'
+			const selector = ':scope > :nth-child(' + (this.of.cellColumnNumber(selected) + 1).toString() + ')'
 			const cell     = siblingRow.querySelector(selector) as HTMLTableCellElement
 			if (tableEdit.closestEditableCell(cell)) {
 				tableEdit.selectCell(cell)

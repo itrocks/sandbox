@@ -1,5 +1,6 @@
-import TableEdit         from './table-edit.js'
-import { Plugin, Table } from './table.js'
+import Plugin    from './plugin.js'
+import Table     from './table.js'
+import TableEdit from './table-edit.js'
 
 class Options
 {
@@ -9,7 +10,7 @@ class Options
 	}
 }
 
-export class TableEditLock extends Plugin
+export class TableEditLock extends Plugin<Table>
 {
 	options = new Options
 
@@ -26,7 +27,7 @@ export class TableEditLock extends Plugin
 	colCell(cell: HTMLTableCellElement)
 	{
 		const table    = cell.closest('table') as HTMLTableElement
-		const position = this.table.cellColumnNumber(cell)
+		const position = this.of.cellColumnNumber(cell)
 		const col      = table.querySelector(':scope > colgroup')
 		if (col) {
 			return col.children[position] as HTMLTableColElement

@@ -1,4 +1,5 @@
-import { Plugin } from './table.js'
+import Plugin from './plugin.js'
+import Table  from './table.js'
 
 let editable:      HTMLDivElement | undefined
 let selected:      HTMLTableCellElement | undefined
@@ -32,13 +33,13 @@ export class RangeCopy
 
 }
 
-export class TableEdit extends Plugin
+export class TableEdit extends Plugin<Table>
 {
 	zIndex = '2'
 
 	init()
 	{
-		const table = this.table
+		const table = this.of
 		table.styleSheet.push(`
 			${table.selector} > * > tr > * > div[contenteditable] {
 				position: relative;
@@ -183,7 +184,7 @@ export class TableEdit extends Plugin
 	{
 		if (newText === selectedText) return
 		selectedText = newText
-		this.table.reset()
+		this.of.reset()
 	}
 
 	setSelectionRange(range: Range)

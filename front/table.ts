@@ -1,3 +1,4 @@
+import { HasPlugins, Options as PluginOptions } from './plugin.js'
 
 export type HTMLTableFixElement = HTMLTableCellElement | HTMLTableColElement
 
@@ -10,12 +11,6 @@ let tables       = [] as Table[]
 export function applyStyleSheets()
 {
 	styleSheets.replaceSync(tables.map(table => table.styleSheet.join(`\n`)).join(`\n`))
-}
-
-export class Options
-{
-	[index: string]: any
-	plugins: (typeof Plugin)[] = []
 }
 
 export function garbageCollector()
@@ -42,25 +37,19 @@ function nextTableId(table: Table)
 	return tableCounter
 }
 
-export class Plugin
-{
-	constructor(public table: Table) {}
-	init() {}
-}
+export type Options = PluginOptions<Table>
 
-export class Table
+export class Table extends HasPlugins<Table>
 {
 	readonly id:       number
 	readonly selector: string
 
 	readonly onReset    = [] as (() => void)[]
-	readonly options    = new Options
-	readonly plugins    = {} as { [index: string]: Plugin }
-	readonly styleSheet = {} as string[]
+	readonly styleSheet = [] as string[]
 
 	constructor(public readonly element: HTMLTableElement, options: Partial<Options> = {})
 	{
-		Object.assign(this.options, options)
+		super(options)
 
 		this.id       = nextTableId(this)
 		this.selector = `table.itrocks[data-table-id="${this.id}"]`
@@ -94,20 +83,6 @@ export class Table
 			previous = previous.previousElementSibling
 		}
 		return count
-	}
-
-	protected constructPlugins()
-	{
-		for (const pluginType of this.options.plugins) {
-			this.plugins[pluginType.name] = new pluginType(this)
-		}
-	}
-
-	protected initPlugins()
-	{
-		for (const plugin of Object.values(this.plugins)) {
-			plugin.init()
-		}
 	}
 
 	reset()

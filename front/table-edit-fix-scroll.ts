@@ -1,8 +1,9 @@
-import FixTable          from './fix-table.js'
-import { Plugin, Table } from './table.js'
-import TableEdit         from './table-edit.js'
+import FixTable  from './fix-table.js'
+import Plugin    from './plugin.js'
+import Table     from './table.js'
+import TableEdit from './table-edit.js'
 
-export class TableEditFixScroll extends Plugin
+export class TableEditFixScroll extends Plugin<Table>
 {
 	fixTable: FixTable
 

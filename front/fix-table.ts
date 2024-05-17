@@ -1,4 +1,5 @@
-import {HTMLTableFixElement, Plugin, Table} from './table.js'
+import Plugin                         from './plugin.js'
+import { HTMLTableFixElement, Table } from './table.js'
 
 interface FullIndex
 {
@@ -7,7 +8,7 @@ interface FullIndex
 	row:    string
 }
 
-export class FixTable extends Plugin
+export class FixTable extends Plugin<Table>
 {
 	columns:          NodeListOf<HTMLTableFixElement>
 	full?:            FullIndex
@@ -60,7 +61,7 @@ export class FixTable extends Plugin
 
 	protected fixFootRows()
 	{
-		const table = this.table
+		const table = this.of
 		if (!table.element.tFoot?.rows.length) return
 		let counter = 1, bottom = .0, previousBottom = table.element.getBoundingClientRect().bottom
 		for (const row of Array.from(table.element.tFoot.querySelectorAll<HTMLTableRowElement>(':scope > tr')).reverse()) {
@@ -85,7 +86,7 @@ export class FixTable extends Plugin
 
 	protected fixHeadRows()
 	{
-		const table = this.table
+		const table = this.of
 		if (!table.element.tHead?.rows.length) return
 		let counter = 1, top = .0, previousTop = table.element.getBoundingClientRect().top
 		table.element.tHead.querySelectorAll<HTMLTableRowElement>(':scope > tr').forEach(row => {
@@ -111,7 +112,7 @@ export class FixTable extends Plugin
 	protected fixLeftColumns()
 	{
 		if (!this.leftColumnCount) return
-		const table = this.table
+		const table = this.of
 		const bodySel:   string[] = []
 		const cornerSel: string[] = []
 		let counter = 1, left = .0, previousLeft = table.element.getBoundingClientRect().left
@@ -145,7 +146,7 @@ export class FixTable extends Plugin
 	protected fixRightColumns()
 	{
 		if (!this.rightColumnCount) return
-		const table = this.table
+		const table = this.of
 		const bodySel:   string[] = []
 		const cornerSel: string[] = []
 		let counter = 1, right = .0, previousRight = table.element.getBoundingClientRect().right
@@ -181,7 +182,7 @@ export class FixTable extends Plugin
 	protected getColumns()
 	{
 		if (this.columns) return this.columns
-		const table = this.table
+		const table = this.of
 		let columns = table.element.querySelectorAll<HTMLTableColElement>(':scope > colgroup > col')
 		if (!columns.length) {
 			columns = table.element.querySelectorAll<HTMLTableColElement>(':scope > thead > tr:first-child > *')
@@ -203,7 +204,7 @@ export class FixTable extends Plugin
 
 	visibleInnerRect()
 	{
-		const tableElement = this.table.element
+		const tableElement = this.of.element
 		const rect         = tableElement.getBoundingClientRect()
 		if (this.leftColumnCount) {
 			rect.x = this.columns[this.leftColumnCount - 1].getBoundingClientRect().right

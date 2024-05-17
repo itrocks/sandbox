@@ -17,7 +17,7 @@ export class InheritBackground extends FixTable
 	init()
 	{
 		if (this.tableStyle.borderCollapse !== 'separate') return
-		const table = this.table
+		const table = this.of
 
 		if (this.tableStyle.backgroundColor.replaceAll(' ', '').endsWith(',0)')) return
 		const borderSpacing = parseFloat(this.tableStyle.borderSpacing)

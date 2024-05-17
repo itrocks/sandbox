@@ -1,6 +1,7 @@
-import { HTMLTableFixElement, Plugin, Table } from './table.js'
+import Plugin                         from './plugin.js'
+import { HTMLTableFixElement, Table } from './table.js'
 
-export class ColumnReorderTable extends Plugin
+export class ColumnReorderTable extends Plugin<Table>
 {
 	reorderCells: NodeListOf<HTMLTableFixElement>
 
@@ -46,9 +47,9 @@ export class ColumnReorderTable extends Plugin
 	{
 		if (this.reorderCells) return this.reorderCells
 		let cells: NodeListOf<HTMLTableFixElement>
-		cells = this.table.element.querySelectorAll<HTMLTableColElement>(':scope > thead > tr:first-child > *')
+		cells = this.of.element.querySelectorAll<HTMLTableColElement>(':scope > thead > tr:first-child > *')
 		if (!cells.length) {
-			cells = this.table.element.querySelectorAll<HTMLTableColElement>(':scope > tbody > tr:first-child > *')
+			cells = this.of.element.querySelectorAll<HTMLTableColElement>(':scope > tbody > tr:first-child > *')
 		}
 		return cells
 	}

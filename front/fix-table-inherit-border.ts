@@ -1,10 +1,11 @@
-import FixTable                               from './fix-table.js'
-import { HTMLTableFixElement, Plugin, Table } from './table.js'
+import FixTable                       from './fix-table.js'
+import Plugin                         from './plugin.js'
+import { HTMLTableFixElement, Table } from './table.js'
 
 /**
  * This plugin has no use and no effect if your table has border-collapse: separate (default)
  */
-export class InheritBorder extends Plugin
+export class InheritBorder extends Plugin<Table>
 {
 	tableStyle: CSSStyleDeclaration
 	fixTable:   FixTable
@@ -19,7 +20,7 @@ export class InheritBorder extends Plugin
 
 		const original         = this.fixTable.position
 		this.fixTable.position = (position, counter, colCell, side) => original.call(
-			this.table.plugins.FixTable, this.position(position, counter, colCell, side), counter, colCell, side
+			this.of.plugins.FixTable, this.position(position, counter, colCell, side), counter, colCell, side
 		)
 	}
 
@@ -27,7 +28,7 @@ export class InheritBorder extends Plugin
 	{
 		if (this.tableStyle.borderCollapse !== 'collapse') return
 		const fixTable = this.fixTable
-		const table    = this.table
+		const table    = this.of
 
 		// table
 		table.styleSheet.push(`

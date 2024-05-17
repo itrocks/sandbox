@@ -1,6 +1,7 @@
-import FixTable          from './fix-table.js'
-import { Plugin, Table } from './table.js'
-import TableEdit         from './table-edit.js'
+import FixTable  from './fix-table.js'
+import Plugin    from './plugin.js'
+import Table     from './table.js'
+import TableEdit from './table-edit.js'
 
 const zIndex = {
 	back:     false,
@@ -8,7 +9,7 @@ const zIndex = {
 	selected: ''
 }
 
-export class TableEditFixHide extends Plugin
+export class TableEditFixHide extends Plugin<Table>
 {
 	readonly fixTable:  FixTable
 	readonly tableEdit: TableEdit

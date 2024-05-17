@@ -80,36 +80,36 @@ const observer = new MutationObserver(mutations => {
 
 observer.observe(document.body, { childList: true, subtree: true })
 
-type BuildElementCallback = (element: Element) => void
-type BuildEventCallback   = (event:   Event)   => void
-type BuildEventCall       = typeof CALL
-type BuildEventName       = keyof GlobalEventHandlersEventMap
+type BuildElementCallback<E extends Element> = (element: E) => void
+type BuildEventCallback                      = (event:   Event) => void
+type BuildEventCall                          = typeof CALL
+type BuildEventName                          = keyof GlobalEventHandlersEventMap
 
-export type BuildEvent = {
-	callback:    BuildElementCallback | BuildEventCallback,
+export type BuildEvent<E extends Element> = {
+	callback:    BuildElementCallback<E> | BuildEventCallback,
 	name?:       BuildEventCall | BuildEventName,
 	parameters?: any[],
 	priority?:   number,
 	selector?:   string | string[]
 }
 
-export function build(callback: BuildElementCallback): void
-export function build(event: BuildEvent): void
-export function build(selector: string | string[], callback: BuildElementCallback): void
-export function build(selector: string | string[], event: BuildEventCall, callback: BuildElementCallback): void
+export function build<E extends Element>(callback: BuildElementCallback<E>): void
+export function build<E extends Element>(event: BuildEvent<E>): void
+export function build<E extends Element>(selector: string | string[], callback: BuildElementCallback<E>): void
+export function build<E extends Element>(selector: string | string[], event: BuildEventCall, callback: BuildElementCallback<E>): void
 export function build(selector: string | string[], event: BuildEventName, callback: BuildEventCallback): void
-export function build(
-	event:     BuildElementCallback | BuildEvent | string | string[],
-	name?:     BuildElementCallback | BuildEventCall | BuildEventName,
-	callback?: BuildElementCallback | BuildEventCallback
+export function build<E extends Element>(
+	event:     BuildElementCallback<E> | BuildEvent<E> | string | string[],
+	name?:     BuildElementCallback<E> | BuildEventCall | BuildEventName,
+	callback?: BuildElementCallback<E> | BuildEventCallback
 ) {
 	if (typeof event === 'function') {
 		event = { callback: event }
 	}
 	else if ((typeof event === 'string') || Array.isArray(event)) {
 		event = callback
-			? { callback, name, selector: event } as BuildEvent
-			: { callback: name, selector: event } as BuildEvent
+			? { callback, name, selector: event } as BuildEvent<E>
+			: { callback: name, selector: event } as BuildEvent<E>
 	}
 	if (!event.name)       event.name       = CALL
 	if (!event.parameters) event.parameters = []
