@@ -14,13 +14,13 @@ describe('translation', () => {
 		}
 	}
 
-	it('translateLabelAttributeAfterLabel', () => {
+	it('translateLabelAttributeAfterLabel', async () => {
 		template.setSource(`<label>search</label><label title="or not">make it crash</label>`)
-		expect(template.parseVars()).toEqual(`<label>recherche</label><label title="ou pas">fait planter ça</label>`)
+		expect(await template.parseVars()).toEqual(`<label>recherche</label><label title="ou pas">fait planter ça</label>`)
 	})
 
-	it('translateInputAttributeAfterLabel', () => {
+	it('translateInputAttributeAfterLabel', async () => {
 		template.setSource(`<label>search</label><input title="make it crash">`)
-		expect(template.parseVars()).toEqual(`<label>recherche</label><input title="fait planter ça">`)
+		expect(await template.parseVars()).toEqual(`<label>recherche</label><input title="fait planter ça">`)
 	})
 })

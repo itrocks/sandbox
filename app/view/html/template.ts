@@ -1,5 +1,5 @@
 import { readFile }    from 'node:fs/promises'
-import path            from 'path'
+import path, { sep }   from 'path'
 import { appPath }     from '../../app'
 import { tr }          from '../../locale/translate'
 import { SortedArray } from '../../sorted-array'
@@ -9,7 +9,6 @@ import parseReflect    from './parseReflect'
 
 type BlockStack = Array<{ blockStart: number, collection: any[], data: any, iteration: number, iterations: number }>
 
-let doIt = 0
 let index:    number
 let length:   number
 let source:   string
@@ -24,15 +23,19 @@ let translateParts:     string[]
 let translatePartStack: string[][]
 let translating:        boolean
 
-export const frontScripts = new Array<string>
+export const frontScripts = new SortedArray<string>
+frontScripts.distinct = true
 
 export default class Template
 {
 	doExpression = true
+	doHeadLinks  = false
 	doTranslate  = true
 
 	fileName?: string
 	filePath?: string
+
+	headLinks = new SortedArray<string>
 
 	included = false
 
@@ -71,6 +74,7 @@ export default class Template
 
 	constructor(public data?: any)
 	{
+		this.headLinks.distinct = true
 	}
 
 	closeTag(shouldTranslate: boolean, targetIndex: number)
@@ -86,8 +90,6 @@ export default class Template
 				this.translateTarget(targetIndex)
 			}
 			translateParts = translatePartStack.pop() as string[]
-			if (target.length) doIt ++
-			if (index > start) doIt ++
 			translateParts.push(target + source.substring(start, index))
 			start           = index
 			target          = targetStack.pop() + '$' + translateParts.length
@@ -129,6 +131,28 @@ export default class Template
 		return { index, length, source, start, target, targetStack, translatePartStack, translateParts, translating }
 	}
 
+	async include(relativePath: string, data: any)
+	{
+		const template = new Template(data)
+		template.doHeadLinks = true
+		template.included    = true
+
+		template.doExpression = this.doExpression
+		template.doTranslate  = this.doTranslate
+		template.onAttribute  = this.onAttribute
+		template.onTagClose   = this.onTagClose
+		template.onTagOpen    = this.onTagOpen
+		template.onTagOpened  = this.onTagOpened
+
+		const parsed = await template.parseFile(__dirname + sep + relativePath)
+		if (this.doHeadLinks) {
+			this.headLinks.push(...template.headLinks)
+		}
+		else {
+		}
+		return parsed.substring(parsed.indexOf('<!--BEGIN-->') + 12, parsed.indexOf('<!--END-->'))
+	}
+
 	isContextClean()
 	{
 		const clean   = this.getCleanContext()
@@ -142,13 +166,13 @@ export default class Template
 			&& context.translating               === clean.translating
 	}
 
-	parseBuffer(buffer: string)
+	async parseBuffer(buffer: string)
 	{
 		this.setSource(buffer)
 		return this.parseVars()
 	}
 
-	parseExpression(data: any, close: string, finalClose = '')
+	async parseExpression(data: any, close: string, finalClose = '')
 	{
 		const finalChar = finalClose.length ? finalClose[0] : ''
 		const indexOut  = index
@@ -170,8 +194,6 @@ export default class Template
 		}
 
 		let stackPos = targetStack.length
-		if (target.length) doIt ++
-		if (indexOut > start) doIt ++
 		targetStack.push(target + source.substring(start, indexOut))
 		start  = index
 		target = ''
@@ -180,8 +202,6 @@ export default class Template
 			const char = source[index]
 
 			if (char === open) {
-				if (target.length) doIt ++
-				if (index > start) doIt ++
 				targetStack.push(target + source.substring(start, index))
 				index  ++
 				start  = index
@@ -195,7 +215,7 @@ export default class Template
 			) {
 				const expression = target + source.substring(start, index)
 				const lastTarget = targetStack.pop() as string
-				const parsed     = this.parsePath(expression, data)
+				const parsed     = await this.parsePath(expression, data)
 				index           += (char === close) ? 1 : finalClose.length
 				start            = index
 				target           = ''
@@ -245,10 +265,13 @@ export default class Template
 		return this.parseBuffer(await readFile(fileName, 'utf-8'))
 	}
 
-	parsePath(expression: string, data: any)
+	async parsePath(expression: string, data: any)
 	{
 		if (expression === '') {
 			return undefined
+		}
+		if ((expression[0] === '.') && (expression.startsWith('./') || expression.startsWith('../'))) {
+			return await this.include(expression, data)
 		}
 		for (const variable of expression.split('.')) {
 			data = this.parseVariable(variable, data)
@@ -258,44 +281,42 @@ export default class Template
 
 	parseVariable(variable: string, data: any)
 	{
+		if ((variable === '') || ((variable[0] === 'B') && (variable === 'BEGIN'))) {
+			return data
+		}
 		if (
-			(variable.startsWith('"') && variable.endsWith('"'))
-			|| (variable.startsWith("'") && variable.endsWith("'"))
+			((variable[0] === '"') && (variable[variable.length - 1] === '"'))
+			|| ((variable[0] === "'") && (variable[variable.length - 1] === "'"))
 		) {
 			return variable.substring(1, variable.length - 1)
 		}
 		if (variable[0] === '@') return parseDecorator(variable, data)
 		if (variable[0] === '%') return parseReflect(variable, data)
-		switch (variable) {
-			case '':
-			case 'BEGIN':
-				return data
-			default:
-				if (data[variable] === undefined) {
-					data = new Str(data)
-				}
-				const value = data[variable]
-				return (typeof value === 'function')
-					? value.call(data)
-					: value
+		if (data[variable] === undefined) {
+			data = new Str(data)
 		}
+		const value = data[variable]
+		return (typeof value === 'function')
+			? value.call(data)
+			: value
 	}
 
-	parseVars()
+	async parseVars()
 	{
-		const blockStack  = [] as BlockStack
-		let   blockStart  = 0
-		let   collection  = []
-		let   data        = this.data
-		let   iteration   = 0
-		let   iterations  = 0
+		const blockStack = [] as BlockStack
+		let   blockStart = 0
+		let   collection = []
+		let   data       = this.data
+		let   inHead     = false
+		let   iteration  = 0
+		let   iterations = 0
 
 		while (index < length) {
 			let char = source[index]
 
 			// expression
 			if ((char === '{') && this.doExpression) {
-				this.parseExpression(data, '}')
+				await this.parseExpression(data, '}')
 				continue
 			}
 
@@ -331,8 +352,8 @@ export default class Template
 						continue
 					}
 
-					// end condition / loop
-					if (['end-->', 'END-->'].includes(source.substring(index, index + 6))) {
+					// end condition / loop block
+					if ('eE'.includes(source[index]) && ['end-->', 'END-->'].includes(source.substring(index, index + 6))) {
 						target += this.trimEndLine(source.substring(start, tagIndex))
 						iteration ++
 						if (iteration < iterations) {
@@ -353,7 +374,7 @@ export default class Template
 						continue
 					}
 
-					// begin condition / loop
+					// begin condition / loop block
 					blockStack.push({ blockStart, collection, data, iteration, iterations })
 					let blockData: any
 					if (tagIndex > start) {
@@ -365,7 +386,7 @@ export default class Template
 					index       = tagIndex
 					target      = ''
 					translating = false
-					this.parseExpression(data, '}', '-->')
+					await this.parseExpression(data, '}', '-->')
 					blockData   = target
 					blockStart  = index
 					iteration   = 0
@@ -409,6 +430,9 @@ export default class Template
 				index ++
 				const closeTagName = source.substring(index, source.indexOf('>', index))
 				index += closeTagName.length + 1
+				if (inHead && (closeTagName[0] === 'h') && (closeTagName === 'head')) {
+					inHead = false
+				}
 				let shouldTranslate = translating
 				if (!this.unclosingTags.includes(closeTagName)) {
 					do {
@@ -432,6 +456,9 @@ export default class Template
 			if (this.onTagOpen) this.onTagOpen.call(this, tagName)
 			while (' \n\r\t\f'.includes(source[index])) index ++
 			char = tagName[0]
+			if ((char === 'h') && (tagName === 'head')) {
+				inHead = true
+			}
 
 			const unclosingTag = this.unclosingTags.includes(tagName)
 			if (!unclosingTag) {
@@ -443,13 +470,9 @@ export default class Template
 				inlineElement = this.elementInline.includes(tagName)
 				if (inlineElement) {
 					if (translateParts.length) {
-						if (target.length) doIt ++
-						if (tagIndex > start) doIt ++
 						targetStack.push(target + source.substring(start, tagIndex))
 					}
 					else {
-						if (target.length) doIt ++
-						if (tagIndex > start) doIt ++
 						targetStack.push(target, source.substring(start, tagIndex))
 					}
 					start  = tagIndex
@@ -467,10 +490,11 @@ export default class Template
 			const elementTranslating = translating
 
 			// attributes
-			let   hasTypeSubmit = false
-			const inInput       = (char === 'i') && (tagName === 'input')
-			const inLink        = (char === 'l') && (tagName === 'link')
-			const inScript      = (char === 's') && (tagName === 'script')
+			let   hasTypeSubmit  = false
+			const inInput        = (char === 'i') && (tagName === 'input')
+			const inLink         = (char === 'l') && (tagName === 'link')
+			const inScript       = (char === 's') && (tagName === 'script')
+			let   targetTagIndex = -1
 			while (source[index] !== '>') {
 
 				// attribute name
@@ -509,6 +533,9 @@ export default class Template
 					const inScriptSrc = inScript && (attributeChar === 's') && (attributeName === 'src')
 					if ((inLinkHRef || inScriptSrc || translating) && (index > start)) {
 						this.sourceToTarget()
+						if (inHead && (targetTagIndex < 0) && this.doHeadLinks) {
+							targetTagIndex = target.lastIndexOf('<')
+						}
 					}
 
 					const position   = index
@@ -528,13 +555,12 @@ export default class Template
 								this.translateTarget(index)
 							}
 							if (inLinkHRef && attributeValue.endsWith('.css')) {
-								target += path.normalize(this.filePath + '/' + source.substring(start, index)).substring(appPath.length)
+								target += path.normalize(this.filePath + sep + source.substring(start, index)).substring(appPath.length)
 								start   = index
 							}
 							if (inScriptSrc && attributeValue.endsWith('.js')) {
-								const frontScript = path.normalize(this.filePath + '/' + source.substring(start, index)).substring(
-									appPath.length
-								)
+								const frontScript = path.normalize(this.filePath + sep + source.substring(start, index))
+									.substring(appPath.length)
 								if (!frontScripts.includes(frontScript)) {
 									frontScripts.push(frontScript)
 								}
@@ -547,7 +573,7 @@ export default class Template
 						}
 						// expression in attribute value
 						if ((char === open) && this.doExpression) {
-							this.parseExpression(data, close)
+							await this.parseExpression(data, close)
 							continue
 						}
 						index ++
@@ -560,6 +586,11 @@ export default class Template
 			}
 			index ++
 			if (this.onTagOpened) this.onTagOpened.call(this, tagName)
+
+			if (inHead && (targetTagIndex > -1) && this.doHeadLinks) {
+				this.sourceToTarget()
+				this.headLinks.insert(target.substring(targetTagIndex))
+			}
 
 			// skip script content
 			if (inScript) {

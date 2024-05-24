@@ -6,11 +6,11 @@ describe('parseVars', () => {
 	})
 	template.doTranslate = false
 
-	it('empty', () => {
+	it('empty', async () => {
 		template.setSource('')
-		expect(template.parseVars()).toEqual('')
+		expect(await template.parseVars()).toEqual('')
 	})
-	it('numLoop', () => {
+	it('numLoop', async () => {
 		template.setSource(`
 			<ul>
 				<!--numLoop-->
@@ -18,7 +18,7 @@ describe('parseVars', () => {
 				<!--end-->
 			</ul>
 		`)
-		expect(template.parseVars()).toEqual(`
+		expect(await template.parseVars()).toEqual(`
 			<ul>
 				<li>Hello1</li>
 				<li>Hello2</li>

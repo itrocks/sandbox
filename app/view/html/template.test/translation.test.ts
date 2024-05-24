@@ -41,9 +41,9 @@ class TemplateMockTranslate extends Template
 
 }
 
-function testBuffer(template: Template, source: string, target: string)
+async function testBuffer(template: Template, source: string, target: string)
 {
-	expect(template.parseBuffer(source)).toEqual(target)
+	expect(await template.parseBuffer(source)).toEqual(target)
 	expect(template.getContext()).toEqual(template.getCleanContext())
 }
 
