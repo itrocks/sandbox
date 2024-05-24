@@ -13,7 +13,10 @@ export default class Output extends Action
 	{
 		const template    = new Template(request.object)
 		template.included = (request.request.headers['sec-fetch-dest'] === 'empty')
-		return this.htmlResponse(await template.parseFile(__dirname + sep + 'output.html'))
+		return this.htmlResponse(await template.parseFile(
+			__dirname + sep + 'output.html',
+			__dirname + sep + '../../../home/output.html'
+		))
 	}
 
 	async json(request: Request)

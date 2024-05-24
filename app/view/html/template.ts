@@ -9,33 +9,37 @@ import parseReflect    from './parseReflect'
 
 type BlockStack = Array<{ blockStart: number, collection: any[], data: any, iteration: number, iterations: number }>
 
-let index:    number
-let length:   number
-let source:   string
-let start:    number
-let tagName:  string
-let tagStack: { tagName: string, translating: boolean }[]
-let target:   string
+let doHeadLinks = false
 
-let targetStack:        string[]
+let index:       number
+let length:      number
+let source:      string
+let start:       number
+let tagName:     string
+let tagStack:    { tagName: string, translating: boolean }[]
+let target:      string
+let targetStack: string[]
+
 let transLock:          boolean
-let translateParts:     string[]
 let translatePartStack: string[][]
+let translateParts:     string[]
 let translating:        boolean
 
 export const frontScripts = new SortedArray<string>
 frontScripts.distinct = true
 
+let doneLinks = new SortedArray<string>
+doneLinks.distinct = true
+let headLinks = new SortedArray<string>
+headLinks.distinct = true
+
 export default class Template
 {
 	doExpression = true
-	doHeadLinks  = false
 	doTranslate  = true
 
 	fileName?: string
 	filePath?: string
-
-	headLinks = new SortedArray<string>
 
 	included = false
 
@@ -74,7 +78,6 @@ export default class Template
 
 	constructor(public data?: any)
 	{
-		this.headLinks.distinct = true
 	}
 
 	closeTag(shouldTranslate: boolean, targetIndex: number)
@@ -108,15 +111,22 @@ export default class Template
 
 	getCleanContext()
 	{
+		const doneLinks = new SortedArray<string>
+		doneLinks.distinct = true
+		const headLinks = new SortedArray<string>
+		headLinks.distinct = true
 		return {
+			doHeadLinks:        false,
+			doneLinks:          doneLinks,
+			headLinks:          headLinks,
 			index:              length,
 			length:             source.length,
 			source:             source,
 			start:              length,
 			target:             target,
-			targetStack:        [] as string[],
-			translatePartStack: [] as string[][],
-			translateParts:     [] as string[],
+			targetStack:        [],
+			translatePartStack: [],
+			translateParts:     [],
 			translating:        this.doTranslate
 		}
 	}
@@ -128,14 +138,22 @@ export default class Template
 
 	getContext()
 	{
-		return { index, length, source, start, target, targetStack, translatePartStack, translateParts, translating }
+		return {
+			doHeadLinks, doneLinks, headLinks, index, length, source, start, target, targetStack,
+			translatePartStack, translateParts, translating
+		}
 	}
 
-	async include(relativePath: string, data: any)
+	async include(path: string, data: any)
 	{
-		const template = new Template(data)
-		template.doHeadLinks = true
-		template.included    = true
+		const back = {
+			doHeadLinks, index, length, source, start, tagName, tagStack, target, targetStack,
+			translateParts, translatePartStack, translating, transLock
+		}
+		doHeadLinks = true
+
+		const template    = new Template(data)
+		template.included = true
 
 		template.doExpression = this.doExpression
 		template.doTranslate  = this.doTranslate
@@ -144,12 +162,13 @@ export default class Template
 		template.onTagOpen    = this.onTagOpen
 		template.onTagOpened  = this.onTagOpened
 
-		const parsed = await template.parseFile(__dirname + sep + relativePath)
-		if (this.doHeadLinks) {
-			this.headLinks.push(...template.headLinks)
-		}
-		else {
-		}
+		const parsed = await template.parseFile((path[0] === sep) ? path : (this.filePath + sep + path));
+
+		({
+			doHeadLinks, index, length, source, start, tagName, tagStack, target, targetStack,
+			translateParts, translatePartStack, translating, transLock
+		} = back)
+
 		return parsed.substring(parsed.indexOf('<!--BEGIN-->') + 12, parsed.indexOf('<!--END-->'))
 	}
 
@@ -157,7 +176,12 @@ export default class Template
 	{
 		const clean   = this.getCleanContext()
 		const context = this.getContext()
-		return context.index                   === clean.index
+		return context.doHeadLinks             === clean.doHeadLinks
+			&& context.doneLinks.distinct        === clean.doneLinks.distinct
+			&& context.doneLinks.length          === clean.doneLinks.length
+			&& context.headLinks.distinct        === clean.headLinks.distinct
+			&& context.headLinks.length          === clean.headLinks.length
+			&& context.index                     === clean.index
 			&& context.length                    === clean.length
 			&& context.start                     === clean.start
 			&& context.targetStack.length        === clean.targetStack.length
@@ -169,7 +193,16 @@ export default class Template
 	async parseBuffer(buffer: string)
 	{
 		this.setSource(buffer)
-		return this.parseVars()
+		await this.parseVars()
+		if (headLinks.length && !doHeadLinks) {
+			const position = target.lastIndexOf('>', target.indexOf('</head>')) + 1
+			target = target.slice(0, position) + "\n\t" + headLinks.join("\n\t") + target.slice(position)
+			doneLinks = new SortedArray<string>
+			doneLinks.distinct = true
+			headLinks = new SortedArray<string>
+			headLinks.distinct = true
+		}
+		return target
 	}
 
 	async parseExpression(data: any, close: string, finalClose = '')
@@ -258,8 +291,13 @@ export default class Template
 		target = targetStack.pop() + (finalClose.length ? '<!--' : open) + target
 	}
 
-	async parseFile(fileName: string)
+	async parseFile(fileName: string, containerFileName?: string): Promise<string>
 	{
+		if (containerFileName && !this.included) {
+			const data = this.data
+			this.data  = () => this.include(fileName, data)
+			return this.parseFile(containerFileName)
+		}
 		this.fileName = fileName.substring(fileName.lastIndexOf('/') + 1)
 		this.filePath = fileName.substring(0, fileName.lastIndexOf('/'))
 		return this.parseBuffer(await readFile(fileName, 'utf-8'))
@@ -274,14 +312,19 @@ export default class Template
 			return await this.include(expression, data)
 		}
 		for (const variable of expression.split('.')) {
-			data = this.parseVariable(variable, data)
+			data = await this.parseVariable(variable, data)
 		}
 		return data
 	}
 
-	parseVariable(variable: string, data: any)
+	async parseVariable(variable: string, data: any)
 	{
-		if ((variable === '') || ((variable[0] === 'B') && (variable === 'BEGIN'))) {
+		if (variable === '') {
+			return (typeof data === 'function')
+				? await data.call()
+				: data
+		}
+		if ((variable[0] === 'B') && (variable === 'BEGIN')) {
 			return data
 		}
 		if (
@@ -297,7 +340,7 @@ export default class Template
 		}
 		const value = data[variable]
 		return (typeof value === 'function')
-			? value.call(data)
+			? await value.call(data)
 			: value
 	}
 
@@ -432,6 +475,11 @@ export default class Template
 				index += closeTagName.length + 1
 				if (inHead && (closeTagName[0] === 'h') && (closeTagName === 'head')) {
 					inHead = false
+					if (!doHeadLinks) {
+						doneLinks = headLinks
+						headLinks = new SortedArray<string>
+						headLinks.distinct = true
+					}
 				}
 				let shouldTranslate = translating
 				if (!this.unclosingTags.includes(closeTagName)) {
@@ -495,6 +543,10 @@ export default class Template
 			const inLink         = (char === 'l') && (tagName === 'link')
 			const inScript       = (char === 's') && (tagName === 'script')
 			let   targetTagIndex = -1
+			if (inHead && (inLink || inScript)) {
+				this.sourceToTarget()
+				targetTagIndex = target.lastIndexOf('<')
+			}
 			while (source[index] !== '>') {
 
 				// attribute name
@@ -533,9 +585,6 @@ export default class Template
 					const inScriptSrc = inScript && (attributeChar === 's') && (attributeName === 'src')
 					if ((inLinkHRef || inScriptSrc || translating) && (index > start)) {
 						this.sourceToTarget()
-						if (inHead && (targetTagIndex < 0) && this.doHeadLinks) {
-							targetTagIndex = target.lastIndexOf('<')
-						}
 					}
 
 					const position   = index
@@ -587,11 +636,6 @@ export default class Template
 			index ++
 			if (this.onTagOpened) this.onTagOpened.call(this, tagName)
 
-			if (inHead && (targetTagIndex > -1) && this.doHeadLinks) {
-				this.sourceToTarget()
-				this.headLinks.insert(target.substring(targetTagIndex))
-			}
-
 			// skip script content
 			if (inScript) {
 				if (this.onTagClose) this.onTagClose.call(this, 'script')
@@ -600,6 +644,17 @@ export default class Template
 				if (translating && (index > start)) {
 					this.sourceToTarget()
 				}
+			}
+
+			if (targetTagIndex > -1) {
+				this.sourceToTarget()
+				const headLink = target.substring(targetTagIndex)
+				if (!doneLinks || !doneLinks.includes(headLink)) {
+					headLinks.insert(headLink)
+				}
+			}
+
+			if (inScript) {
 				continue
 			}
 

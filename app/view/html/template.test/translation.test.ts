@@ -4,7 +4,7 @@ import * as translate from '../../../locale/translate';
 class TemplateMockTranslate extends Template
 {
 
-	parseVariable(name: string)
+	async parseVariable(name: string)
 	{
 		switch (name) {
 			case 'name':           return 'value'

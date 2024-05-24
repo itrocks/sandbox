@@ -11,9 +11,12 @@ export default class Edit extends Action
 
 	async html(request: Request)
 	{
-		const template = new Template(request.object)
+		const template    = new Template(request.object)
 		template.included = (request.request.headers['sec-fetch-dest'] === 'empty')
-		return this.htmlResponse(await template.parseFile(__dirname + sep + 'edit.html'))
+		return this.htmlResponse(await template.parseFile(
+			__dirname + sep + 'edit.html',
+			__dirname + sep + '../../../home/output.html'
+		))
 	}
 
 	async json(request: Request)
