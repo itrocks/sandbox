@@ -60,51 +60,51 @@ describe('orderedInsert', () => {
 	it('first', () => {
 		const array = new SortedArray<string>
 		expect(array.insert('a')).toEqual(0)
-		expect(array).toEqual(['a'])
+		expect(new Array(...array)).toEqual(['a'])
 	})
 	it('fourthAfter', () => {
 		const array = new SortedArray('f', 'n', 't')
 		expect(array.insert('z')).toEqual(3)
-		expect(array).toEqual(['f', 'n', 't', 'z'])
+		expect(new Array(...array)).toEqual(['f', 'n', 't', 'z'])
 	})
 	it('fourthBefore', () => {
 		const array = new SortedArray('f', 'n', 't')
 		expect(array.insert('a')).toEqual(0)
-		expect(array).toEqual(['a', 'f', 'n', 't'])
+		expect(new Array(...array)).toEqual(['a', 'f', 'n', 't'])
 	})
 	it('fourthMiddle1', () => {
 		const array = new SortedArray('f', 'n', 't')
 		expect(array.insert('i')).toEqual(1)
-		expect(array).toEqual(['f', 'i', 'n', 't'])
+		expect(new Array(...array)).toEqual(['f', 'i', 'n', 't'])
 	})
 	it('fourthMiddle2', () => {
 		const array = new SortedArray('f', 'n', 't')
 		expect(array.insert('q')).toEqual(2)
-		expect(array).toEqual(['f', 'n', 'q', 't'])
+		expect(new Array(...array)).toEqual(['f', 'n', 'q', 't'])
 	})
 	it('secondAfter', () => {
 		const array = new SortedArray('m')
 		expect(array.insert('z')).toEqual(1)
-		expect(array).toEqual(['m', 'z'])
+		expect(new Array(...array)).toEqual(['m', 'z'])
 	})
 	it('secondBefore', () => {
 		const array = new SortedArray('m')
 		expect(array.insert('a')).toEqual(0)
-		expect(array).toEqual(['a', 'm'])
+		expect(new Array(...array)).toEqual(['a', 'm'])
 	})
 	it('thirdAfter', () => {
 		const array = new SortedArray('h', 'r')
 		expect(array.insert('z')).toEqual(2)
-		expect(array).toEqual(['h', 'r', 'z'])
+		expect(new Array(...array)).toEqual(['h', 'r', 'z'])
 	})
 	it('thirdBefore', () => {
 		const array = new SortedArray('h', 'r')
 		expect(array.insert('a')).toEqual(0)
-		expect(array).toEqual(['a', 'h', 'r'])
+		expect(new Array(...array)).toEqual(['a', 'h', 'r'])
 	})
 	it('thirdMiddle', () => {
 		const array = new SortedArray('h', 'r')
 		expect(array.insert('m')).toEqual(1)
-		expect(array).toEqual(['h', 'm', 'r'])
+		expect(new Array(...array)).toEqual(['h', 'm', 'r'])
 	})
 })

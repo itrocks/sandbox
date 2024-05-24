@@ -1,12 +1,13 @@
 
 abstract class ASortedArray<T> extends Array<T>
 {
+	public distinct = false
 
-	abstract insert(insertElement: T): number
+	abstract insert(insertElement: T): number|undefined
 
 	abstract isSorted(): boolean
 
-	push(...items: any[]): number
+	push(...items: T[]): number
 	{
 		for (const item of items)
 			this.insert(item)
@@ -59,6 +60,9 @@ export class SortedArray<T> extends ASortedArray<T>
 				left = middle + 1
 			else
 				right = middle
+		}
+		if (this.distinct && (this[left] === insertElement)) {
+			return
 		}
 		this.splice(left, 0, insertElement)
 		return left
@@ -124,6 +128,9 @@ export class SortedArrayCompareFn<T> extends ASortedArray<T>
 				left = middle + 1
 			else
 				right = middle
+		}
+		if (this.distinct && (this[left] === insertElement)) {
+			return
 		}
 		this.splice(left, 0, insertElement)
 		return left
@@ -192,6 +199,9 @@ export class SortedArrayKey<T extends { [index: number | string]: any }> extends
 				left = middle + 1
 			else
 				right = middle
+		}
+		if (this.distinct && (this[left] === insertElement)) {
+			return
 		}
 		this.splice(left, 0, insertElement)
 		return left
