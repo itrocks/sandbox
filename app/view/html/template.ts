@@ -162,7 +162,8 @@ export default class Template
 		template.onTagOpen    = this.onTagOpen
 		template.onTagOpened  = this.onTagOpened
 
-		const parsed = await template.parseFile((path[0] === sep) ? path : (this.filePath + sep + path));
+		const parsed = await template.parseFile(
+			((path[0] === sep) || (path[1] === ':')) ? path : (this.filePath + sep + path));
 
 		({
 			doHeadLinks, index, length, source, start, tagName, tagStack, target, targetStack,
@@ -296,10 +297,10 @@ export default class Template
 		if (containerFileName && !this.included) {
 			const data = this.data
 			this.data  = () => this.include(fileName, data)
-			return this.parseFile(containerFileName)
+			return this.parseFile(path.normalize(containerFileName))
 		}
-		this.fileName = fileName.substring(fileName.lastIndexOf('/') + 1)
-		this.filePath = fileName.substring(0, fileName.lastIndexOf('/'))
+		this.fileName = fileName.substring(fileName.lastIndexOf(sep) + 1)
+		this.filePath = fileName.substring(0, fileName.lastIndexOf(sep))
 		return this.parseBuffer(await readFile(fileName, 'utf-8'))
 	}
 
@@ -604,12 +605,22 @@ export default class Template
 								this.translateTarget(index)
 							}
 							if (inLinkHRef && attributeValue.endsWith('.css')) {
-								target += path.normalize(this.filePath + sep + source.substring(start, index)).substring(appPath.length)
-								start   = index
+								let frontStyle = path
+									.normalize(this.filePath + sep + source.substring(start, index))
+									.substring(appPath.length)
+								if (sep !== '/') {
+									frontStyle = frontStyle.replaceAll(sep, '/')
+								}
+								target += frontStyle
+								start = index
 							}
 							if (inScriptSrc && attributeValue.endsWith('.js')) {
-								const frontScript = path.normalize(this.filePath + sep + source.substring(start, index))
+								let frontScript = path
+									.normalize(this.filePath + sep + source.substring(start, index))
 									.substring(appPath.length)
+								if (sep !== '/') {
+									frontScript = frontScript.replaceAll(sep, '/')
+								}
 								if (!frontScripts.includes(frontScript)) {
 									frontScripts.push(frontScript)
 								}

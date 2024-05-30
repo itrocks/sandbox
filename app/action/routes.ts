@@ -38,7 +38,7 @@ export function getRoute(ofModule: string)
 {
 	let getRoute = ''
 	let route    = routes as Routes | string
-	for (const name of ofModule.substring(1).split('/').reverse()) {
+	for (const name of ofModule.substring((ofModule[1] === ':') ? 3 : 1).split(sep).reverse()) {
 		if (typeof route === 'string') return getRoute
 		const routeStep = route[name] as Routes | string | undefined
 		if (!routeStep) break
