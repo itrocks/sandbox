@@ -1,9 +1,9 @@
 
 ul.object.properties {
 	border-collapse: separate;
-	border-spacing: .6em;
+	border-spacing: .5em;
 	display: table;
-	margin: .2em 0;
+	margin: 0;
 	padding: 0;
 
 	> li[class] {
@@ -29,7 +29,7 @@ ul.object.properties {
 
 		> :not(label) {
 			border-radius: 4px;
-			padding: .5em .6em;
+			padding: .5em;
 			white-space: pre-line;
 
 			&:not(input) {

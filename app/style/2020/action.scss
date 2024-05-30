@@ -1,7 +1,9 @@
 ul.actions {
-	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5em;
 	margin: 0;
-	padding: 0;
+	padding: .5em;
 
 	&.general {
 		border-bottom: 1px solid #ccc;
@@ -13,7 +15,6 @@ ul.actions {
 		border: 1px solid #d0d0d0;
 		border-radius: 4px;
 		display: inline-block;
-		margin: 5px 0 5px 5px;
 		transition: background-color .2s;
 
 		&:hover {
