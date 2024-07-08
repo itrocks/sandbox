@@ -1,17 +1,18 @@
 import './class/compose'
 import 'reflect-metadata'
 
-import fastify                             from 'fastify'
-import { readFile }                        from 'node:fs/promises'
-import Action                              from './action/action'
-import Exception                           from './action/exception'
-import { needOf }                          from './action/need'
-import ActionRequest                       from './action/request'
-import { appPath }                         from './app'
-import { mimeTypes, utf8Types }            from './mime'
-import { fastifyRequest, fastifyResponse } from './server/fastify'
-import Response                            from './server/response'
-import { frontScripts }                    from './view/html/template'
+import { fastify, FastifyReply, FastifyRequest } from 'fastify'
+import fastifyMultipart                          from '@fastify/multipart'
+import { readFile }                              from 'node:fs/promises'
+import Action                                    from './action/action'
+import Exception                                 from './action/exception'
+import { needOf }                                from './action/need'
+import ActionRequest                             from './action/request'
+import { appPath }                               from './app'
+import { mimeTypes, utf8Types }                  from './mime'
+import { fastifyRequest, fastifyResponse }       from './server/fastify'
+import Response                                  from './server/response'
+import { frontScripts }                          from './view/html/template'
 
 async function execute(request: ActionRequest)
 {
@@ -36,10 +37,10 @@ async function execute(request: ActionRequest)
 	return action[request.format](request)
 }
 
-const server = fastify()
-
-server.get<{ Params: { [index: string]: string, '*': string } }>('/*', async (originRequest, finalResponse) =>
-{
+async function httpCall(
+	originRequest: FastifyRequest<{ Params: { [index: string]: string } }>,
+	finalResponse: FastifyReply
+) {
 	const request = fastifyRequest(originRequest)
 	const dot     = request.path.lastIndexOf('.') + 1
 	if ((dot > request.path.length - 6) && !request.path.includes('./')) {
@@ -74,7 +75,15 @@ server.get<{ Params: { [index: string]: string, '*': string } }>('/*', async (or
 			throw exception
 		}
 	}
-})
+}
+
+const server = fastify()
+
+server.register(fastifyMultipart)
+server.delete('/*', httpCall)
+server.get   ('/*', httpCall)
+server.post  ('/*', httpCall)
+server.put   ('/*', httpCall)
 
 server.listen({ port: 3000 }).then()
 

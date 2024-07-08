@@ -1,6 +1,7 @@
 {
 	"author": "Baptiste Pillot",
 	"dependencies": {
+		"@fastify/multipart": "^8.3.0",
 		"fastify": "^4.25.2",
 		"mariadb": "^3.2.3",
 		"normalize.css": "^8.0.1",

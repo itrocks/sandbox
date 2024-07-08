@@ -6,9 +6,12 @@ export function formFetch(form: HTMLFormElement, action?: string, init: RequestI
 	const url          = new URL(action ?? form.action)
 
 	if (!init.method) {
-		init.method = form.method
+		init.method = form.getAttribute('data-method') ?? ''
+		if (!init.method) {
+			init.method = form.method
+		}
 	}
-	if (init.method.toLowerCase() === 'post') {
+	if (['patch', 'post', 'put'].includes(init.method.toLowerCase())) {
 		init.body = (form.enctype.toLowerCase() === 'multipart/form-data')
 			? formData
 			: searchParams

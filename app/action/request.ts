@@ -58,7 +58,7 @@ export default class Request
 		const regExp  = (method === 'GET')
 			? `^${route}${id}?${action}?${format}?$`
 			: (method === 'POST')
-				? `^${route}${format}?$`
+				? `^${route}${id}?${action}?${format}?$`
 				// method === any of 'DELETE' | 'PATCH' | 'PUT'
 				: `^${route}${id}${action}?${format}?$`
 		const match = request.path.replaceAll('-', '_').match(new RegExp(regExp))
