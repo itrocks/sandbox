@@ -9,8 +9,8 @@
 	<link href="../../../style/font/roboto/roboto.css" rel="stylesheet">
 	<link href="front/front.css" rel="stylesheet">
 	<meta charset="utf-8">
-	<script src="front/edit.js" type="module"></script>
 	<script src="../../../../front/app.js" type="module"></script>
+	<script src="front/edit.js" type="module"></script>
 	<title>Edit {@output}</title>
 </head>
 <body>
@@ -28,7 +28,7 @@
 		</header>
 		<ul class="object properties">
 			<!--%properties-->
-			<li class="{name}">
+			<li data-property="{name}">
 				<label for="{name}">{@display}</label>
 				<input id="{name}" name="{name}" value="{object.{name}}">
 			</li>

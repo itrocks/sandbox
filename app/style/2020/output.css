@@ -4,25 +4,25 @@ ul.object.properties {
   display: table;
   margin: 0;
   padding: 0; }
-  ul.object.properties > li[class] {
+  ul.object.properties > li {
     display: table-row; }
-    ul.object.properties > li[class] > * {
+    ul.object.properties > li > * {
       border: 1px solid;
       display: table-cell;
       line-height: 16px; }
-    ul.object.properties > li[class] > label {
+    ul.object.properties > li > label {
       border-color: transparent;
       font-weight: 500;
       padding: .5em 0;
       text-align: right;
       vertical-align: top; }
-    ul.object.properties > li[class] > input {
+    ul.object.properties > li > input {
       border-color: #ddd; }
-    ul.object.properties > li[class] > :not(label) {
+    ul.object.properties > li > :not(label) {
       border-radius: 4px;
       padding: .5em;
       white-space: pre-line; }
-      ul.object.properties > li[class] > :not(label):not(input) {
+      ul.object.properties > li > :not(label):not(input) {
         background: #f4f4f4;
         border-color: #f8f8f8; }
 

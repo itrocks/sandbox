@@ -1,9 +1,9 @@
-import Action                    from '../../../action/action'
-import Need                      from '../../../action/need'
-import Request                   from '../../../action/request'
-import dao                       from '../../../dao/dao'
-import Template                  from '../../../view/html/template'
-import { sep }                   from 'path'
+import Action   from '../../../action/action'
+import Need     from '../../../action/need'
+import Request  from '../../../action/request'
+import dao      from '../../../dao/dao'
+import Template from '../../../view/html/template'
+import { sep }  from 'path'
 
 @Need('object')
 export default class Edit extends Action

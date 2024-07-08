@@ -9,6 +9,10 @@ ul.actions {
 		border-bottom: 1px solid #ccc;
 	}
 
+	&.selection {
+		border-top: 1px solid #ccc;
+	}
+
 	> li {
 		background: left center no-repeat;
 		background-size: 24px;
@@ -36,6 +40,10 @@ ul.actions {
 			cursor: pointer;
 		}
 
+		&.add {
+			background-image: url('action/add.svg')
+		}
+
 		&.close {
 			background-image: url('action/close.svg')
 		}
@@ -46,6 +54,10 @@ ul.actions {
 
 		&.edit {
 			background-image: url('action/edit.svg')
+		}
+
+		&.new {
+			background-image: url('action/new.svg')
 		}
 
 		&.save {

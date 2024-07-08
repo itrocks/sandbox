@@ -6,6 +6,8 @@ ul.actions {
   padding: .5em; }
   ul.actions.general {
     border-bottom: 1px solid #ccc; }
+  ul.actions.selection {
+    border-top: 1px solid #ccc; }
   ul.actions > li {
     background: left center no-repeat;
     background-size: 24px;
@@ -24,12 +26,16 @@ ul.actions {
       background: inherit;
       border: none;
       cursor: pointer; }
+    ul.actions > li.add {
+      background-image: url("action/add.svg"); }
     ul.actions > li.close {
       background-image: url("action/close.svg"); }
     ul.actions > li.delete {
       background-image: url("action/delete.svg"); }
     ul.actions > li.edit {
       background-image: url("action/edit.svg"); }
+    ul.actions > li.new {
+      background-image: url("action/new.svg"); }
     ul.actions > li.save {
       background-image: url("action/save.svg"); }
 
