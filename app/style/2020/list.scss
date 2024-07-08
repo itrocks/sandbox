@@ -1,0 +1,53 @@
+
+main > article[data-action="list"] {
+	display: grid;
+	grid-template-areas: "header" "content";
+	grid-template-rows: min-content 1fr;
+	height: 100%;
+
+	> header {
+		grid-area: header;
+
+		> .summary {
+			padding: 13px 10px 12px;
+			position: absolute;
+			right: 0;
+			white-space: nowrap;
+		}
+	}
+
+	> form {
+		position: relative;
+
+		> table {
+			border-collapse: collapse;
+			margin-bottom: 38px;
+
+			tr {
+				> td, > th {
+					border-bottom: 1px solid #d8d8d8;
+					border-spacing: 0;
+					padding: .6em;
+
+					&:last-child {
+						border-right: 1px solid #d8d8d8;
+					}
+				}
+			}
+
+			> thead > tr > * {
+				background: #f8f8f8;
+			}
+
+			> tbody > tr:nth-child(2n) > * {
+				background: #f8f8f8;
+			}
+		}
+
+		> footer {
+			position: absolute;
+			bottom: 0;
+			width: 100%;
+		}
+	}
+}

@@ -1,0 +1,33 @@
+main > article[data-action="list"] {
+  display: grid;
+  grid-template-areas: "header" "content";
+  grid-template-rows: min-content 1fr;
+  height: 100%; }
+  main > article[data-action="list"] > header {
+    grid-area: header; }
+    main > article[data-action="list"] > header > .summary {
+      padding: 13px 10px 12px;
+      position: absolute;
+      right: 0;
+      white-space: nowrap; }
+  main > article[data-action="list"] > form {
+    position: relative; }
+    main > article[data-action="list"] > form > table {
+      border-collapse: collapse;
+      margin-bottom: 38px; }
+      main > article[data-action="list"] > form > table tr > td, main > article[data-action="list"] > form > table tr > th {
+        border-bottom: 1px solid #d8d8d8;
+        border-spacing: 0;
+        padding: .6em; }
+        main > article[data-action="list"] > form > table tr > td:last-child, main > article[data-action="list"] > form > table tr > th:last-child {
+          border-right: 1px solid #d8d8d8; }
+      main > article[data-action="list"] > form > table > thead > tr > * {
+        background: #f8f8f8; }
+      main > article[data-action="list"] > form > table > tbody > tr:nth-child(2n) > * {
+        background: #f8f8f8; }
+    main > article[data-action="list"] > form > footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%; }
+
+/*# sourceMappingURL=list.css.map */

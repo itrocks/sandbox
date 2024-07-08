@@ -1,4 +1,4 @@
-article[data-action="edit"] > header > h2, article[data-action="output"] > header > h2, form[data-action="edit"] > header > h2, form[data-action="output"] > header > h2 {
+article[data-action="edit"] > header > h2, article[data-action="list"] > header > h2, article[data-action="output"] > header > h2, form[data-action="edit"] > header > h2, form[data-action="list"] > header > h2, form[data-action="output"] > header > h2 {
   background: #eee;
   border-bottom: 1px solid #ccc;
   font-size: inherit;
