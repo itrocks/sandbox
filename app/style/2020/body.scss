@@ -17,6 +17,7 @@ body {
 	> nav {
 		background-color: #eee;
 		grid-area: nav;
+		overflow: auto;
 		position: relative;
 	}
 

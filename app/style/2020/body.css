@@ -10,6 +10,7 @@ body {
   body > nav {
     background-color: #eee;
     grid-area: nav;
+    overflow: auto;
     position: relative; }
   body > main {
     border-left: 1px solid #ccc;
