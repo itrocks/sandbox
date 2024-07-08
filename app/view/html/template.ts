@@ -334,13 +334,17 @@ export default class Template
 		) {
 			return variable.substring(1, variable.length - 1)
 		}
-		if (variable[0] === '@') return parseDecorator(variable, data)
-		if (variable[0] === '%') return parseReflect(variable, data)
+		if (variable[0] === '@') {
+			return parseDecorator(variable, data)
+		}
+		if (variable[0] === '%') {
+			return parseReflect(variable, data)
+		}
 		if (data[variable] === undefined) {
 			data = new Str(data)
 		}
 		const value = data[variable]
-		return (typeof value === 'function')
+		return ((typeof value === 'function') && !value.prototype)
 			? await value.call(data)
 			: value
 	}

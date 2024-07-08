@@ -3,7 +3,8 @@ import ReflectProperty from '../../property/reflect'
 
 export default function parseReflect(variable: string, data: any)
 {
-	if (typeof data !== 'object') {
+	const typeOfData = typeof data
+	if (((typeOfData !== 'object') && (typeOfData !== 'function')) || (typeOfData === 'function') && !data.prototype) {
 		throw 'Could not parse ' + variable + ' for non-object ' + data
 	}
 	if (!((data instanceof ReflectClass) || (data instanceof ReflectProperty))) {
