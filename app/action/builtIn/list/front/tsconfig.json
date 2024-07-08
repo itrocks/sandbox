@@ -1,4 +1,0 @@
-{
-	"extends": "../../../../../front/tsconfig.json",
-	"include": ["../../../../../front/**/*"]
-}

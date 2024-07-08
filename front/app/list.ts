@@ -1,9 +1,9 @@
-import build                     from '../../../../../front/build.js'
-import FixTable                  from '../../../../../front/fix-table.js'
-import FixTableInheritBackground from '../../../../../front/fix-table-inherit-background.js'
-import FixTableInheritBorder     from '../../../../../front/fix-table-inherit-border.js'
-import { tableByElement }        from '../../../../../front/table.js'
-import { xTargetCall }           from '../../../../../front/xtarget.js'
+import build                     from '../build.js'
+import FixTable                  from '../fix-table.js'
+import FixTableInheritBackground from '../fix-table-inherit-background.js'
+import FixTableInheritBorder     from '../fix-table-inherit-border.js'
+import { tableByElement }        from '../table.js'
+import { xTargetCall }           from '../xtarget.js'
 
 build<HTMLTableElement>(
 	'article[data-action="list"] > form > table.objects',
