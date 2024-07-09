@@ -3,15 +3,15 @@ import ReflectProperty from '../../property/reflect'
 
 export default function parseReflect(variable: string, data: any)
 {
-	const typeOfData = typeof data
-	if (((typeOfData !== 'object') && (typeOfData !== 'function')) || (typeOfData === 'function') && !data.prototype) {
+	const typeOfDataChar = (typeof data)[0]
+	if ((typeOfDataChar !== 'f') && (typeOfDataChar !== 'o')) {
 		throw 'Could not parse ' + variable + ' for non-object ' + data
 	}
 	if (!((data instanceof ReflectClass) || (data instanceof ReflectProperty))) {
 		data = new ReflectClass(data)
 	}
 	const value = data[variable.substring(1)]
-	return (typeof value === 'function')
+	return ((typeof value)[0] === 'f')
 		? value.call(data)
 		: value
 }
