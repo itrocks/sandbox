@@ -1,8 +1,9 @@
 import './class/compose'
 import 'reflect-metadata'
 
-import { fastify, FastifyReply, FastifyRequest } from 'fastify'
+import fastifyFormbody                           from '@fastify/formbody'
 import fastifyMultipart                          from '@fastify/multipart'
+import { fastify, FastifyReply, FastifyRequest } from 'fastify'
 import { readFile }                              from 'node:fs/promises'
 import Action                                    from './action/action'
 import Exception                                 from './action/exception'
@@ -41,7 +42,7 @@ async function httpCall(
 	originRequest: FastifyRequest<{ Params: { [index: string]: string } }>,
 	finalResponse: FastifyReply
 ) {
-	const request = fastifyRequest(originRequest)
+	const request = await fastifyRequest(originRequest)
 	const dot     = request.path.lastIndexOf('.') + 1
 	if ((dot > request.path.length - 6) && !request.path.includes('./')) {
 		const fileExtension = request.path.substring(dot)
@@ -79,6 +80,7 @@ async function httpCall(
 
 const server = fastify()
 
+server.register(fastifyFormbody)
 server.register(fastifyMultipart)
 server.delete('/*', httpCall)
 server.get   ('/*', httpCall)
