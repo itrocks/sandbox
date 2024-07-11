@@ -1,5 +1,5 @@
 import { routeOf }                        from '../../action/route'
-import { tr }                             from '../../locale/translate'
+import tr                                 from '../../locale/translate'
 import ReflectProperty                    from '../../property/reflect'
 import { displayOf as classDisplayOf }    from '../class/display'
 import { trOutputOf }                     from '../class/output'

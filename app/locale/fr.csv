@@ -12,15 +12,19 @@ edit;modifier
 edit $1;modifier $1
 email;mail
 en;fr
+false;faux
 global search;recherche globale
 id;id
 login;identifiant
 main module;module principal
 new;nouveau
 new $1;nouveau $1
+no;non
 password;mot de passe
 save;enregistrer
 save $1;enregistrer $1
 send;envoyer
 this is the $1 I love;c'est le $1 que j'aime
+true;vrai
 user;utilisateur
+yes;oui

@@ -1,7 +1,7 @@
 import { readFile }    from 'node:fs/promises'
 import path, { sep }   from 'path'
 import { appPath }     from '../../app'
-import { tr }          from '../../locale/translate'
+import tr              from '../../locale/translate'
 import { SortedArray } from '../../sorted-array'
 import Str             from '../str'
 import parseDecorator  from './parseDecorator'

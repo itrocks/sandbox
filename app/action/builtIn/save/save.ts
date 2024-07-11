@@ -4,6 +4,7 @@ import Request      from '../../../action/request'
 import ReflectClass from '../../../class/reflect'
 import dao          from '../../../dao/dao'
 import dump         from '../../../debug/dump'
+import tr           from '../../../locale/translate'
 
 @Need('?object')
 export default class Save extends Action
@@ -19,7 +20,7 @@ export default class Save extends Action
 					object[propertyName] = BigInt(data[propertyName])
 					break
 				case 'boolean':
-					object[propertyName] = !['', '0', 'false'].includes(data[propertyName])
+					object[propertyName] = !['', '0', 'false', 'no', tr('false'), tr('no')].includes(data[propertyName])
 					break
 				case 'number':
 					object[propertyName] = Number(data[propertyName])

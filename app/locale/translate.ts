@@ -15,9 +15,9 @@ readFile(__dirname + sep + 'fr.csv', 'utf-8')
 		}
 	}))
 
-export const lang = 'fr'
+const lang = 'fr'
 
-export function tr(text: string, parts = [] as string[])
+export default function tr(text: string, parts = [] as string[])
 {
 	let   partsCount = parts.length
 	const firstChar  = text[0]
@@ -53,3 +53,5 @@ function trMatch(text: string, parts: string[])
 	}
 	return text
 }
+
+export { lang, tr }
