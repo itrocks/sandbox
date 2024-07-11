@@ -13,7 +13,7 @@ export default Display
 export const displayOf = (target: object | Type) => decoratorOfCallback<string>(target, DISPLAY, target =>
 {
 	let constr = target.constructor
-	while (!constr.name.length || (constr.name === 'builtClass')) {
+	while (!constr.name.length || (constr.name === 'BuiltClass')) {
 		constr = Object.getPrototypeOf(constr)
 	}
 	return toDisplay(constr.name)

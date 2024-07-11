@@ -6,19 +6,9 @@ export function Super<T extends object>(self: object): T
 	return Object.getPrototypeOf(Object.getPrototypeOf(self)) as T
 }
 
-/*
-export function Super<T extends object>(): T
+function uses<T extends Type>(target: T, mixins: Type[]): T
 {
-	// this does not work because of strict mode "use strict":
-	return Super.caller as T
-	// this does not work because of strict mode "use strict":
-	return require('caller').default() as T
-}
-*/
-
-export function uses<T extends Type>(target: T, mixins: Type[]): T
-{
-	const builtClass = class extends target {
+	const BuiltClass = class extends target {
 		[index: string]: any
 		constructor(...args: any[]) {
 			super(...args)
@@ -33,30 +23,42 @@ export function uses<T extends Type>(target: T, mixins: Type[]): T
 			for (const [name, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(proto))) {
 				if (already.includes(name)) continue
 				already.push(name)
-				Object.defineProperty(builtClass.prototype, name, descriptor)
+				Object.defineProperty(BuiltClass.prototype, name, descriptor)
 			}
 			proto = Object.getPrototypeOf(proto)
 		}
 	}
 
 	for (const mixin of mixins) {
-		Object.defineProperty(builtClass.prototype, mixin.name, {
+		Object.defineProperty(BuiltClass.prototype, mixin.name, {
 			value: function() {
 				for (const [name, value] of Object.entries(new mixin)) this[name] = value
 			}
 		})
 	}
 
-	return builtClass
+	return BuiltClass
 }
 
 const USES = Symbol('uses')
 
 export const Uses = (...mixins: Type[]) => <T extends Type>(target: T): T =>
 {
-	decorate(USES, mixins)(target)
+	decorate(USES, mixins.concat(usesOf(target)))(target)
 	return uses(target, mixins)
 }
 export default Uses
 
-export const usesOf = (target: object | Type) => decoratorOf<Type[]>(target, USES, [])
+export const usesOf = (target: object | Type, resolveBuiltClass = false) => {
+	const usesOf = decoratorOf<Type[]>(target, USES, [])
+	if (!resolveBuiltClass) {
+		return usesOf
+	}
+	for (const x in usesOf) {
+		let type = usesOf[x]
+		while (type.name === 'BuiltClass') {
+			type = usesOf[x] = Object.getPrototypeOf(type)
+		}
+	}
+	return usesOf
+}

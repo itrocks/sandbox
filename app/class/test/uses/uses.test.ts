@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import Uses from '../../uses'
+import { Uses, usesOf } from '../../uses'
 
 class ParentMixin2Extends {
 	parentMixin2ExtendsMethod() { return 'parentMixin2ExtendsMethod' }
@@ -38,7 +38,8 @@ class Mixin2 {
 	mixin2Property = 'mixin2Property'
 }
 
-@Uses(Mixin1, Mixin2)
+@Uses(Mixin1)
+@Uses(Mixin2)
 class Class extends Parent {
 	classMethod() { return 'classMethod' }
 	classProperty = 'classProperty'
@@ -71,6 +72,18 @@ describe('build', () =>
 		expect(object.parentMixin1Property).toEqual('parentMixin1Property')
 		expect(object.parentMixin2Property).toEqual('parentMixin2Property')
 		expect(object.parentMixin2ExtendsProperty).toEqual('parentMixin2ExtendsProperty')
+	})
+
+	it('usesOfClass', () => {
+		expect(usesOf(Class)).toEqual([Mixin1, Mixin2, ParentMixin1, ParentMixin2])
+		// Mixin1 is replaced by a BuiltClass, because it has a @Uses. With true, usesOf() will return the real Mixin1
+		expect(usesOf(Class, true)).toEqual([Object.getPrototypeOf(Mixin1), Mixin2, ParentMixin1, ParentMixin2])
+	})
+
+	it('usesOfObject', () => {
+		expect(usesOf(new Class)).toEqual([Mixin1, Mixin2, ParentMixin1, ParentMixin2])
+		// Mixin1 is replaced by a BuiltClass, because it has a @Uses. With true, usesOf() will return the real Mixin1
+		expect(usesOf(new Class, true)).toEqual([Object.getPrototypeOf(Mixin1), Mixin2, ParentMixin1, ParentMixin2])
 	})
 
 })
