@@ -1,4 +1,4 @@
-import { routeOf }                        from '../../action/route'
+import { objectRouteOf, routeOf }         from '../../action/route'
 import tr                                 from '../../locale/translate'
 import ReflectProperty                    from '../../property/reflect'
 import { displayOf as classDisplayOf }    from '../class/display'
@@ -15,6 +15,8 @@ export default function parseDecorator(variable: string, data: any)
 			return (data instanceof ReflectProperty)
 				? tr(propertyDisplayOf(data.class.object ?? data.class.type, data.name))
 				: tr(classDisplayOf(data))
+		case '@objectRoute':
+			return objectRouteOf(data)
 		case '@output':
 			return trOutputOf(data)
 		case '@route':

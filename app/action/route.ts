@@ -3,6 +3,8 @@ import { decorate, decoratorOf } from '../decorator/class'
 
 const ROUTE = Symbol('route')
 
+export const objectRouteOf = (target: object) => routeOf(target) + (('id' in target) ? ('/' + target.id) : '')
+
 export const Route = (route: string) => decorate(ROUTE, route)
 export default Route
 
