@@ -32,6 +32,10 @@ main > article[data-action="list"] {
 					&:last-child {
 						border-right: 1px solid #d8d8d8;
 					}
+
+					&:not(:first-child) {
+						cursor: pointer;
+					}
 				}
 			}
 

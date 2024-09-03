@@ -21,6 +21,8 @@ main > article[data-action="list"] {
         padding: .6em; }
         main > article[data-action="list"] > form > table tr > td:last-child, main > article[data-action="list"] > form > table tr > th:last-child {
           border-right: 1px solid #d8d8d8; }
+        main > article[data-action="list"] > form > table tr > td:not(:first-child), main > article[data-action="list"] > form > table tr > th:not(:first-child) {
+          cursor: pointer; }
       main > article[data-action="list"] > form > table > thead > tr > * {
         background: #f8f8f8; }
       main > article[data-action="list"] > form > table > tbody > tr:nth-child(2n) > * {

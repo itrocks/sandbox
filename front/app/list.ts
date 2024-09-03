@@ -15,7 +15,15 @@ build<HTMLTableElement>(
 			if (!(td instanceof HTMLTableCellElement)) return
 			const tr = td.closest('tr')
 			if (!tr) return
-			const select = tr.querySelector<HTMLInputElement>(':scope > th.select > input[name=select]')
+			let select = td.closest('.select')
+			if (select) {
+				const input = select.querySelector('input')
+				if (!input) return
+				input.click()
+				input.focus()
+				return
+			}
+			select = tr.querySelector<HTMLInputElement>(':scope > th.select > input[name=select]')
 			if (!select) return
 			const id = select.getAttribute('value')
 			if (!id) return
