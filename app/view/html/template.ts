@@ -197,7 +197,7 @@ export default class Template
 		await this.parseVars()
 		if (headLinks.length && !doHeadLinks) {
 			const position = target.lastIndexOf('>', target.indexOf('</head>')) + 1
-			target = target.slice(0, position) + "\n\t" + headLinks.join("\n\t") + target.slice(position)
+			target = target.slice(0, position) + '\n\t' + headLinks.join('\n\t') + target.slice(position)
 			doneLinks = new SortedArray<string>
 			doneLinks.distinct = true
 			headLinks = new SortedArray<string>
@@ -208,9 +208,8 @@ export default class Template
 
 	async parseExpression(data: any, close: string, finalClose = '')
 	{
-		const finalChar = finalClose.length ? finalClose[0] : ''
-		const indexOut  = index
-		let   open      = source[index]
+		const indexOut = index
+		let   open     = source[index]
 
 		if (translating && !translateParts.length) {
 			targetStack.push(target)
@@ -223,11 +222,17 @@ export default class Template
 		}
 
 		index ++
-		if ((index >= length) || !new RegExp('[a-z0-9@%."\'' + open + close + ']', 'i').test(source[index])) {
+		const firstChar = source[index]
+		if ((index >= length) || !new RegExp('[a-z0-9@%."\'\?' + open + close + ']', 'i').test(firstChar)) {
 			return
 		}
 
-		let stackPos = targetStack.length
+		const conditional = (firstChar === '?')
+		const finalChar   = finalClose.length ? finalClose[0] : ''
+		let   stackPos    = targetStack.length
+		if (conditional) {
+			index ++
+		}
 		targetStack.push(target + source.substring(start, indexOut))
 		start  = index
 		target = ''
@@ -250,9 +255,9 @@ export default class Template
 				const expression = target + source.substring(start, index)
 				const lastTarget = targetStack.pop() as string
 				const parsed     = await this.parsePath(expression, data)
-				index           += (char === close) ? 1 : finalClose.length
-				start            = index
-				target           = ''
+				index += (char === close) ? 1 : finalClose.length
+				start  = index
+				target = ''
 				if (char === finalChar) while (targetStack.length > stackPos) {
 					target += targetStack.shift()
 				}
@@ -268,6 +273,13 @@ export default class Template
 					target = parsed
 				}
 				if (targetStack.length === stackPos) {
+					if (conditional && !parsed) {
+						target = target.substring(0, target.lastIndexOf(' '))
+						while ((index < length) && !' \n\r\t\f'.includes(source[index])) {
+							index ++
+							start ++
+						}
+					}
 					return
 				}
 				continue
@@ -577,6 +589,11 @@ export default class Template
 					else {
 						quote = ' >'
 					}
+					if ((open === '(') && (source.substring(index, index + 6) === 'app://')) {
+						this.sourceToTarget()
+						index += 6
+						start  = index
+					}
 
 					translating = this.doTranslate && this.attributeTranslate.includes(attributeName)
 						|| (hasTypeSubmit && (attributeChar === 'v') && (attributeName === 'value'))
@@ -770,7 +787,7 @@ export default class Template
 		let index = string.length
 		while ((index > 0) && ' \n\r\t\f'.includes(string[index - 1])) {
 			index --
-			if (string[index] === "\n") {
+			if (string[index] === '\n') {
 				break
 			}
 		}
