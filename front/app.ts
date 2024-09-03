@@ -5,8 +5,9 @@ import { XTargetDefaultOptions }   from './xtarget.js'
 import XTargetBeginEnd             from './xtarget-begin-end.js'
 import XTargetHead                 from './xtarget-head.js'
 import XTargetHeadersSize          from './xtarget-headers-size.js'
+import XTargetHistory              from './xtarget-history.js'
 
-XTargetDefaultOptions({ plugins: [XTargetBeginEnd, XTargetHead, XTargetHeadersSize] })
+XTargetDefaultOptions({ plugins: [ XTargetBeginEnd, XTargetHead, XTargetHeadersSize, XTargetHistory ] })
 
 build<HTMLAnchorElement>('a.auto-redirect', element => autoRedirect(element))
 

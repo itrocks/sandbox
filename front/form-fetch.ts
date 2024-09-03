@@ -5,13 +5,8 @@ export function formFetch(form: HTMLFormElement, action?: string, init: RequestI
 	const searchParams = new URLSearchParams(formData as any)
 	const url          = new URL(action ?? form.action)
 
-	if (!init.method) {
-		init.method = form.getAttribute('data-method') ?? ''
-		if (!init.method) {
-			init.method = form.method
-		}
-	}
-	if (['patch', 'post', 'put'].includes(init.method.toLowerCase())) {
+	init.method = formMethod(form, init)
+	if (init.method.toLowerCase() === 'post') {
 		init.body = (form.enctype.toLowerCase() === 'multipart/form-data')
 			? formData
 			: searchParams
@@ -39,4 +34,15 @@ export function formFetchOnSubmit(
 		formFetch(event.currentTarget as HTMLFormElement, submitter.formAction, init)
 			.then(response => setResponse(response, submitter.formTarget ?? form.target, form))
 	})
+}
+
+export function formMethod(form: HTMLFormElement, init: RequestInit = {})
+{
+	if (!init.method) {
+		init.method = form.getAttribute('data-method') ?? ''
+		if (!init.method) {
+			init.method = form.method
+		}
+	}
+	return init.method
 }
