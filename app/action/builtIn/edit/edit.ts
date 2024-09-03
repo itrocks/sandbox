@@ -11,7 +11,7 @@ export default class Edit extends Action
 
 	async html(request: Request)
 	{
-		const template    = new Template(request.object)
+		const template    = new Template(request.object ?? new (request.getType()))
 		template.included = (request.request.headers['sec-fetch-dest'] === 'empty')
 		return this.htmlResponse(await template.parseFile(
 			__dirname + sep + 'edit.html',
@@ -22,7 +22,7 @@ export default class Edit extends Action
 	async json(request: Request)
 	{
 		if (request.objects.length === 1) {
-			return this.jsonResponse(request.object)
+			return this.jsonResponse(request.object ?? new (request.getType()))
 		}
 		if (request.objects.length > 1) {
 			return this.jsonResponse(request.objects)

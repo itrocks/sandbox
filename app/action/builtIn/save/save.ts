@@ -1,10 +1,11 @@
+import { sep }      from 'path'
 import Action       from '../../../action/action'
 import Need         from '../../../action/need'
 import Request      from '../../../action/request'
 import ReflectClass from '../../../class/reflect'
 import dao          from '../../../dao/dao'
-import dump         from '../../../debug/dump'
 import tr           from '../../../locale/translate'
+import Template     from '../../../view/html/template'
 
 @Need('?object')
 export default class Save extends Action
@@ -32,22 +33,26 @@ export default class Save extends Action
 		}
 	}
 
-	html(request: Request)
+	async html(request: Request)
 	{
-		this.dataToObject(request.object, request.request.data)
-		console.log(new ReflectClass(request.object).propertyTypes)
-		//dao.save(request.object)
-		return this.htmlResponse(`<html lang="en">
-<head><meta charset="utf-8"><title>HTML save</title></head>
-<body>${dump(request.object)}</body>
-</html>`)
+		const object = request.object ?? new (request.getType())
+		this.dataToObject(object, request.request.data)
+		await dao.save(object)
+
+		const template    = new Template(object)
+		template.included = (request.request.headers['sec-fetch-dest'] === 'empty')
+		return this.htmlResponse(await template.parseFile(
+			__dirname + sep + 'save.html',
+			__dirname + sep + '../../../home/output.html'
+		))
 	}
 
-	json(request: Request)
+	async json(request: Request)
 	{
-		this.dataToObject(request.object, request.request.data)
-		//dao.save(request.object)
-		return this.jsonResponse(request.object)
+		const object = request.object ?? new (request.getType())
+		this.dataToObject(object, request.request.data)
+		await dao.save(object)
+		return this.jsonResponse(object)
 	}
 
 }

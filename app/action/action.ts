@@ -10,7 +10,7 @@ export default class Action
 		return new HtmlResponse(body, statusCode, headers)
 	}
 
-	jsonResponse(data: object, statusCode: number = 200, headers: Headers = {})
+	jsonResponse(data: any, statusCode: number = 200, headers: Headers = {})
 	{
 		return new JsonResponse(data, statusCode, headers)
 	}

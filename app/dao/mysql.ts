@@ -30,12 +30,50 @@ export default class Mysql implements Dao
 		return Object.assign(new type, rows[0])
 	}
 
+	async update<T extends object>(object: T & Entity)
+	{
+		const connection = this.connection ?? await this.connect()
+		if (!connection) throw 'Not connected'
+
+		const id        = object.id
+		const valObject = object as T
+		delete (valObject as any).id
+		const sql    = Object.keys(valObject).map(name => '`' + name + '` = ?').join(', ')
+		const values = Object.values(valObject).concat([id])
+		const query  = 'UPDATE `' + storeOf(object) + '` SET '  + sql + ' WHERE id = ?'
+		await connection.query(query, values)
+		object.id = id
+
+		return object
+	}
+
+	async insert<T extends object>(object: T)
+	{
+		const connection = this.connection ?? await this.connect()
+		if (!connection) throw 'Not connected'
+
+		const sql    = Object.keys(object).map(name => '`' + name + '` = ?').join(', ')
+		const values = Object.values(object)
+		const query  = 'INSERT INTO `' + storeOf(object) + '` SET '  + sql
+		const result = await connection.query(query, values);
+		(object as Entity).id = result.insertId
+
+		return object as T & Entity
+	}
+
+	async save<T extends object>(object: T | (T & Entity))
+	{
+		return (('id' in object) && object.id)
+			? this.update(object)
+			: this.insert(object)
+	}
+
 	async search<T extends object>(type: new() => T, search: object = {})
 	{
 		const connection = this.connection ?? await this.connect()
 		if (!connection) throw 'Not connected'
 
-		let sql = Object.keys(search).map(name => '`' + name + '` = ?').join(', ')
+		let sql          = Object.keys(search).map(name => '`' + name + '` = ?').join(', ')
 		let searchValues = Object.values(search)
 		if (sql.length) {
 			sql = ' WHERE ' + sql

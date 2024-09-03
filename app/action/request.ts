@@ -1,3 +1,4 @@
+import Type            from '../class/type'
 import { dao, Entity } from '../dao/dao'
 import ServerRequest   from '../server/request'
 import Exception       from './exception'
@@ -19,7 +20,7 @@ export default class Request
 
 	get object()
 	{
-		return this.objects[0]
+		return this.objects.length ? this.objects[0] : undefined
 	}
 
 	getType()
@@ -29,10 +30,10 @@ export default class Request
 			throw new Exception('Module ' + this.route.substring(1) + ' not found')
 		}
 		const type = require('..' + module).default
-		if (typeof type !== 'function') {
+		if ((typeof type)[0] !== 'f') {
 			throw new Exception('Module ' + this.route.substring(1) + ' default is not a class')
 		}
-		return type
+		return type as Type
 	}
 
 	async getObjects()
@@ -55,12 +56,9 @@ export default class Request
 
 		const request = this.request
 		const method  = request.method
-		const regExp  = (method === 'GET')
+		const regExp  = ['GET', 'POST'].includes(method)
 			? `^${route}${id}?${action}?${format}?$`
-			: (method === 'POST')
-				? `^${route}${id}?${action}?${format}?$`
-				// method === any of 'DELETE' | 'PATCH' | 'PUT'
-				: `^${route}${id}${action}?${format}?$`
+			: `^${route}${id}${action}?${format}?$`
 		const match = request.path.replaceAll('-', '_').match(new RegExp(regExp))
 		if (!match?.groups) {
 			return {}
@@ -118,6 +116,9 @@ export default class Request
 			}
 			else if (method === 'POST') {
 				path.action = 'save'
+				if (path.route.endsWith('/save')) {
+					path.route = path.route.substring(0, path.route.lastIndexOf('/'))
+				}
 			}
 			// action <- route
 			else if (path.route.lastIndexOf('/') > 0) {

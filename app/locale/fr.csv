@@ -3,6 +3,7 @@ $1 list;$1s
 active;actif
 add;ajouter
 add $1;ajouter $1
+back;retour
 close;fermer
 delete;supprimer
 delete $1;supprimer $1

@@ -1,15 +1,8 @@
-import Action from '../../../action/action'
+import Need from '../../need'
+import Edit from '../edit/edit'
 
-export default class New extends Action
+@Need('')
+export default class New extends Edit
 {
-
-	html()
-	{
-		return this.htmlResponse(`<html lang="en">
-<head><meta charset="utf-8"><title>HTML new</title></head>
-<body>NEW</body>
-</html>`
-		)
-	}
 
 }

@@ -4,6 +4,7 @@
 	<link href="../../../../node_modules/normalize.css/normalize.css" rel="stylesheet">
 	<link href="../../../style/2020/action.css" rel="stylesheet">
 	<link href="../../../style/2020/article.css" rel="stylesheet">
+	<link href="../../../style/2020/auto-redirect.css" rel="stylesheet">
 	<link href="../../../style/2020/edit.css" rel="stylesheet">
 	<link href="../../../style/2020/global.css" rel="stylesheet">
 	<link href="../../../style/2020/output.css" rel="stylesheet">
@@ -16,13 +17,13 @@
 <main>
 <!--BEGIN-->
 
-	<form data-action="edit" data-class="{%name}" data-id="{id}" data-route="{@route}" enctype="multipart/form-data" method="post">
+	<form data-action="edit" data-class="{%name}" data-id="{?id}" data-route="{@route}" enctype="multipart/form-data" method="post">
 		<header>
 			<h2>Edit {@output}</h2>
 			<ul class="general actions">
-				<li class="close"><a href="(@route)/(id)" target="main">Close</a></li>
-				<li class="save"><input formaction="(@route)/(id)/save" formtarget="#notification" type="submit" value="Save"></li>
-				<li class="delete"><a href="(@route)/(id)/delete" target="#notification">Delete</a></li>
+				<li class="close"><a href="app://(@objectRoute)" target="main">Close</a></li>
+				<li class="save"><input formaction="app://(@objectRoute)/save" formtarget="#notification" type="submit" value="Save"></li>
+				<li class="delete"><a href="app://(@objectRoute)/delete" target="#notification">Delete</a></li>
 			</ul>
 		</header>
 		<ul class="object properties">
@@ -33,6 +34,7 @@
 			</li>
 			<!--end-->
 		</ul>
+		<div id="notification"></div>
 		<footer>
 		</footer>
 	</form>
