@@ -28,9 +28,10 @@ let translating:        boolean
 export const frontScripts = new SortedArray<string>
 frontScripts.distinct = true
 
-let doneLinks = new SortedArray<string>
+let doneLinks      = new SortedArray<string>
+let headLinks      = new SortedArray<string>
+let headTitle      = undefined as string|undefined
 doneLinks.distinct = true
-let headLinks = new SortedArray<string>
 headLinks.distinct = true
 
 export default class Template
@@ -195,13 +196,20 @@ export default class Template
 	{
 		this.setSource(buffer)
 		await this.parseVars()
-		if (headLinks.length && !doHeadLinks) {
+		if (doHeadLinks) {
+			return target
+		}
+		if (headLinks.length) {
 			const position = target.lastIndexOf('>', target.indexOf('</head>')) + 1
 			target = target.slice(0, position) + '\n\t' + headLinks.join('\n\t') + target.slice(position)
 			doneLinks = new SortedArray<string>
 			doneLinks.distinct = true
 			headLinks = new SortedArray<string>
 			headLinks.distinct = true
+		}
+		if (headTitle && !this.included) {
+			const position = target.indexOf('>', target.indexOf('<title') + 6) + 1
+			target = target.slice(0, position) + headTitle + target.slice(target.indexOf('</title>', position))
 		}
 		return target
 	}
@@ -507,7 +515,7 @@ export default class Template
 				}
 				if (shouldTranslate) {
 					transLock = false
-					this.translateTarget(tagIndex)
+					this.translateTarget(tagIndex, (tagName[0] === 't') && (tagName === 'title'))
 				}
 				if (translating && (index > start)) {
 					this.sourceToTarget()
@@ -769,16 +777,20 @@ export default class Template
 		return original.substring(0, left) + text + original.substring(right)
 	}
 
-	translateTarget(index: number)
+	translateTarget(index: number, isTitle = false)
 	{
 		if (!translateParts.length) {
 			target += this.tr(source.substring(start, index))
 			start   = index
 			return
 		}
-		target        += source.substring(start, index)
-		start          = index
-		target         = (targetStack.pop() ?? '') + this.tr(target, translateParts)
+		target          += source.substring(start, index)
+		start            = index
+		const translated = this.tr(target, translateParts)
+		if (isTitle && doHeadLinks) {
+			headTitle = translated
+		}
+		target         = (targetStack.pop() ?? '') + translated
 		translateParts = []
 	}
 
