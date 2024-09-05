@@ -3,6 +3,8 @@ import config from '../../local/dao'
 export interface Dao
 {
 
+	delete<T extends object>(object: T & Entity): Promise<T>
+
 	read<T extends object>(type: new() => T, id: Identifier): Promise<T & Entity>
 
 	save<T extends object>(object: T | (T & Entity)): Promise<T & Entity>

@@ -17,6 +17,20 @@ export default class Mysql implements Dao
 		return createConnection(mariaDbConfig).then(connection => this.connection = connection)
 	}
 
+	async delete<T extends object>(object: T & Entity): Promise<T>
+	{
+		const connection = this.connection ?? await this.connect()
+		if (!connection) throw 'Not connected'
+
+		await connection.query(
+			'DELETE FROM `' + storeOf(object) + '` WHERE id = ?',
+			[object.id]
+		)
+		delete (object as any).id
+
+		return object
+	}
+
 	async read<T extends object>(type: new() => T, id: bigint | string)
 	{
 		const connection = this.connection ?? await this.connect()
