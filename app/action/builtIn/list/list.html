@@ -10,7 +10,7 @@
 	<meta charset="utf-8">
 	<script src="../../../../front/app.js" type="module"></script>
 	<script src="../../../../front/app/list.js" type="module"></script>
-	<title>{@output.ucFirst} list</title>
+	<title>{type.@output.ucFirst} list</title>
 </head>
 <body>
 <main>
@@ -18,7 +18,7 @@
 
 	<article data-action="list" data-class="{type.%name}" data-route="{route}">
 		<header>
-			<h2>{@output.ucFirst} list</h2>
+			<h2>{type.@output.ucFirst} list</h2>
 			<section class="summary">{objects.length} elements</section>
 			<ul class="general actions">
 				<li class="new"><a href="(route)/new" target="main">New</a></li>
