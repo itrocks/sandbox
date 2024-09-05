@@ -124,11 +124,11 @@ describe('parsePath', () => {
 	})
 	it('neverDeleteNoId', () => {
 		const path = new Request(new ServerRequest('DELETE', 'https', 'test', '/user', acceptJson)).parsePath()
-		expect(pathTuple(path)).toEqual([undefined, undefined, undefined, undefined])
+		expect(pathTuple(path)).toEqual(['/user', [], 'delete', 'json'])
 	})
 	it('neverDeleteNoIdActionFormat', () => {
 		const path = new Request(new ServerRequest('DELETE', 'https', 'test', '/user/action/csv', acceptJson)).parsePath()
-		expect(pathTuple(path)).toEqual([undefined, undefined, undefined, undefined])
+		expect(pathTuple(path)).toEqual(['/user', [], 'action', 'csv'])
 	})
 	it('neverGetEmpty', () => {
 		const path = new Request(new ServerRequest('GET', 'https', 'test', '/', acceptJson)).parsePath()
@@ -144,15 +144,15 @@ describe('parsePath', () => {
 	})
 	it('neverPatchNoId', () => {
 		const path = new Request(new ServerRequest('PATCH', 'https', 'test', '/user', acceptJson)).parsePath()
-		expect(pathTuple(path)).toEqual([undefined, undefined, undefined, undefined])
+		expect(pathTuple(path)).toEqual(['/user', [], 'save', 'json'])
 	})
 	it('neverPatchNoIdActionFormat', () => {
 		const path = new Request(new ServerRequest('PATCH', 'https', 'test', '/user/action/csv', acceptJson)).parsePath()
-		expect(pathTuple(path)).toEqual([undefined, undefined, undefined, undefined])
+		expect(pathTuple(path)).toEqual(['/user', [], 'action', 'csv'])
 	})
 	it('neverPostAction', () => {
 		const path = new Request(new ServerRequest('POST', 'https', 'test', '/user/action/csv', acceptJson)).parsePath()
-		expect(pathTuple(path)).toEqual(['/user/action', [], 'save', 'csv'])
+		expect(pathTuple(path)).toEqual(['/user', [], 'action', 'csv'])
 	})
 	it('neverPostEmpty', () => {
 		const path = new Request(new ServerRequest('POST', 'https', 'test', '/', acceptJson)).parsePath()
@@ -160,18 +160,18 @@ describe('parsePath', () => {
 	})
 	it('neverPostId', () => {
 		const path = new Request(new ServerRequest('POST', 'https', 'test', '/user/1', acceptJson)).parsePath()
-		expect(pathTuple(path)).toEqual([undefined, undefined, undefined, undefined])
+		expect(pathTuple(path)).toEqual(['/user', ['1'], 'save', 'json'])
 	})
 	it('neverPostIdAction', () => {
 		const path = new Request(new ServerRequest('POST', 'https', 'test', '/user/1/action', acceptJson)).parsePath()
-		expect(pathTuple(path)).toEqual([undefined, undefined, undefined, undefined])
+		expect(pathTuple(path)).toEqual(['/user', ['1'], 'action', 'json'])
 	})
 	it('neverPostIdActionFormat', () => {
 		const path = new Request(new ServerRequest('POST', 'https', 'test', '/user/1/action/csv', acceptJson)).parsePath()
-		expect(pathTuple(path)).toEqual([undefined, undefined, undefined, undefined])
+		expect(pathTuple(path)).toEqual(['/user', ['1'], 'action', 'csv'])
 	})
 	it('neverPostIdFormat', () => {
 		const path = new Request(new ServerRequest('POST', 'https', 'test', '/user/1/csv', acceptJson)).parsePath()
-		expect(pathTuple(path)).toEqual([undefined, undefined, undefined, undefined])
+		expect(pathTuple(path)).toEqual(['/user', ['1'], 'save', 'csv'])
 	})
 })

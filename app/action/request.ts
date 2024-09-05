@@ -101,18 +101,15 @@ export default class Request
 
 		if (!path.action) {
 			// action <- method
+			const method0 = method[0]
 			if (path.ids.length) {
-				if (method === 'DELETE') {
-					path.action = 'delete'
-				}
-				else if (method === 'GET') {
-					path.action = 'output'
-				}
-				else if ((method === 'PATCH') || (method === 'PUT')) {
-					path.action = 'save'
+				switch (method0) {
+					case 'D': path.action = 'delete'; break
+					case 'G': path.action = 'output'; break
+					case 'P': path.action = 'save'
 				}
 			}
-			else if ((method === 'POST') && (path.format === 'json')) {
+			else if ((method0 === 'P') && (path.format === 'json')) {
 				path.action = 'save'
 				if (path.route.endsWith('/save')) {
 					path.route = path.route.substring(0, path.route.lastIndexOf('/'))
@@ -126,7 +123,11 @@ export default class Request
 			}
 			// action <- default
 			else {
-				path.action = 'list'
+				switch (method0) {
+					case 'D': path.action = 'delete'; break
+					case 'G': path.action = 'list';   break
+					case 'P': path.action = 'save'
+				}
 			}
 		}
 
