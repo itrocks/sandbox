@@ -23,9 +23,9 @@ build<HTMLTableElement>(
 				input.focus()
 				return
 			}
-			select = tr.querySelector<HTMLInputElement>(':scope > th.select > input[name=select]')
+			select = tr.querySelector<HTMLInputElement>(':scope > th.select > input[name^="id["]')
 			if (!select) return
-			const id = select.getAttribute('value')
+			const id = select.getAttribute('name')?.slice(3, -1)
 			if (!id) return
 			const form = tr.closest('form')
 			if (!form) return

@@ -24,7 +24,7 @@
 				<li class="new"><a href="(route)/new" target="main">New</a></li>
 			</ul>
 		</header>
-		<form action="(route)/" enctype="multipart/form-data" method="post">
+		<form action="(route)/" method="post">
 			<table class="objects">
 				<thead>
 					<tr class="properties">
@@ -37,7 +37,7 @@
 				<tbody>
 					<!--objects-->
 					<tr>
-						<th class="select"><input name="select" type="checkbox" value="{id}"></th>
+						<th class="select"><input name="id[{id}]" type="checkbox" value="1"></th>
 						<!--%properties-->
 						<td>{object.{name}}</td>
 						<!--end-->
@@ -45,9 +45,10 @@
 					<!--end-->
 				</tbody>
 			</table>
+			<div id="notification"></div>
 			<footer>
 				<ul class="selection actions">
-					<li class="delete"><input formaction="(route)/delete" formtarget="main" type="submit" value="Delete"></li>
+					<li class="delete"><input formaction="(route)/delete" formtarget="#notification" type="submit" value="Delete"></li>
 				</ul>
 			</footer>
 		</form>
