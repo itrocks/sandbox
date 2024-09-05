@@ -1,4 +1,5 @@
 form[name=global-search] {
+  display: none;
   padding: .8em 1em; }
   form[name=global-search] input {
     box-sizing: border-box;

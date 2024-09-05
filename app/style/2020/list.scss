@@ -43,6 +43,10 @@ main > article[data-action="list"] {
 				background: #f8f8f8;
 			}
 
+			> thead > .properties > .select > input[name=select] {
+				display: none;
+			}
+
 			> tbody > tr:nth-child(2n) > * {
 				background: #f8f8f8;
 			}

@@ -25,6 +25,8 @@ main > article[data-action="list"] {
           cursor: pointer; }
       main > article[data-action="list"] > form > table > thead > tr > * {
         background: #f8f8f8; }
+      main > article[data-action="list"] > form > table > thead > .properties > .select > input[name=select] {
+        display: none; }
       main > article[data-action="list"] > form > table > tbody > tr:nth-child(2n) > * {
         background: #f8f8f8; }
     main > article[data-action="list"] > form > footer {
