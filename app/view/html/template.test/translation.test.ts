@@ -1,5 +1,5 @@
-import Template from '../template';
-import * as translate from '../../../locale/translate';
+import { translations } from '../../../locale/translate';
+import Template         from '../template';
 
 class TemplateMockTranslate extends Template
 {
@@ -49,12 +49,7 @@ async function testBuffer(template: Template, source: string, target: string)
 
 describe('tr', () => {
 	const template = new Template
-	jest.spyOn(translate, 'tr').mockImplementation((text: string) => {
-		switch (text) {
-			case 'example': return 'translated'
-		}
-		return '!'
-	})
+	translations.set('example', 'translated')
 
 	it('simple', () => {
 		expect(template.tr('example')).toEqual('translated')

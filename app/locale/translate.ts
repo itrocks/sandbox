@@ -1,10 +1,10 @@
 import { readFile } from 'node:fs/promises'
 import { sep }      from 'path'
 
-const parseCsv     = require('papaparse').parse
+const parseCsv = require('papaparse').parse
 
-const expressions  = new Set<RegExp>
-const translations = new Map<string, string>
+export const expressions  = new Set<RegExp>
+export const translations = new Map<string, string>
 
 readFile(__dirname + sep + 'fr.csv', 'utf-8')
 	.then(data => parseCsv(data, { delimiter: ';' }).data as [string, string][])
