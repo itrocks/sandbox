@@ -56,10 +56,8 @@ export default class Request
 
 		const request = this.request
 		const method  = request.method
-		const regExp  = ['GET', 'POST'].includes(method)
-			? `^${route}${id}?${action}?${format}?$`
-			: `^${route}${id}${action}?${format}?$`
-		const match = request.path.replaceAll('-', '_').match(new RegExp(regExp))
+		const regExp  = `^${route}${id}?${action}?${format}?$`
+		const match   = request.path.replaceAll('-', '_').match(new RegExp(regExp))
 		if (!match?.groups) {
 			return {}
 		}
@@ -114,7 +112,7 @@ export default class Request
 					path.action = 'save'
 				}
 			}
-			else if (method === 'POST') {
+			else if ((method === 'POST') && (path.format === 'json')) {
 				path.action = 'save'
 				if (path.route.endsWith('/save')) {
 					path.route = path.route.substring(0, path.route.lastIndexOf('/'))
@@ -129,6 +127,13 @@ export default class Request
 			// action <- default
 			else {
 				path.action = 'list'
+			}
+		}
+
+		if (!path.ids.length) {
+			for (const name in request.data) if (name.startsWith('id[') && request.data[name]) {
+				path.ids.push(name.slice(3, -1))
+				delete request.data[name]
 			}
 		}
 
