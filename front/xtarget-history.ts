@@ -1,6 +1,6 @@
-import { formMethod } from './form-fetch.js'
-import Plugin         from './plugin.js'
-import XTarget        from './xtarget.js'
+import { formMethod }           from './form-fetch.js'
+import Plugin                   from './plugin.js'
+import { XTarget, xTargetCall } from './xtarget.js'
 
 export default class XTargetHistory extends Plugin<XTarget>
 {
@@ -10,6 +10,7 @@ export default class XTargetHistory extends Plugin<XTarget>
 		super(xTarget)
 
 		let postMethod = false
+		let response: Response
 
 		const superActivateFormElement = xTarget.activateFormElement
 		xTarget.activateFormElement    = function(element)
@@ -18,18 +19,15 @@ export default class XTargetHistory extends Plugin<XTarget>
 			superActivateFormElement.call(this, element)
 		}
 
-		let response: Response
-
 		const superSetHTML = xTarget.setHTML
 		xTarget.setHTML    = function(text, target)
 		{
-			if (postMethod) return superSetHTML.call(this, text, target)
+			if (postMethod || xTarget.options.targetHistoryDisable) return superSetHTML.call(this, text, target)
 
-			const position = text.indexOf('>', text.indexOf('<title') + 6) + 1
-			const title    = position ? text.substring(position, text.indexOf('</title>', position)) : document.title
-			document.title = title
-			window.history.pushState({ reload: true }, title, response.url)
-			return superSetHTML.call(this, text, target)
+			const html           = superSetHTML.call(this, text, target)
+			const targetSelector = target.id ? ('#' + target.id) : target.tagName
+			history.pushState({ reload: true, target: targetSelector, title: document.title }, '', response.url)
+			return html
 		}
 
 		const superSetResponse = xTarget.setResponse
@@ -42,8 +40,12 @@ export default class XTargetHistory extends Plugin<XTarget>
 
 }
 
-window.addEventListener('popstate', event => {
+addEventListener('popstate', async (event) => {
 	if (event.state && event.state.reload) {
-		window.location.href = document.location.href
+		await xTargetCall(document.location.href, event.state.target, { targetHistoryDisable: true })
+		document.title = event.state.title
+	}
+	else {
+		document.location.reload()
 	}
 })
