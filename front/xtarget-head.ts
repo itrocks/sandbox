@@ -36,6 +36,9 @@ export default class XTargetHead extends Plugin<XTarget>
 					}
 					head.append(script)
 				}
+				if (element instanceof HTMLTitleElement) {
+					document.title = element.innerText
+				}
 			}
 
 			return superSetHTML.call(this, text, target)
