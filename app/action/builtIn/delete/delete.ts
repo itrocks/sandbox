@@ -1,23 +1,35 @@
-import Action  from '../../../action/action'
-import Need    from '../../../action/need'
-import Request from '../../../action/request'
-import dump    from '../../../debug/dump'
+import Action   from '../../../action/action'
+import Need     from '../../../action/need'
+import Request  from '../../../action/request'
+import dao      from '../../../dao/dao'
+import Template from '../../../view/html/template'
+import { sep }  from 'path'
 
 @Need('objects')
 export default class Delete extends Action
 {
 
-	html(request: Request)
+	async html(request: Request)
 	{
-		return this.htmlResponse(`<html lang="en">
-<head><meta charset="utf-8"><title>HTML delete</title></head>
-<body>${dump(request.objects)}</body>
-</html>`)
+		const objects = request.objects
+		for (const object of objects) {
+			await dao.delete(object)
+		}
+		const template    = new Template({ objects, type: request.getType() })
+		template.included = (request.request.headers['sec-fetch-dest'] === 'empty')
+		return this.htmlResponse(await template.parseFile(
+			__dirname + sep + 'delete.html',
+			__dirname + sep + '../../../home/output.html'
+		))
 	}
 
-	json(request: Request)
+	async json(request: Request)
 	{
-		return this.jsonResponse(request.objects)
+		const objects = request.objects
+		for (const object of objects) {
+			await dao.delete(object)
+		}
+		return this.jsonResponse(objects)
 	}
 
 }
