@@ -36,6 +36,8 @@ ul.actions {
       background-image: url("action/edit.svg"); }
     ul.actions > li.new {
       background-image: url("action/new.svg"); }
+    ul.actions > li.print {
+      background-image: url("action/print.svg"); }
     ul.actions > li.save {
       background-image: url("action/save.svg"); }
 
