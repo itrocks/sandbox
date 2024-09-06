@@ -10,7 +10,7 @@ type SubstitutionModule = { __esModule: true, default?: Type }
 
 function applyFileToType(module: any, file: string)
 {
-	const type = module.default
+	const type = module?.default
 	if (((typeof type)[0] === 'f') && (type.toString()[0] === 'c')) {
 		File(file)(type)
 		const route = getRoute(file.slice(0, -3))
