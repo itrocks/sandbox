@@ -1,0 +1,143 @@
+
+body {
+	background-color: #ddd;
+	display: grid;
+	grid-template-areas: "main";
+	grid-template-columns: 100%;
+	grid-template-rows: 100%;
+	height: calc(100vh - 16px);
+	margin: 0;
+	padding: 8px;
+}
+
+main {
+	display: grid;
+	grid-area: main;
+	grid-template-areas: "article";
+	grid-template-columns: 100%;
+	grid-template-rows: 100%;
+}
+
+.document-designer {
+	background-color: #eee;
+	display: grid;
+	grid-area: article;
+	grid-template-areas: "fields nothing toolbox toolbox"
+		"fields nothing horizontal-snap-tool horizontal-snap-tool"
+		"fields vertical-snap-tool page nothing2";
+	grid-template-columns: min-content 15px min-content 1fr;
+	grid-template-rows: min-content 15px 1fr;
+
+	> ul.fields {
+		background-color: white;
+		display: block;
+		grid-area: fields;
+		margin: 0;
+		padding: 0;
+
+		> li {
+			cursor: pointer;
+			display: block;
+			padding: 2px 6px;
+			transition: background-color .2s;
+
+			&:hover {
+				background-color: #f4f4f4;
+			}
+		}
+	}
+
+	> ul.toolbox {
+		display: block;
+		grid-area: toolbox;
+		font-size: 0;
+		margin: 0;
+		padding: 0;
+
+		> li {
+			background: #fff center / 24px no-repeat;
+			border: 1px solid #ddd;
+			cursor: pointer;
+			display: inline-block;
+			height: 32px;
+			margin: 4px 0;
+			transition: background-color .2s;
+			width: 32px;
+
+			&:not(:first-child) {
+				margin-left: -1px;
+			}
+
+			&:hover {
+				background-color: #f4f4f4;
+			}
+
+			&.free-text {
+				background-image: url('../../app/style/2020/designer/free-text.svg');
+			}
+
+			&.rectangle {
+				background-image: url('../../app/style/2020/designer/rectangle.svg');
+			}
+
+			&.horizontal-line {
+				background-image: url('../../app/style/2020/designer/horizontal-line.svg');
+			}
+
+			&.vertical-line {
+				background-image: url('../../app/style/2020/designer/vertical-line.svg');
+			}
+		}
+	}
+
+	> .snap.tool {
+		position: relative;
+	}
+
+	> .horizontal.snap.tool {
+		grid-area: horizontal-snap-tool;
+	}
+
+	> .vertical.snap.tool {
+		grid-area: vertical-snap-tool;
+	}
+
+	.horizontal.snap {
+		background: linear-gradient(to right, transparent 60%, #888 40%) center / 6px 1px repeat-x;
+		cursor: ns-resize;
+		height: 15px;
+	}
+
+	.vertical.snap {
+		background: linear-gradient(to bottom, transparent 60%, #888 40%) center / 1px 6px repeat-y;
+		cursor: ew-resize;
+		width: 15px;
+	}
+
+	> section.page {
+		background-color: white;
+		grid-area: page;
+		overflow: auto;
+		position: relative;
+
+		> :not(.background) {
+			position: absolute;
+		}
+
+		> .background {
+			height: 1184px;
+			width: 840px;
+		}
+
+		> .horizontal.snap {
+			left: 0;
+			width: 840px;
+		}
+
+		> .vertical.snap {
+			height: 1184px;
+			top: 0;
+		}
+	}
+
+}
