@@ -22,6 +22,7 @@ new;nouveau
 new $1;nouveau $1
 no;non
 password;mot de passe
+print;imprimer
 save;enregistrer
 save $1;enregistrer $1
 send;envoyer

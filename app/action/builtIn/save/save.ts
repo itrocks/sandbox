@@ -1,11 +1,13 @@
-import { sep }      from 'path'
-import Action       from '../../../action/action'
-import Need         from '../../../action/need'
-import Request      from '../../../action/request'
-import ReflectClass from '../../../class/reflect'
-import dao          from '../../../dao/dao'
-import tr           from '../../../locale/translate'
-import Template     from '../../../view/html/template'
+import { createHash } from 'crypto'
+import { sep }        from 'path'
+import Action         from '../../../action/action'
+import Need           from '../../../action/need'
+import Request        from '../../../action/request'
+import ReflectClass   from '../../../class/reflect'
+import dao            from '../../../dao/dao'
+import tr             from '../../../locale/translate'
+import { passwordOf } from '../../../property/filter/password'
+import Template       from '../../../view/html/template'
 
 @Need('?object')
 export default class Save extends Action
@@ -25,6 +27,15 @@ export default class Save extends Action
 					break
 				case 'number':
 					object[propertyName] = Number(data[propertyName])
+					break
+				case 'string':
+					if (passwordOf(object, propertyName)) {
+						if (data[propertyName] !== '¤~!~!~!~!~¤') {
+							object[propertyName] = createHash('sha512').update(data[propertyName], 'utf8').digest('hex')
+						}
+						break
+					}
+					object[propertyName] = data[propertyName]
 					break
 				default:
 					object[propertyName] = data[propertyName]

@@ -1,7 +1,9 @@
 import { ReflectClass } from '../class/reflect'
 import { Type }         from '../class/type'
+import tr               from '../locale/translate'
+import { passwordOf }   from './filter/password'
 
-export class ReflectProperty<T extends object>
+export class ReflectProperty<T extends { [index: string]: any } = {}>
 {
 	readonly #class: T | ReflectClass<T> | Type<T>
 	readonly name:   string
@@ -21,11 +23,37 @@ export class ReflectProperty<T extends object>
 		return value
 	}
 
-	get object()
+	get object() : { [index: string]: any } | undefined
 	{
 		const value = this.class.object
 		Object.defineProperty(this, 'object', { value, writable: false })
 		return value
+	}
+
+	get output()
+	{
+		if (!this.object) {
+			return undefined
+		}
+		let value = this.object[this.name]
+		if (passwordOf(this.object, this.name)) {
+			return '***********'
+		}
+		else if (this.class.propertyTypes[this.name] === 'boolean') {
+			return value ? tr('yes') : tr('no')
+		}
+		return value
+	}
+
+	get type() : any
+	{
+		// TODO string, boolean, etc.
+		return undefined
+	}
+
+	get value()
+	{
+		return this.object ? this.object[this.name] : undefined
 	}
 
 }

@@ -363,7 +363,7 @@ export default class Template
 		if (data[variable] === undefined) {
 			data = new Str(data)
 		}
-		const value = data[variable]
+		let value = data[variable]
 		return ((typeof value === 'function') && !value.prototype)
 			? await value.call(data)
 			: value

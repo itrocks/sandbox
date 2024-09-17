@@ -10,7 +10,7 @@ export const properties = <T extends object>(object: T | ReflectClass<T> | Type<
 export const propertyNames = (object: object | ReflectClass | Type) =>
 	Object.getOwnPropertyNames((object instanceof ReflectClass) ? new (object.type) : objectOf(object))
 
-export class ReflectClass<T extends object = object>
+export class ReflectClass<T extends { [index: string]: any } = {}>
 {
 	readonly name:    string
 	readonly object?: T

@@ -18,11 +18,13 @@ ul.object.properties {
       vertical-align: top; }
     ul.object.properties > li > input {
       border-color: #ddd; }
-    ul.object.properties > li > :not(label) {
+      ul.object.properties > li > input[type=checkbox] {
+        margin: 8px 0; }
+    ul.object.properties > li > :not(input[type=checkbox]):not(label) {
       border-radius: 4px;
       padding: .5em;
       white-space: pre-line; }
-      ul.object.properties > li > :not(label):not(input) {
+      ul.object.properties > li > :not(input[type=checkbox]):not(label):not(input) {
         background: #f4f4f4;
         border-color: #f8f8f8; }
 
