@@ -2,6 +2,7 @@ export const mimeTypes = new Map([
 	['css',   'text/css'],
 	['ico',   'image/x-icon'],
 	['jpg',   'image/jpeg'],
+	['js',    'text/javascript'],
 	['map',   'application/json'],
 	['png',   'image/png'],
 	['scss',  'text/css'],
@@ -11,4 +12,4 @@ export const mimeTypes = new Map([
 ])
 export default mimeTypes
 
-export const utf8Types = new Set(['application/json', 'image/svg+xml', 'text/css'])
+export const utf8Types = new Set(['application/json', 'image/svg+xml', 'text/css', 'text/javascript'])

@@ -12,6 +12,7 @@ import ActionRequest                             from './action/request'
 import { appPath }                               from './app'
 import { mimeTypes, utf8Types }                  from './mime'
 import { fastifyRequest, fastifyResponse }       from './server/fastify'
+import Request                                   from './server/request'
 import Response                                  from './server/response'
 import { frontScripts }                          from './view/html/template'
 
@@ -46,27 +47,12 @@ async function httpCall(
 	const dot     = request.path.lastIndexOf('.') + 1
 	if ((dot > request.path.length - 6) && !request.path.includes('./')) {
 		const fileExtension = request.path.substring(dot)
-		const mimeType      = mimeTypes.get(fileExtension)
-		if (mimeType) {
-			const utf8Type = utf8Types.has(mimeType)
-			const filePath = appPath + ((request.path === '/favicon.ico') ? '/app/style/2020/logo/favicon.ico' : request.path)
-			const ifModified   = request.headers['if-modified-since']
-			const lastModified = new Date((await stat(filePath)).mtime)
-			if (ifModified && (new Date(ifModified) >= lastModified)) {
-				return fastifyResponse(finalResponse, new Response('', 304))
+		if ((fileExtension !== 'js') || request.path.startsWith('/front/') || frontScripts.includes(request.path)) {
+			const filePath = (request.path === '/favicon.ico') ? '/app/style/2020/logo/favicon.ico' : request.path
+			const mimeType = mimeTypes.get(fileExtension)
+			if (mimeType) {
+				return fastifyResponse(finalResponse, await httpAsset(request, appPath + filePath, mimeType))
 			}
-			const response = new Response(await readFile(filePath, utf8Type ? 'utf-8' : undefined), 200, {})
-			response.headers['Content-Type']  = mimeType + (utf8Type ? '; charset=utf-8' : '')
-			response.headers['Last-Modified'] = lastModified.toUTCString()
-			return fastifyResponse(finalResponse, response)
-		}
-		if (
-			(fileExtension === 'js')
-			&& (request.path.startsWith('/front/') || frontScripts.includes(request.path))
-		) {
-			const headers  = { 'Content-Type': 'text/javascript; charset=utf-8' }
-			const response = new Response(await readFile(appPath + request.path, 'utf-8'), 200, headers)
-			return fastifyResponse(finalResponse, response)
 		}
 	}
 	try {
@@ -82,6 +68,21 @@ async function httpCall(
 			throw exception
 		}
 	}
+}
+
+async function httpAsset(request: Request, filePath: string, mimeType: string)
+{
+	const ifModified   = request.headers['if-modified-since']
+	const lastModified = new Date((await stat(filePath)).mtime)
+	if (ifModified && (new Date(ifModified) >= lastModified)) {
+		return new Response('', 304)
+	}
+	const utf8Type = utf8Types.has(mimeType)
+	const headers  = {
+		'Content-Type':  mimeType + (utf8Type ? '; charset=utf-8' : ''),
+		'Last-Modified': lastModified.toUTCString()
+	}
+	return new Response(await readFile(filePath, utf8Type ? 'utf-8' : undefined), 200, headers)
 }
 
 const server = fastify()
