@@ -1,7 +1,6 @@
 import { ReflectClass } from '../class/reflect'
 import { Type }         from '../class/type'
-import tr               from '../locale/translate'
-import { passwordOf }   from './filter/password'
+import { applyFilter }  from './filter/filter'
 
 export class ReflectProperty<T extends { [index: string]: any } = {}>
 {
@@ -23,6 +22,13 @@ export class ReflectProperty<T extends { [index: string]: any } = {}>
 		return value
 	}
 
+	edit(format: string = 'html')
+	{
+		return this.object
+			? applyFilter(this.object[this.name], this.class.type, this.name, format, 'edit')
+			: undefined
+	}
+
 	get object() : { [index: string]: any } | undefined
 	{
 		const value = this.class.object
@@ -30,25 +36,16 @@ export class ReflectProperty<T extends { [index: string]: any } = {}>
 		return value
 	}
 
-	get output()
+	output(format: string = 'html')
 	{
-		if (!this.object) {
-			return undefined
-		}
-		let value = this.object[this.name]
-		if (passwordOf(this.object, this.name)) {
-			return '***********'
-		}
-		else if (this.class.propertyTypes[this.name] === 'boolean') {
-			return value ? tr('yes') : tr('no')
-		}
-		return value
+		return this.object
+			? applyFilter(this.object[this.name], this.class.type, this.name, format, 'output')
+			: undefined
 	}
 
-	get type() : any
+	get type()
 	{
-		// TODO string, boolean, etc.
-		return undefined
+		return this.class.propertyTypes[this.name]
 	}
 
 	get value()

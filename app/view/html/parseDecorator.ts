@@ -4,7 +4,6 @@ import ReflectProperty                    from '../../property/reflect'
 import { displayOf as classDisplayOf }    from '../class/display'
 import { trOutputOf }                     from '../class/output'
 import { displayOf as propertyDisplayOf } from '../property/display'
-import widgetOf                           from './widget'
 
 export default function parseDecorator(variable: string, data: any)
 {
@@ -24,10 +23,6 @@ export default function parseDecorator(variable: string, data: any)
 			return routeOf(data)
 		case '@title':
 			return tr('title')
-		case '@widget':
-			return (data instanceof ReflectProperty)
-				? widgetOf(data)
-				: '?';
 	}
 	return '?'
 }

@@ -1,13 +1,12 @@
-import { createHash } from 'crypto'
-import { sep }        from 'path'
-import Action         from '../../../action/action'
-import Need           from '../../../action/need'
-import Request        from '../../../action/request'
-import ReflectClass   from '../../../class/reflect'
-import dao            from '../../../dao/dao'
-import tr             from '../../../locale/translate'
-import { passwordOf } from '../../../property/filter/password'
-import Template       from '../../../view/html/template'
+import { sep }                    from 'path'
+import Action                     from '../../../action/action'
+import Need                       from '../../../action/need'
+import Request                    from '../../../action/request'
+import ReflectClass               from '../../../class/reflect'
+import dao                        from '../../../dao/dao'
+import tr                         from '../../../locale/translate'
+import { applyFilter, UNCHANGED } from '../../../property/filter/filter'
+import Template                   from '../../../view/html/template'
 
 @Need('?object')
 export default class Save extends Action
@@ -15,7 +14,8 @@ export default class Save extends Action
 
 	dataToObject(object: { [index: string]: any }, data: { [index: string]: string })
 	{
-		const propertyTypes = new ReflectClass(object).propertyTypes
+		const reflectClass  = new ReflectClass(object)
+		const propertyTypes = reflectClass.propertyTypes
 		for (const propertyName in propertyTypes) {
 			const propertyType = propertyTypes[propertyName]
 			switch (propertyType) {
@@ -29,13 +29,11 @@ export default class Save extends Action
 					object[propertyName] = Number(data[propertyName])
 					break
 				case 'string':
-					if (passwordOf(object, propertyName)) {
-						if (data[propertyName] !== '¤~!~!~!~!~¤') {
-							object[propertyName] = createHash('sha512').update(data[propertyName], 'utf8').digest('hex')
-						}
+					const value = applyFilter(data[propertyName], reflectClass.type, propertyName, 'html', 'input')
+					if (value !== UNCHANGED) {
+						object[propertyName] = value
 						break
 					}
-					object[propertyName] = data[propertyName]
 					break
 				default:
 					object[propertyName] = data[propertyName]
