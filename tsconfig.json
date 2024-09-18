@@ -5,12 +5,12 @@
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"forceConsistentCasingInFileNames": true,
-		"module": "nodeNext",
-		"moduleResolution": "nodeNext",
-		"sourceMap": true,
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
 		"skipLibCheck": true,
+		"sourceMap": true,
 		"strict": true,
-		"target": "esNext"
+		"target": "esnext"
 	},
 	"include": ["app/**/*", "local/**/*", "tests/**/*"],
 	"references": [{ "path": "./front" }]
