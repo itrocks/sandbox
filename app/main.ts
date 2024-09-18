@@ -4,7 +4,7 @@ import 'reflect-metadata'
 import fastifyFormbody                           from '@fastify/formbody'
 import fastifyMultipart                          from '@fastify/multipart'
 import { fastify, FastifyReply, FastifyRequest } from 'fastify'
-import { readFile }                              from 'node:fs/promises'
+import { readFile, stat }                        from 'node:fs/promises'
 import Action                                    from './action/action'
 import Exception                                 from './action/exception'
 import { needOf }                                from './action/need'
@@ -49,9 +49,15 @@ async function httpCall(
 		const mimeType      = mimeTypes.get(fileExtension)
 		if (mimeType) {
 			const utf8Type = utf8Types.has(mimeType)
-			const headers  = { 'Content-Type': mimeType + (utf8Type ? '; charset=utf-8' : '') }
-			const path     = (request.path === '/favicon.ico') ? '/app/style/2020/logo/favicon.ico' : request.path
-			const response = new Response(await readFile(appPath + path, utf8Type ? 'utf-8' : undefined), 200, headers)
+			const filePath = appPath + ((request.path === '/favicon.ico') ? '/app/style/2020/logo/favicon.ico' : request.path)
+			const ifModified   = request.headers['if-modified-since']
+			const lastModified = new Date((await stat(filePath)).mtime)
+			if (ifModified && (new Date(ifModified) >= lastModified)) {
+				return fastifyResponse(finalResponse, new Response('', 304))
+			}
+			const response = new Response(await readFile(filePath, utf8Type ? 'utf-8' : undefined), 200, {})
+			response.headers['Content-Type']  = mimeType + (utf8Type ? '; charset=utf-8' : '')
+			response.headers['Last-Modified'] = lastModified.toUTCString()
 			return fastifyResponse(finalResponse, response)
 		}
 		if (
