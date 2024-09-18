@@ -4,7 +4,6 @@ import Need                       from '../../../action/need'
 import Request                    from '../../../action/request'
 import ReflectClass               from '../../../class/reflect'
 import dao                        from '../../../dao/dao'
-import tr                         from '../../../locale/translate'
 import { applyFilter, UNCHANGED } from '../../../property/filter/filter'
 import Template                   from '../../../view/html/template'
 
@@ -17,27 +16,10 @@ export default class Save extends Action
 		const reflectClass  = new ReflectClass(object)
 		const propertyTypes = reflectClass.propertyTypes
 		for (const propertyName in propertyTypes) {
-			const propertyType = propertyTypes[propertyName]
-			switch (propertyType) {
-				case 'bigint':
-					object[propertyName] = BigInt(data[propertyName])
-					break
-				case 'boolean':
-					object[propertyName] = !['', '0', 'false', 'no', tr('false'), tr('no')].includes(data[propertyName])
-					break
-				case 'number':
-					object[propertyName] = Number(data[propertyName])
-					break
-				case 'string':
-					const value = applyFilter(data[propertyName], reflectClass.type, propertyName, 'html', 'input')
-					if (value !== UNCHANGED) {
-						object[propertyName] = value
-						break
-					}
-					break
-				default:
-					object[propertyName] = data[propertyName]
-					break
+			const value = applyFilter(data[propertyName], reflectClass.type, propertyName, 'html', 'input')
+			if (value !== UNCHANGED) {
+				object[propertyName] = value
+				break
 			}
 		}
 	}

@@ -2,6 +2,7 @@ import { objectOf, Type }        from '../../class/type'
 import { decorate, decoratorOf } from '../../decorator/property'
 import tr                        from '../../locale/translate'
 import { displayOf }             from '../../view/property/display'
+import ReflectClass              from '../../class/reflect'
 
 const FILTERS = Symbol('filters')
 
@@ -18,18 +19,25 @@ type DirectionFilters     = { [direction: string]: Filter }
 type FormatFilters        = { [format:    string]: DirectionFilters }
 type PropertyFilters      = { [property:  string]: FormatFilters }
 
-// get(type:FilterType)[property:string][format:string][direction:string]: Filter
-const filters = new Map<FilterType, PropertyFilters>()
+const filters = {} as { [ primitiveType: string ]: FormatFilters }
 
 const tab = '\n\t\t\t\t'
 
 export function applyFilter(value: any, type: FilterType, property: string, format: string, direction: string): any
 {
-	const filter = getFilter(type, property, format, direction)
+	let filter = getFilter(type, property, format, direction)
 	if (filter) {
 		return filter(value, type, property, format, direction)
 	}
-	if ((direction === 'edit') && (format === 'html') && !(typeof type === 'string')) {
+	if (typeof type === 'string') {
+		return value
+	}
+	const propertyType = new ReflectClass(type).propertyTypes[property] as PrimitiveType
+	filter = getFilter(propertyType, property, format, direction)
+	if (filter) {
+		return filter(value, type, property, format, direction)
+	}
+	if ((direction === 'edit') && (format === 'html')) {
 		const label      = `<label for="${property}">` + tr(displayOf(type, property)) + '</label>'
 		const name       = `id="${property}" name="${property}"`
 		const inputValue = value ? ` value="${value}"` : ''
@@ -44,7 +52,7 @@ export { Filter }
 export function getFilter(type: FilterType, property: string, format: string, direction: string): Filter | undefined
 {
 	const formatFilters = (typeof type === 'string')
-		? filters.get(type)?.[property]
+		? filters[type]
 		: decoratorOf(type, property, FILTERS, undefined)
 	if (!formatFilters) return undefined
 	const directionFilters = formatFilters[format] ?? formatFilters['']
@@ -56,9 +64,7 @@ export function setFilter(type: FilterType, property: string, format: string, di
 {
 	let propertyFilters
 	if (typeof type === 'string') {
-		let typeFilters = filters.get(type)
-		if (!typeFilters) filters.set(type, typeFilters = {} as PropertyFilters)
-		propertyFilters = typeFilters[property] ?? (typeFilters[property] = {})
+		propertyFilters = filters[type] ?? (filters[type] = {})
 	}
 	else {
 		propertyFilters = decoratorOf(type, property, FILTERS, undefined)
