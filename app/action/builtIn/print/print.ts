@@ -16,12 +16,9 @@ export default class Print extends Action
 		document.pipe(stream)
 		stream.on('data', chunk => { chunks.push(chunk) })
 
-		for (let i = 0; i < 5000; i ++) {
-			document.font('Times-Roman')
-				.fontSize(25)
-				.text('Bonjour, ô seigneur et maître !', 100, 100)
-			document.addPage()
-		}
+		document.font('Times-Roman')
+			.fontSize(25)
+			.text('Bonjour, ô seigneur et maître !', 100, 100)
 		document.end()
 
 		await new Promise(resolve => stream.on('end', resolve))
