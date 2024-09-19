@@ -1,5 +1,4 @@
 import { objectRouteOf, routeOf }         from '../../action/route'
-import tr                                 from '../../locale/translate'
 import ReflectProperty                    from '../../property/reflect'
 import { displayOf as classDisplayOf }    from '../class/display'
 import { trOutputOf }                     from '../class/output'
@@ -13,16 +12,14 @@ export default function parseDecorator(variable: string, data: any)
 	switch (variable) {
 		case '@display':
 			return (data instanceof ReflectProperty)
-				? tr(propertyDisplayOf(data.class.object ?? data.class.type, data.name))
-				: tr(classDisplayOf(data))
+				? propertyDisplayOf(data.class.object ?? data.class.type, data.name)
+				: classDisplayOf(data)
 		case '@objectRoute':
 			return objectRouteOf(data)
 		case '@output':
 			return trOutputOf(data)
 		case '@route':
 			return routeOf(data)
-		case '@title':
-			return tr('title')
 	}
 	return '?'
 }
