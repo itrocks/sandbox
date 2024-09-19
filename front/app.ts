@@ -1,3 +1,4 @@
+import autoFocus                   from './auto-focus.js'
 import autoRedirect                from './auto-redirect.js'
 import build                       from './build.js'
 import { XTarget, XTargetElement } from './xtarget.js'
@@ -10,6 +11,8 @@ import XTargetHistory              from './xtarget-history.js'
 XTargetDefaultOptions({ plugins: [ XTargetBeginEnd, XTargetHead, XTargetHeadersSize, XTargetHistory ] })
 
 build<HTMLAnchorElement>('a.auto-redirect', element => autoRedirect(element))
+
+build<HTMLFormElement>('form', element => autoFocus(element))
 
 build<XTargetElement>(
 	'a[target="main"], a[target^="#"],'
