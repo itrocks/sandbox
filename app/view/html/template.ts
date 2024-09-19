@@ -234,11 +234,11 @@ export default class Template
 
 		index ++
 		const firstChar = source[index]
-		if ((index >= length) || !new RegExp('[a-z0-9@%."?\'\\-' + open + close + ']', 'i').test(firstChar)) {
+		if ((index >= length) || !this.startsExpression(firstChar, open, close)) {
 			return
 		}
 
-		const conditional = (firstChar === '?')
+		let   conditional = (firstChar === '?')
 		const finalChar   = finalClose.length ? finalClose[0] : ''
 		let   stackPos    = targetStack.length
 		if (conditional) {
@@ -263,7 +263,12 @@ export default class Template
 				(char === close)
 				|| ((char === finalChar) && (source.substring(index, index + finalClose.length) === finalClose))
 			) {
-				const expression = target + source.substring(start, index)
+				let minus = 0
+				if (source[index - 1] === '?') {
+					conditional = true
+					minus = 1
+				}
+				const expression = target + source.substring(start, index - minus)
 				const lastTarget = targetStack.pop() as string
 				const parsed     = await this.parsePath(expression, data)
 				index += (char === close) ? 1 : finalClose.length
@@ -275,7 +280,7 @@ export default class Template
 				if (translating && (targetStack.length === stackPos)) {
 					translateParts.push(parsed)
 					target += lastTarget + '$' + translateParts.length
-					return
+					return conditional
 				}
 				if (lastTarget.length || target.length) {
 					target += lastTarget + parsed
@@ -285,13 +290,16 @@ export default class Template
 				}
 				if (targetStack.length === stackPos) {
 					if (conditional && !parsed) {
-						target = target.substring(0, target.lastIndexOf(' '))
-						while ((index < length) && !' \n\r\t\f'.includes(source[index])) {
-							index ++
-							start ++
+						if ((typeof target)[0] === 's') {
+							target = target.substring(0, target.lastIndexOf(' '))
+							while ((index < length) && !' \n\r\t\f'.includes(source[index])) {
+								index ++
+								start ++
+							}
 						}
+						return conditional
 					}
-					return
+					return conditional
 				}
 				continue
 			}
@@ -313,6 +321,7 @@ export default class Template
 			target = targetStack.pop() + open + target
 		}
 		target = targetStack.pop() + (finalClose.length ? '<!--' : open) + target
+		return conditional
 	}
 
 	async parseFile(fileName: string, containerFileName?: string): Promise<string>
@@ -452,7 +461,6 @@ export default class Template
 
 					// begin condition / loop block
 					blockStack.push({ blockStart, collection, data, iteration, iterations })
-					let blockData: any
 					if (tagIndex > start) {
 						target += this.trimEndLine(source.substring(start, tagIndex))
 						start   = tagIndex
@@ -462,8 +470,8 @@ export default class Template
 					index       = tagIndex
 					target      = ''
 					translating = false
-					await this.parseExpression(data, '}', '-->')
-					blockData   = target
+					const condition = await this.parseExpression(data, '}', '-->')
+					let blockData   = condition ? (target ? data : undefined) : target
 					blockStart  = index
 					iteration   = 0
 					target      = backTarget
@@ -477,6 +485,10 @@ export default class Template
 						collection = []
 						data       = blockData
 						iterations = data ? 1 : 0
+					}
+					if (!iterations) {
+						this.skipBlock()
+						continue
 					}
 					if (translating && (index > start)) {
 						this.sourceToTarget()
@@ -767,10 +779,44 @@ export default class Template
 		translating        = this.doTranslate
 	}
 
+	skipBlock()
+	{
+		if (index > start) {
+			this.sourceToTarget()
+		}
+		let depth = 1
+		while (depth) {
+			index = source.indexOf('<!--', index)
+			if (index < 0) {
+				break
+			}
+			index += 4
+			const char = source[index]
+			if (!this.startsExpression(char)) {
+				continue
+			}
+			if ((char === 'e') && (source.substring(index, index + 6) === 'end-->')) {
+				depth --
+				continue
+			}
+			depth ++
+		}
+		index -= 4
+		if (index < 0) {
+			index = length
+		}
+		start = index
+	}
+
 	sourceToTarget()
 	{
 		target += source.substring(start, index)
 		start   = index
+	}
+
+	startsExpression(char: string, open = '{', close = '}')
+	{
+		return RegExp('[a-z0-9@%."?\'\\-' + open + close + ']', 'i').test(char)
 	}
 
 	tr(text: string, parts?: string[])
