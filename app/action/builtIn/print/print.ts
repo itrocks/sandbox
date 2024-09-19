@@ -4,7 +4,7 @@ import Action          from '../../../action/action'
 import Need            from '../../../action/need'
 import PdfResponse     from '../../../server/response/pdf'
 
-@Need('objects')
+@Need('object')
 export default class Print extends Action
 {
 

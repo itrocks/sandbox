@@ -5,7 +5,7 @@ import dao      from '../../../dao/dao'
 import Template from '../../../view/html/template'
 import { sep }  from 'path'
 
-@Need('objects')
+@Need('object')
 export default class Delete extends Action
 {
 
@@ -15,7 +15,7 @@ export default class Delete extends Action
 		for (const object of objects) {
 			await dao.delete(object)
 		}
-		const template    = new Template({ objects, type: request.getType() })
+		const template    = new Template({ objects, type: request.type })
 		template.included = (request.request.headers['sec-fetch-dest'] === 'empty')
 		return this.htmlResponse(await template.parseFile(
 			__dirname + sep + 'delete.html',

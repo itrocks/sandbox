@@ -3,9 +3,13 @@ import { decorate, decoratorOf } from '../decorator/class'
 
 const NEED = Symbol('need')
 
-export type Needs = ''|'?object'|'object'|'objects'
+export const NOTHING = ''
+type NOTHING = ''
 
-export const Need = (value: Needs) => decorate(NEED, value)
+export type Needs = NOTHING | 'object' | 'Store'
+type Need = { alternative?: string, need: Needs }
+
+export const Need = (need: Needs, alternative?: string) => decorate(NEED, { alternative, need })
 export default Need
 
-export const needOf = (target: object | Type) => decoratorOf<Needs>(target, NEED, '')
+export const needOf = (target: object | Type) => decoratorOf<Need>(target, NEED, { need: NOTHING })

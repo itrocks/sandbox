@@ -2,15 +2,17 @@ import Action      from '../../../action/action'
 import Request     from '../../../action/request'
 import dao         from '../../../dao/dao'
 import Template    from '../../../view/html/template'
+import Need        from '../../need'
 import { routeOf } from '../../route'
 import { sep }     from 'path'
 
+@Need('Store', 'new')
 export default class List extends Action
 {
 
 	async html(request: Request)
 	{
-		const type        = request.getType()
+		const type        = request.type
 		const objects     = await dao.search(type)
 		const route       = routeOf(type)
 		const template    = new Template({ objects, route, type })
@@ -23,7 +25,7 @@ export default class List extends Action
 
 	async json(request: Request)
 	{
-		const objects = await dao.search(request.getType())
+		const objects = await dao.search(request.type)
 		return this.jsonResponse(objects)
 	}
 

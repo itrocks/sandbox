@@ -1,13 +1,11 @@
 import { sep }                    from 'path'
 import Action                     from '../../../action/action'
-import Need                       from '../../../action/need'
 import Request                    from '../../../action/request'
 import ReflectClass               from '../../../class/reflect'
 import dao                        from '../../../dao/dao'
 import { applyFilter, UNCHANGED } from '../../../property/filter/filter'
 import Template                   from '../../../view/html/template'
 
-@Need('?object')
 export default class Save extends Action
 {
 
@@ -26,7 +24,7 @@ export default class Save extends Action
 
 	async html(request: Request)
 	{
-		const object = request.object ?? new (request.getType())
+		const object = request.object ?? new (request.type)
 		this.dataToObject(object, request.request.data)
 		await dao.save(object)
 
@@ -40,7 +38,7 @@ export default class Save extends Action
 
 	async json(request: Request)
 	{
-		const object = request.object ?? new (request.getType())
+		const object = request.object ?? new (request.type)
 		this.dataToObject(object, request.request.data)
 		await dao.save(object)
 		return this.jsonResponse(object)

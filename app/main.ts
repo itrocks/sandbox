@@ -1,21 +1,26 @@
 import './class/compose'
 import 'reflect-metadata'
 
-import fastifyFormbody                           from '@fastify/formbody'
-import fastifyMultipart                          from '@fastify/multipart'
-import { fastify, FastifyReply, FastifyRequest } from 'fastify'
-import { readFile, stat }                        from 'node:fs/promises'
-import Action                                    from './action/action'
-import Exception                                 from './action/exception'
-import { needOf }                                from './action/need'
-import ActionRequest                             from './action/request'
-import { appPath }                               from './app'
-import { mimeTypes, utf8Types }                  from './mime'
-import                                                './property/filter/primitive'
-import { fastifyRequest, fastifyResponse }       from './server/fastify'
-import Request                                   from './server/request'
-import Response                                  from './server/response'
-import { frontScripts }                          from './view/html/template'
+import fastifyCookie                       from '@fastify/cookie'
+import fastifyFormbody                     from '@fastify/formbody'
+import fastifyMultipart                    from '@fastify/multipart'
+import fastifySession                      from '@fastify/session'
+import fastify                             from 'fastify'
+import { FastifyReply, FastifyRequest }    from 'fastify'
+import { readFile, stat }                  from 'node:fs/promises'
+import secret                              from '../local/secret'
+import Action                              from './action/action'
+import Exception                           from './action/exception'
+import { needOf }                          from './action/need'
+import ActionRequest                       from './action/request'
+import { appPath }                         from './app'
+import { storeOf }                         from './dao/store'
+import { mimeTypes, utf8Types }            from './mime'
+import                                          './property/filter/primitive'
+import { fastifyRequest, fastifyResponse } from './server/fastify'
+import Request                             from './server/request'
+import Response                            from './server/response'
+import { frontScripts }                    from './view/html/template'
 
 async function execute(request: ActionRequest)
 {
@@ -33,8 +38,16 @@ async function execute(request: ActionRequest)
 	if (!action[request.format]) {
 		throw new Exception('Action ' + request.action + ' unavailable in format ' + request.format)
 	}
-	const objects = await request.getObjects()
-	if ((needOf(action) === 'object') && !objects.length) {
+	const need    = needOf(action)
+	const objects = storeOf(request.type) ? await request.getObjects() : []
+	if (need.alternative && (
+		((need.need === 'object') && !objects.length)
+		|| ((need.need === 'Store') && !storeOf(request.type))
+	)) {
+		request.action = need.alternative
+		return execute(request)
+	}
+	if ((need.need === 'object') && !objects.length) {
 		return new Exception('Action ' + request.action + ' needs an object').response
 	}
 	return action[request.format](request)
@@ -86,10 +99,12 @@ async function httpAsset(request: Request, filePath: string, mimeType: string)
 	return new Response(await readFile(filePath, utf8Type ? 'utf-8' : undefined), 200, headers)
 }
 
-const server = fastify()
+const server = fastify({ trustProxy: true })
 
+server.register(fastifyCookie)
 server.register(fastifyFormbody)
 server.register(fastifyMultipart)
+server.register(fastifySession, { cookie: { secure: true }, saveUninitialized: false, secret })
 server.delete('/*', httpCall)
 server.get   ('/*', httpCall)
 server.post  ('/*', httpCall)

@@ -11,19 +11,20 @@
 	<link href="../../../style/font/roboto/roboto.css" rel="stylesheet">
 	<meta charset="utf-8">
 	<script src="../../../../front/app.js" type="module"></script>
-	<title>Edit {@output}</title>
+	<title>{request.action.ucFirst} {object.@output}</title>
 </head>
 <body>
 <main>
 <!--BEGIN-->
 
+	<!--object-->
 	<form data-action="edit" data-class="{%name}" data-id="{?id}" data-route="{@route}" method="post">
 		<header>
-			<h2>Edit {@output}</h2>
+			<h2>{-.request.action.ucFirst} {@output}</h2>
 			<ul class="general actions">
 				<li class="close"><a href="app://(@objectRoute)" target="main">Close</a></li>
 				<li class="save"><input formaction="app://(@objectRoute)/save" formtarget="#notification" type="submit" value="Save"></li>
-				<li class="delete"><a href="app://(@objectRoute)/delete" target="#notification">Delete</a></li>
+				<li class="delete"><a href="app://(-.@objectRoute)/delete" target="#notification">Delete</a></li>
 			</ul>
 		</header>
 		<ul class="object properties">
@@ -34,9 +35,8 @@
 			<!--end-->
 		</ul>
 		<div id="notification"></div>
-		<footer>
-		</footer>
 	</form>
+	<!--end-->
 
 <!--END-->
 </main>

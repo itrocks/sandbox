@@ -5,7 +5,7 @@ import Request  from '../../../action/request'
 import dao      from '../../../dao/dao'
 import Template from '../../../view/html/template'
 
-@Need('object')
+@Need('object', 'new')
 export default class Output extends Action
 {
 
@@ -27,7 +27,7 @@ export default class Output extends Action
 		if (request.objects.length > 1) {
 			return this.jsonResponse(request.objects)
 		}
-		const objects = await dao.search(request.getType())
+		const objects = await dao.search(request.type)
 		return this.jsonResponse(objects)
 	}
 

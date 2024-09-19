@@ -23,7 +23,7 @@ export default class Request
 		return this.objects.length ? this.objects[0] : undefined
 	}
 
-	getType()
+	get type()
 	{
 		const module = getModule(this.route)
 		if (!module) {
@@ -33,13 +33,14 @@ export default class Request
 		if ((typeof type)[0] !== 'f') {
 			throw new Exception('Module ' + this.route.substring(1) + ' default is not a class')
 		}
+		Object.defineProperty(this, 'type', { value: type, writable: false })
 		return type as Type
 	}
 
 	async getObjects()
 	{
 		this.objects = []
-		const type = this.getType()
+		const type = this.type
 		return Promise.all(this.ids.map(async id => {
 			const object = await dao.read(type, id)
 			this.objects.push(object)
