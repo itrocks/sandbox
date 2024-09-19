@@ -5,13 +5,13 @@ import dao      from '../../../dao/dao'
 import Template from '../../../view/html/template'
 import { sep }  from 'path'
 
-@Need('object')
+@Need('object', 'new')
 export default class Edit extends Action
 {
 
 	async html(request: Request)
 	{
-		const template    = new Template(request.object ?? new (request.getType()))
+		const template    = new Template({ object: request.object ?? new (request.type), request })
 		template.included = (request.request.headers['sec-fetch-dest'] === 'empty')
 		return this.htmlResponse(await template.parseFile(
 			__dirname + sep + 'edit.html',
@@ -22,12 +22,12 @@ export default class Edit extends Action
 	async json(request: Request)
 	{
 		if (request.objects.length === 1) {
-			return this.jsonResponse(request.object ?? new (request.getType()))
+			return this.jsonResponse(request.object ?? new (request.type))
 		}
 		if (request.objects.length > 1) {
 			return this.jsonResponse(request.objects)
 		}
-		const objects = await dao.search(request.getType())
+		const objects = await dao.search(request.type)
 		return this.jsonResponse(objects)
 	}
 
