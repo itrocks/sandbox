@@ -9,6 +9,9 @@ import parseReflect    from './parseReflect'
 
 type BlockStack = Array<{ blockStart: number, collection: any[], data: any, iteration: number, iterations: number }>
 
+let blockBack:  number
+let blockStack: BlockStack
+
 let doHeadLinks = false
 
 let index:       number
@@ -231,7 +234,7 @@ export default class Template
 
 		index ++
 		const firstChar = source[index]
-		if ((index >= length) || !new RegExp('[a-z0-9@%."\'\?' + open + close + ']', 'i').test(firstChar)) {
+		if ((index >= length) || !new RegExp('[a-z0-9@%."?\'\\-' + open + close + ']', 'i').test(firstChar)) {
 			return
 		}
 
@@ -332,6 +335,7 @@ export default class Template
 		if ((expression[0] === '.') && (expression.startsWith('./') || expression.startsWith('../'))) {
 			return await this.include(expression, data)
 		}
+		blockBack = 0
 		for (const variable of expression.split('.')) {
 			data = await this.parseVariable(variable, data)
 		}
@@ -360,6 +364,10 @@ export default class Template
 		if (variable[0] === '%') {
 			return parseReflect(variable, data)
 		}
+		if (variable[0] === '-') {
+			blockBack ++
+			return blockStack[blockStack.length - blockBack].data
+		}
 		if (data[variable] === undefined) {
 			data = new Str(data)
 		}
@@ -371,13 +379,13 @@ export default class Template
 
 	async parseVars()
 	{
-		const blockStack = [] as BlockStack
-		let   blockStart = 0
-		let   collection = []
-		let   data       = this.data
-		let   inHead     = false
-		let   iteration  = 0
-		let   iterations = 0
+		blockStack = []
+		let blockStart = 0
+		let collection = []
+		let data       = this.data
+		let inHead     = false
+		let iteration  = 0
+		let iterations = 0
 
 		while (index < length) {
 			let char = source[index]
@@ -773,7 +781,9 @@ export default class Template
 		let left       = text.length
 		text           = text.trimStart()
 		left          -= text.length
-		text           = parts && /^(\$[1-9][0-9]*)+$/.test(text) ? parts.join('') : text.length ? tr(text, parts) : text
+		text           = (parts && /^(\$[1-9][0-9]*)+$/.test(text))
+			? parts.join('')
+			: (text.length ? tr(text, parts?.map(part => ((typeof part)[0] === 's') ? tr(part) : part)) : text)
 		return original.substring(0, left) + text + original.substring(right)
 	}
 
