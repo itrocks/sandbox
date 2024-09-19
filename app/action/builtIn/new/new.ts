@@ -1,7 +1,7 @@
-import Need from '../../need'
-import Edit from '../edit/edit'
+import { Need, NOTHING } from '../../need'
+import Edit              from '../edit/edit'
 
-@Need('')
+@Need(NOTHING)
 export default class New extends Edit
 {
 
