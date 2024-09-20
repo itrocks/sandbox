@@ -213,7 +213,7 @@ Look at your browser console: demos give you information about what they do.
 
 ### Visual Studio Code
 
-I don't know... I suggest you use a local web server as apache (see below)
+I don't know... I suggest you use a local web server like apache (see below)
 
 ### Apache local web server
 
