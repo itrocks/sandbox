@@ -13,6 +13,7 @@ import Action                              from './action/action'
 import Exception                           from './action/exception'
 import { needOf }                          from './action/need'
 import ActionRequest                       from './action/request'
+import { getActionModule }                 from './action/routes'
 import { appPath }                         from './app'
 import { storeOf }                         from './dao/store'
 import { mimeTypes, utf8Types }            from './mime'
@@ -29,7 +30,7 @@ async function execute(request: ActionRequest)
 		throw new Exception('Action is missing')
 	}
 	try {
-		action = new (require('./action/builtIn/' + request.action + '/' + request.action).default)
+		action = new (require('.' + await getActionModule(request.route, request.action)).default)
 	}
 	catch (exception) {
 		console.error(exception)

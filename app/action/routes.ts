@@ -1,5 +1,7 @@
-import { readdir } from 'node:fs/promises'
-import { sep }     from 'path'
+import { access, readdir } from 'node:fs/promises'
+import { sep }             from 'path'
+
+const DEBUG = false
 
 const walk = async (directoryName: string): Promise<string[]> =>
 {
@@ -18,6 +20,23 @@ const walk = async (directoryName: string): Promise<string[]> =>
 const readDirRecursive = async (directoryName: string) =>
 	walk(directoryName)
 	.then(entries => entries.map(entry => entry.substring(directoryName.length)))
+
+export async function accessModule(path: string)
+{
+	if (DEBUG) console.log('try', path)
+	try { await access('./app' + path + '.js') }
+	catch { return }
+	if (DEBUG) console.log('> OK')
+	return path
+}
+
+export async function getActionModule(ofRoute: string, action: string)
+{
+	const module = getModule(ofRoute)
+	return await accessModule(module + '/' + action)
+		|| await accessModule('/action/builtIn/' + action + '/' + action)
+		|| ''
+}
 
 export function getModule(ofRoute: string)
 {
@@ -51,9 +70,9 @@ export function getRoute(ofModule: string)
 	return (typeof route === 'string') ? getRoute : undefined
 }
 
-export type Routes = { [name: string]: Routes | string }
+type Routes = { [name: string]: Routes | string }
 
-export const routes = {} as Routes
+const routes = {} as Routes
 
 readDirRecursive(__dirname.substring(0, __dirname.lastIndexOf(sep))).then(entries => {
 	for (let entry of entries) {
