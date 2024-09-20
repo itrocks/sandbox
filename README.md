@@ -61,6 +61,16 @@ export default
   user:     'common'
 }
 ```
+- Generated a local secret salt:
+```bash
+sudo apt install pwgen
+pwgen -sy 32 1
+#> y~N(3e@"VbO<mE(\~Pw,uzfg%z;YQ-7D
+```
+Paste it into a file named `local/secret.ts`:
+```ts
+export default 'y~N(3e@"VbO<mE(\~Pw,uzfg%z;YQ-7D'
+```
 
 ## Develop
 
@@ -137,7 +147,7 @@ npm start
 ```
 
 This is the theory, but it may not work and throw "Cannot find module" errors...
-If so: sorry, you have to keep the devDependencies here, don't ask my why: I don't know:
+If so: sorry, you have to keep the devDependencies here, don't ask me why: I don't know:
 
 ```bash
 npm i
@@ -249,6 +259,7 @@ Allow From 127.0.0.1
 
 Then, you may play with these front scripts. Example:
 - http://localhost/itrocks/sandbox/front/demo/build.html
+- http://localhost/itrocks/sandbox/front/demo/document-designer.html
 - http://localhost/itrocks/sandbox/front/demo/form-fetch.html
 - http://localhost/itrocks/sandbox/front/demo/table.html
 - http://localhost/itrocks/sandbox/front/demo/xtarget.html
