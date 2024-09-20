@@ -61,7 +61,7 @@ export default
   user:     'common'
 }
 ```
-- Generated a local secret salt:
+- Generate a local secret salt:
 ```bash
 sudo apt install pwgen
 pwgen -sy 32 1
