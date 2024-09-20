@@ -3,7 +3,8 @@
 node_modules
 
 /coverage
-/local
+/local/*
+!/local/*-example.*
 
 *.css.map
 *.d.ts
