@@ -358,22 +358,26 @@ export default class Template
 				? await data.call()
 				: data
 		}
-		if ((variable[0] === 'B') && (variable === 'BEGIN')) {
+		if (variable === '*') {
+			return (typeof data === 'object') ? Object.values(data) : data
+		}
+		const firstChar = variable[0]
+		if ((firstChar === 'B') && (variable === 'BEGIN')) {
 			return data
 		}
 		if (
-			((variable[0] === '"') && (variable[variable.length - 1] === '"'))
-			|| ((variable[0] === "'") && (variable[variable.length - 1] === "'"))
+			((firstChar === '"') && (variable[variable.length - 1] === '"'))
+			|| ((firstChar === "'") && (variable[variable.length - 1] === "'"))
 		) {
 			return variable.substring(1, variable.length - 1)
 		}
-		if (variable[0] === '@') {
+		if (firstChar === '@') {
 			return parseDecorator(variable, data)
 		}
-		if (variable[0] === '%') {
+		if (firstChar === '%') {
 			return parseReflect(variable, data)
 		}
-		if (variable[0] === '-') {
+		if (firstChar === '-') {
 			blockBack ++
 			return blockStack[blockStack.length - blockBack].data
 		}
@@ -816,7 +820,7 @@ export default class Template
 
 	startsExpression(char: string, open = '{', close = '}')
 	{
-		return RegExp('[a-z0-9@%."?\'\\-' + open + close + ']', 'i').test(char)
+		return RegExp('[a-z0-9"%*.?@\'' + open + close + '-]', 'i').test(char)
 	}
 
 	tr(text: string, parts?: string[])

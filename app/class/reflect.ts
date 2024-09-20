@@ -1,14 +1,8 @@
 import { ReflectProperty }                      from '../property/reflect'
 import { PropertyTypes, propertyTypesFromFile } from '../property/types'
 import { fileOf }                               from './file'
-import { objectOf, Type, typeOf }               from './type'
+import { Type, typeOf }                         from './type'
 import { usesOf }                               from './uses'
-
-export const properties = <T extends object>(object: T | ReflectClass<T> | Type<T>) =>
-	propertyNames(object).map(propertyName => new ReflectProperty(object, propertyName))
-
-export const propertyNames = (object: object | ReflectClass | Type) =>
-	Object.getOwnPropertyNames((object instanceof ReflectClass) ? new (object.type) : objectOf(object))
 
 export class ReflectClass<T extends { [index: string]: any } = {}>
 {
@@ -32,14 +26,17 @@ export class ReflectClass<T extends { [index: string]: any } = {}>
 
 	get properties()
 	{
-		const value = properties(this)
+		const value = {} as { [name: string]: ReflectProperty }
+		for (const name of this.propertyNames) {
+			value[name] = new ReflectProperty(this, name)
+		}
 		Object.defineProperty(this, 'properties', { value, writable: false })
 		return value
 	}
 
 	get propertyNames()
 	{
-		const value = propertyNames(this)
+		const value = Object.getOwnPropertyNames(new (this.type))
 		Object.defineProperty(this, 'propertyNames', { value, writable: false })
 		return value
 	}
