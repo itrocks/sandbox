@@ -2,6 +2,8 @@ import { Connection, ConnectionConfig, createConnection } from 'mariadb'
 import { Dao, Entity }                                    from './dao'
 import { storeOf }                                        from './store'
 
+const DEBUG = false
+
 export default class Mysql implements Dao
 {
 
@@ -22,6 +24,7 @@ export default class Mysql implements Dao
 		const connection = this.connection ?? await this.connect()
 		if (!connection) throw 'Not connected'
 
+		if (DEBUG) console.log('DELETE FROM `' + storeOf(object) + '` WHERE id = ?', [object.id])
 		await connection.query(
 			'DELETE FROM `' + storeOf(object) + '` WHERE id = ?',
 			[object.id]
@@ -36,6 +39,7 @@ export default class Mysql implements Dao
 		const connection = this.connection ?? await this.connect()
 		if (!connection) throw 'Not connected'
 
+		if (DEBUG) console.log('SELECT * FROM `' + storeOf(type) + '` WHERE id = ?', [id])
 		const rows: (T & Entity)[] = await connection.query(
 			'SELECT * FROM `' + storeOf(type) + '` WHERE id = ?',
 			[id]
@@ -55,6 +59,7 @@ export default class Mysql implements Dao
 		const sql    = Object.keys(valObject).map(name => '`' + name + '` = ?').join(', ')
 		const values = Object.values(valObject).concat([id])
 		const query  = 'UPDATE `' + storeOf(object) + '` SET '  + sql + ' WHERE id = ?'
+		if (DEBUG) console.log(query, values)
 		await connection.query(query, values)
 		object.id = id
 
@@ -69,6 +74,7 @@ export default class Mysql implements Dao
 		const sql    = Object.keys(object).map(name => '`' + name + '` = ?').join(', ')
 		const values = Object.values(object)
 		const query  = 'INSERT INTO `' + storeOf(object) + '` SET '  + sql
+		if (DEBUG) console.log(query, values)
 		const result = await connection.query(query, values);
 		(object as Entity).id = result.insertId
 
@@ -87,11 +93,12 @@ export default class Mysql implements Dao
 		const connection = this.connection ?? await this.connect()
 		if (!connection) throw 'Not connected'
 
-		let sql          = Object.keys(search).map(name => '`' + name + '` = ?').join(', ')
+		let sql          = Object.keys(search).map(name => '`' + name + '` = ?').join(' AND ')
 		let searchValues = Object.values(search)
 		if (sql.length) {
 			sql = ' WHERE ' + sql
 		}
+		if (DEBUG) console.log('SELECT * FROM `' + storeOf(type) + '`' + sql, searchValues)
 		const rows: (T & Entity)[] = await connection.query(
 			'SELECT * FROM `' + storeOf(type) + '`' + sql,
 			searchValues
