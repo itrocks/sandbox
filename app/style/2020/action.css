@@ -30,14 +30,20 @@ ul.actions {
       background-image: url("action/add.svg"); }
     ul.actions > li.close {
       background-image: url("action/close.svg"); }
+    ul.actions > li.connect {
+      background-image: url("action/connect.svg"); }
     ul.actions > li.delete {
       background-image: url("action/delete.svg"); }
     ul.actions > li.edit {
       background-image: url("action/edit.svg"); }
+    ul.actions > li.forgot {
+      background-image: url("action/forgot.svg"); }
     ul.actions > li.new {
       background-image: url("action/new.svg"); }
     ul.actions > li.print {
       background-image: url("action/print.svg"); }
+    ul.actions > li.register {
+      background-image: url("action/register.svg"); }
     ul.actions > li.save {
       background-image: url("action/save.svg"); }
 

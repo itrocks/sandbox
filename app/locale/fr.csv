@@ -3,8 +3,12 @@ $1 list;$1s
 active;actif
 add;ajouter
 add $1;ajouter $1
+authenticate user;authentifier l'utilisateur
 back;retour
 close;fermer
+connect;connecter
+connect user;connecter utilisateur
+continue;continuer
 delete;supprimer
 delete $1;supprimer $1
 disconnect;déconnecter
@@ -14,6 +18,7 @@ edit $1;modifier $1
 email;mail
 en;fr
 false;faux
+forgot password;mot de passe oublié
 global search;recherche globale
 id;id
 login;identifiant
@@ -23,10 +28,12 @@ new $1;nouveau $1
 no;non
 password;mot de passe
 print;imprimer
+register;s'enregistrer
 save;enregistrer
 save $1;enregistrer $1
 send;envoyer
 this is the $1 I love;c'est le $1 que j'aime
 true;vrai
 user;utilisateur
+user login;connexion utilisateur
 yes;oui

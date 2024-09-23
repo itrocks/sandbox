@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link href="../../../node_modules/normalize.css/normalize.css" rel="stylesheet">
+	<link href="../../style/2020/action.css" rel="stylesheet">
+	<link href="../../style/2020/article.css" rel="stylesheet">
+	<link href="../../style/2020/auto-redirect.css" rel="stylesheet">
+	<link href="../../style/2020/body.css" rel="stylesheet">
+	<link href="../../style/2020/edit.css" rel="stylesheet">
+	<link href="../../style/2020/global.css" rel="stylesheet">
+	<link href="../../style/2020/output.css" rel="stylesheet">
+	<link href="../../style/font/roboto/roboto.css" rel="stylesheet">
+	<meta charset="utf-8">
+	<script src="../../../front/app.js" type="module"></script>
+	<title>Forgot password</title>
+</head>
+<body>
+<main>
+<!--BEGIN-->
+
+	<form data-action="forgot" data-class="{%name}" data-route="{@route}" method="post">
+		<header>
+			<h2>Forgot password</h2>
+			<ul class="general actions">
+				<li class="forgot"><input formaction="app://(@route)/forgot" formtarget="#notification" type="submit" value="Send"></li>
+				<li class="connect"><a href="/user/login" target="main">Cancel</a></li>
+			</ul>
+		</header>
+		<ul class="object properties">
+			<!--%properties.email-->
+			<li data-property="{name}">
+				{%edit}
+			</li>
+			<!--end-->
+		</ul>
+		<div id="notification"></div>
+	</form>
+
+<!--END-->
+</main>
+</body>
+</html>

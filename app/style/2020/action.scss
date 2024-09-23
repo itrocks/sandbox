@@ -41,31 +41,43 @@ ul.actions {
 		}
 
 		&.add {
-			background-image: url('action/add.svg')
+			background-image: url('action/add.svg');
 		}
 
 		&.close {
-			background-image: url('action/close.svg')
+			background-image: url('action/close.svg');
+		}
+
+		&.connect {
+			background-image: url('action/connect.svg');
 		}
 
 		&.delete {
-			background-image: url('action/delete.svg')
+			background-image: url('action/delete.svg');
 		}
 
 		&.edit {
-			background-image: url('action/edit.svg')
+			background-image: url('action/edit.svg');
+		}
+
+		&.forgot {
+			background-image: url('action/forgot.svg');
 		}
 
 		&.new {
-			background-image: url('action/new.svg')
+			background-image: url('action/new.svg');
 		}
 
 		&.print {
-			background-image: url('action/print.svg')
+			background-image: url('action/print.svg');
+		}
+
+		&.register {
+			background-image: url('action/register.svg');
 		}
 
 		&.save {
-			background-image: url('action/save.svg')
+			background-image: url('action/save.svg');
 		}
 	}
 }
