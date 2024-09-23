@@ -12,7 +12,8 @@ export class Request
 		public readonly headers:    { [index: string]: string } = {},
 		public readonly parameters: { [index: string]: string } = {},
 		public readonly data:       { [index: string]: string } = {},
-		public readonly files:      { [index: string]: Buffer } = {}
+		public readonly files:      { [index: string]: Buffer } = {},
+		public readonly session:    { [index: string]: any } = {}
 	) {}
 
 	get url()

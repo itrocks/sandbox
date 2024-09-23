@@ -29,7 +29,8 @@ export const fastifyRequest = async (request: FastifyRequest<{ Params: { [index:
 		request.headers as { [index: string]: string },
 		params,
 		data,
-		files
+		files,
+		request.session
 	)
 }
 
