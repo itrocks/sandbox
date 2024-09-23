@@ -80,8 +80,13 @@ export default class Template
 		'source', 'track'
 	)
 
-	constructor(public data?: any)
+	constructor(public data?: any, public containerData?: any)
 	{
+		blockStack = []
+		if (containerData) {
+			blockStack.push({ blockStart: 0, collection: [], data: containerData, iteration: 0, iterations: 1 })
+		}
+		this.data = data
 	}
 
 	closeTag(shouldTranslate: boolean, targetIndex: number)
@@ -156,7 +161,7 @@ export default class Template
 		}
 		doHeadLinks = true
 
-		const template    = new Template(data)
+		const template    = new Template(data, blockStack[0]?.data)
 		template.included = true
 
 		template.doExpression = this.doExpression
@@ -328,7 +333,7 @@ export default class Template
 	{
 		if (containerFileName && !this.included) {
 			const data = this.data
-			this.data  = () => this.include(fileName, data)
+			this.data  = Object.assign({ content: () => this.include(fileName, data) }, blockStack[0]?.data)
 			return this.parseFile(path.normalize(containerFileName))
 		}
 		this.fileName = fileName.substring(fileName.lastIndexOf(sep) + 1)
@@ -392,7 +397,6 @@ export default class Template
 
 	async parseVars()
 	{
-		blockStack = []
 		let blockStart = 0
 		let collection = []
 		let data       = this.data

@@ -29,7 +29,7 @@ build<HTMLTableElement>(
 			if (!id) return
 			const form = tr.closest('form')
 			if (!form) return
-			await xTargetCall(form.getAttribute('action') + id, 'main')
+			await xTargetCall(form.getAttribute('action') + '/' + id, 'main')
 		})
 	}
 )

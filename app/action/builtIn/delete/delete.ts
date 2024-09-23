@@ -1,9 +1,7 @@
-import Action   from '../../../action/action'
-import Need     from '../../../action/need'
-import Request  from '../../../action/request'
-import dao      from '../../../dao/dao'
-import Template from '../../../view/html/template'
-import { sep }  from 'path'
+import Action  from '../../../action/action'
+import Need    from '../../../action/need'
+import Request from '../../../action/request'
+import dao     from '../../../dao/dao'
 
 @Need('object')
 export default class Delete extends Action
@@ -15,12 +13,7 @@ export default class Delete extends Action
 		for (const object of objects) {
 			await dao.delete(object)
 		}
-		const template    = new Template({ objects, type: request.type })
-		template.included = (request.request.headers['sec-fetch-dest'] === 'empty')
-		return this.htmlResponse(await template.parseFile(
-			__dirname + sep + 'delete.html',
-			__dirname + sep + '../../../home/output.html'
-		))
+		return this.htmlTemplateResponse({ objects, type: request.type }, request, __dirname + '/delete.html')
 	}
 
 	async json(request: Request)

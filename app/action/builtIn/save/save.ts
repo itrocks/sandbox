@@ -1,10 +1,8 @@
-import { sep }                    from 'path'
 import Action                     from '../../../action/action'
 import Request                    from '../../../action/request'
 import ReflectClass               from '../../../class/reflect'
 import dao                        from '../../../dao/dao'
 import { applyFilter, UNCHANGED } from '../../../property/filter/filter'
-import Template                   from '../../../view/html/template'
 
 export default class Save extends Action
 {
@@ -14,10 +12,11 @@ export default class Save extends Action
 		const reflectClass  = new ReflectClass(object)
 		const propertyTypes = reflectClass.propertyTypes
 		for (const propertyName in propertyTypes) {
-			const value = applyFilter(data[propertyName], reflectClass.type, propertyName, 'html', 'input')
-			if (value !== UNCHANGED) {
-				object[propertyName] = value
-				break
+			if (propertyName in data) {
+				const value = applyFilter(data[propertyName], reflectClass.type, propertyName, 'html', 'input')
+				if (value !== UNCHANGED) {
+					object[propertyName] = value
+				}
 			}
 		}
 	}
@@ -28,12 +27,7 @@ export default class Save extends Action
 		this.dataToObject(object, request.request.data)
 		await dao.save(object)
 
-		const template    = new Template(object)
-		template.included = (request.request.headers['sec-fetch-dest'] === 'empty')
-		return this.htmlResponse(await template.parseFile(
-			__dirname + sep + 'save.html',
-			__dirname + sep + '../../../home/output.html'
-		))
+		return this.htmlTemplateResponse(object, request, __dirname + '/save.html')
 	}
 
 	async json(request: Request)

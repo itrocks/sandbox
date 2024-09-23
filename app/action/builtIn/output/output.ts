@@ -1,9 +1,7 @@
-import { sep }  from 'path'
-import Action   from '../../../action/action'
-import Need     from '../../../action/need'
-import Request  from '../../../action/request'
-import dao      from '../../../dao/dao'
-import Template from '../../../view/html/template'
+import Action  from '../../../action/action'
+import Need    from '../../../action/need'
+import Request from '../../../action/request'
+import dao     from '../../../dao/dao'
 
 @Need('object', 'new')
 export default class Output extends Action
@@ -11,12 +9,7 @@ export default class Output extends Action
 
 	async html(request: Request)
 	{
-		const template    = new Template(request.object)
-		template.included = (request.request.headers['sec-fetch-dest'] === 'empty')
-		return this.htmlResponse(await template.parseFile(
-			__dirname + sep + 'output.html',
-			__dirname + sep + '../../../home/output.html'
-		))
+		return this.htmlTemplateResponse(request.object, request, __dirname + '/output.html')
 	}
 
 	async json(request: Request)

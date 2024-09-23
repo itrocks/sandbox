@@ -4,6 +4,7 @@
 	<link href="../../../../node_modules/normalize.css/normalize.css" rel="stylesheet">
 	<link href="../../../style/2020/action.css" rel="stylesheet">
 	<link href="../../../style/2020/article.css" rel="stylesheet">
+	<link href="../../../style/2020/body.css" rel="stylesheet">
 	<link href="../../../style/2020/global.css" rel="stylesheet">
 	<link href="../../../style/2020/list.css" rel="stylesheet">
 	<link href="../../../style/font/roboto/roboto.css" rel="stylesheet">
@@ -16,15 +17,15 @@
 <main>
 <!--BEGIN-->
 
-	<article data-action="list" data-class="{type.%name}" data-route="{route}">
+	<article data-action="list" data-class="{type.%name}" data-route="{type.@route}">
 		<header>
 			<h2>{type.@output.ucFirst} list</h2>
 			<section class="summary">{objects.length} elements</section>
 			<ul class="general actions">
-				<li class="new"><a href="(route)/new" target="main">New</a></li>
+				<li class="new"><a href="app://(type.@route)/new" target="main">New</a></li>
 			</ul>
 		</header>
-		<form action="(route)/" method="post">
+		<form action="app://(type.@route)" method="post">
 			<table class="objects">
 				<thead>
 					<tr class="properties">
@@ -48,7 +49,7 @@
 			<div id="notification"></div>
 			<footer>
 				<ul class="selection actions">
-					<li class="delete"><input formaction="(route)/delete" formtarget="#notification" type="submit" value="Delete"></li>
+					<li class="delete"><input formaction="app://(type.@route)/delete" formtarget="#notification" type="submit" value="Delete"></li>
 				</ul>
 			</footer>
 		</form>
