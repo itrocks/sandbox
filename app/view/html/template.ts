@@ -301,6 +301,7 @@ export default class Template
 								index ++
 								start ++
 							}
+							index --
 						}
 						return conditional
 					}
