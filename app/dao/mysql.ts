@@ -1,5 +1,6 @@
 import { Connection, ConnectionConfig, createConnection } from 'mariadb'
 import { Dao, Entity }                                    from './dao'
+import Function                                           from './functions'
 import { storeOf }                                        from './store'
 
 const DEBUG = false
@@ -19,15 +20,15 @@ export default class Mysql implements Dao
 		return createConnection(mariaDbConfig).then(connection => this.connection = connection)
 	}
 
-	async delete<T extends object>(object: T & Entity): Promise<T>
+	async delete<T extends { [index: string]: any }>(object: T & Entity, property = 'id'): Promise<T>
 	{
 		const connection = this.connection ?? await this.connect()
 		if (!connection) throw 'Not connected'
 
-		if (DEBUG) console.log('DELETE FROM `' + storeOf(object) + '` WHERE id = ?', [object.id])
+		if (DEBUG) console.log('DELETE FROM `' + storeOf(object) + '` WHERE ' + property + ' = ?', [object[property]])
 		await connection.query(
-			'DELETE FROM `' + storeOf(object) + '` WHERE id = ?',
-			[object.id]
+			'DELETE FROM `' + storeOf(object) + '` WHERE ' + property + ' = ?',
+			[object[property]]
 		)
 		delete (object as any).id
 
@@ -57,7 +58,7 @@ export default class Mysql implements Dao
 		const valObject = object as T
 		delete (valObject as any).id
 		const sql    = Object.keys(valObject).map(name => '`' + name + '` = ?').join(', ')
-		const values = Object.values(valObject).concat([id])
+		const values = Object.values(valObject).map(this.valueToDb).concat([id])
 		const query  = 'UPDATE `' + storeOf(object) + '` SET '  + sql + ' WHERE id = ?'
 		if (DEBUG) console.log(query, values)
 		await connection.query(query, values)
@@ -72,7 +73,7 @@ export default class Mysql implements Dao
 		if (!connection) throw 'Not connected'
 
 		const sql    = Object.keys(object).map(name => '`' + name + '` = ?').join(', ')
-		const values = Object.values(object)
+		const values = Object.values(object).map(this.valueToDb)
 		const query  = 'INSERT INTO `' + storeOf(object) + '` SET '  + sql
 		if (DEBUG) console.log(query, values)
 		const result = await connection.query(query, values);
@@ -88,13 +89,26 @@ export default class Mysql implements Dao
 			: this.insert(object)
 	}
 
-	async search<T extends object>(type: new() => T, search: object = {})
+	async search<T extends object>(type: new() => T, search: { [index: string]: any } = {})
 	{
 		const connection = this.connection ?? await this.connect()
 		if (!connection) throw 'Not connected'
 
-		let sql          = Object.keys(search).map(name => '`' + name + '` = ?').join(' AND ')
-		let searchValues = Object.values(search)
+		let sql = Object
+			.entries(search)
+			.map(([name, value]) => {
+				let sql: string
+				if (value instanceof Function) {
+					search[name] = value.value
+					sql          = value.sql
+				}
+				else {
+					sql = ' = ?'
+				}
+				return '`' + name + '`' + sql
+			})
+			.join(' AND ')
+		let searchValues = Object.values(search).map(this.valueToDb)
 		if (sql.length) {
 			sql = ' WHERE ' + sql
 		}
@@ -105,6 +119,17 @@ export default class Mysql implements Dao
 		)
 
 		return rows.map(row => Object.assign(new type, row))
+	}
+
+	valueToDb(value: any): any
+	{
+		if (typeof value === 'object') {
+			if (value instanceof Date) {
+				return value.toISOString().replace('T', ' ').substring(0, 19)
+			}
+			return value.id ?? value.toString()
+		}
+		return value
 	}
 
 }

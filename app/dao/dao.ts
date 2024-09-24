@@ -3,7 +3,7 @@ import config from '../../local/dao'
 export interface Dao
 {
 
-	delete<T extends object>(object: T & Entity): Promise<T>
+	delete<T extends { [index: string]: any }>(object: T & Entity, property?: string): Promise<T>
 
 	read<T extends object>(type: new() => T, id: Identifier): Promise<T & Entity>
 
