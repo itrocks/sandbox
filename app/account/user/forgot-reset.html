@@ -12,32 +12,25 @@
 	<link href="../../style/font/roboto/roboto.css" rel="stylesheet">
 	<meta charset="utf-8">
 	<script src="../../../front/app.js" type="module"></script>
-	<title>Register</title>
+	<title>Forgot password</title>
 </head>
 <body>
 <main>
-<!--BEGIN-->
+	<!--BEGIN-->
 
-	<form data-action="register" data-class="{%name}" data-route="{@route}" method="post">
+	<form data-action="forgot" data-class="{user.%name}" data-route="{user.@route}" method="post">
+		<input type="hidden" name="token" value="{token}">
 		<header>
-			<h2>Register</h2>
+			<h2>Please enter your new password</h2>
 			<ul class="general actions">
-				<li class="register"><input formaction="app://(@route)/register" formtarget="#notification" type="submit" value="Register"></li>
-				<li class="connect"><a href="app://(@route)/login" target="main">Connect</a></li>
+				<li class="forgot">
+					<input formaction="app://(user.@route)/forgot" formtarget="#notification" type="submit" value="reset">
+				</li>
+				<li class="connect"><a href="app://(user.@route)/login" target="main">Cancel</a></li>
 			</ul>
 		</header>
 		<ul class="object properties">
-			<!--%properties.login-->
-			<li data-property="{name}">
-				{%edit}
-			</li>
-			<!--end-->
-			<!--%properties.email-->
-			<li data-property="{name}">
-				{%edit}
-			</li>
-			<!--end-->
-			<!--%properties.password-->
+			<!--user.%properties.password-->
 			<li data-property="{name}">
 				{%edit}
 			</li>
@@ -46,7 +39,7 @@
 		<div id="notification"></div>
 	</form>
 
-<!--END-->
+	<!--END-->
 </main>
 </body>
 </html>

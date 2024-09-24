@@ -28,6 +28,9 @@ new;nouveau
 new $1;nouveau $1
 no;non
 password;mot de passe
+password reset request;demande de réinitialisation de mot de passe
+please enter your new password;veuillez entrer votre nouveau mot de passe
+please try again later or contact our support team if the issue persists;veuillez réessayer ultérieurement ou contacter notre équipe de support si le problème persiste
 print;imprimer
 register;s'enregistrer
 save;enregistrer
@@ -37,4 +40,5 @@ this is the $1 I love;c'est le $1 que j'aime
 true;vrai
 user;utilisateur
 user login;connexion utilisateur
+we were unable to send the password reset email;nous n'avons pas pu envoyer l'email de réinitialisation de mot de passe
 yes;oui
