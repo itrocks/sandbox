@@ -8,6 +8,7 @@ export class Request
 		public readonly method:     Method,
 		public readonly scheme:     string,
 		public readonly host:       string,
+		public readonly port:       number,
 		public readonly path:       string,
 		public readonly headers:    { [index: string]: string } = {},
 		public readonly parameters: { [index: string]: string } = {},
@@ -18,7 +19,8 @@ export class Request
 
 	get url()
 	{
-		const value = new URL(this.scheme + '://' + this.host + this.path)
+		const port  = ([['http', 80], ['https', 443]].includes([this.scheme, this.port])) ? '' : (':' + this.port)
+		const value = new URL(this.scheme + '://' + this.host + port + this.path)
 		Object.defineProperty(this, 'url', { value, writable: false })
 		return value
 	}
