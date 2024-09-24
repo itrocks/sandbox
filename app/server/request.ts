@@ -19,7 +19,7 @@ export class Request
 
 	get url()
 	{
-		const port  = ([['http', 80], ['https', 443]].includes([this.scheme, this.port])) ? '' : (':' + this.port)
+		const port  = (this.port ? (':' + this.port) : '')
 		const value = new URL(this.scheme + '://' + this.host + port + this.path)
 		Object.defineProperty(this, 'url', { value, writable: false })
 		return value
