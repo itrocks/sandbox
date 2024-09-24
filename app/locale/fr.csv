@@ -5,6 +5,7 @@ add;ajouter
 add $1;ajouter $1
 authenticate user;authentifier l'utilisateur
 back;retour
+cancel;annuler
 close;fermer
 connect;connecter
 connect user;connecter utilisateur
