@@ -110,7 +110,12 @@ const server = fastify({ trustProxy: true })
 server.register(fastifyCookie)
 server.register(fastifyFormbody)
 server.register(fastifyMultipart)
-server.register(fastifySession, { cookie: { secure: false }, cookieName: 'itrS', saveUninitialized: false, secret })
+server.register(fastifySession, {
+	cookie:            { maxAge: 14400000, secure: false },
+	cookieName:        'itrS',
+	saveUninitialized: false,
+	secret
+})
 server.delete('/*', httpCall)
 server.get   ('/*', httpCall)
 server.post  ('/*', httpCall)
