@@ -15,6 +15,7 @@ import { needOf }                          from './action/need'
 import ActionRequest                       from './action/request'
 import { getActionModule }                 from './action/routes'
 import { appPath }                         from './app'
+import access                              from './config/access'
 import { storeOf }                         from './dao/store'
 import { mimeTypes, utf8Types }            from './mime'
 import                                          './property/filter/primitive'
@@ -28,6 +29,10 @@ async function execute(request: ActionRequest)
 	let action: Action & { [index: string]: (request: ActionRequest) => Promise<Response> }
 	if (!request.action) {
 		throw new Exception('Action is missing')
+	}
+	if (!request.request.session.user && !access.free.includes(request.route + '/' + request.action)) {
+		request.action = 'login'
+		request.route  = '/user'
 	}
 	try {
 		action = new (require('.' + await getActionModule(request.route, request.action)).default)
