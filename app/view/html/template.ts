@@ -844,19 +844,21 @@ export default class Template
 
 	translateTarget(index: number, isTitle = false)
 	{
-		if (!translateParts.length) {
-			target += this.tr(source.substring(start, index))
-			start   = index
-			return
+		let translated: string
+		if (translateParts.length) {
+			target    += source.substring(start, index)
+			translated = this.tr(target, translateParts)
+			target         = (targetStack.pop() ?? '') + translated
+			translateParts = []
 		}
-		target          += source.substring(start, index)
-		start            = index
-		const translated = this.tr(target, translateParts)
+		else {
+			translated = this.tr(source.substring(start, index))
+			target    += translated
+		}
 		if (isTitle && doHeadLinks) {
 			headTitle = translated
 		}
-		target         = (targetStack.pop() ?? '') + translated
-		translateParts = []
+		start = index
 	}
 
 	trimEndLine(string: string)
