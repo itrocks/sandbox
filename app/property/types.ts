@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs'
+import { readFileSync } from 'node:fs'
 import {
 	createSourceFile, forEachChild, Identifier, isClassDeclaration, isPropertyDeclaration, Node, ScriptTarget
 } from 'typescript'
