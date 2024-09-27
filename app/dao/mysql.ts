@@ -17,7 +17,7 @@ export default class Mysql implements Dao
 	{
 		const mariaDbConfig = this.config as ConnectionConfig
 		mariaDbConfig.allowPublicKeyRetrieval = true
-		return createConnection(mariaDbConfig).then(connection => this.connection = connection)
+		return this.connection = await createConnection(mariaDbConfig)
 	}
 
 	async delete<T extends { [index: string]: any }>(object: T & Entity, property = 'id'): Promise<T>
