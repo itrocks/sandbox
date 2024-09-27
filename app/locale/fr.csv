@@ -40,6 +40,7 @@ please enter your new password;veuillez entrer votre nouveau mot de passe
 please try again later or contact our support team if the issue persists;veuillez réessayer ultérieurement ou contacter notre équipe de support si le problème persiste
 print;imprimer
 register;s'enregistrer
+reset;réinitialiser
 save;enregistrer
 save $1;enregistrer $1
 send;envoyer
