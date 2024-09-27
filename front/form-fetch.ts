@@ -25,7 +25,8 @@ export function formFetchOnSubmit(
 	init:        RequestInit = {}
 ) {
 	const form = (element.form ?? element) as HTMLFormElement
-	if (!form) return
+	if (!form || form.formFetchOnSubmit) return
+	form.formFetchOnSubmit = true
 	form.addEventListener('submit', async event => {
 		const submitter = event.submitter
 		if (!(submitter instanceof HTMLButtonElement) && !(submitter instanceof HTMLInputElement)) return
