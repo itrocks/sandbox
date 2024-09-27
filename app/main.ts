@@ -53,7 +53,7 @@ async function execute(request: ActionRequest)
 		request.action = need.alternative
 		return execute(request)
 	}
-	if ((need.need === 'object') && !objects.length) {
+	if ((need.need === 'object') && !objects.length && !request.request.data.confirm) {
 		return new Exception('Action ' + request.action + ' needs an object').response
 	}
 	return action[request.format](request)
@@ -111,7 +111,7 @@ server.register(fastifyCookie)
 server.register(fastifyFormbody)
 server.register(fastifyMultipart)
 server.register(fastifySession, {
-	cookie:            { maxAge: 14400000, secure: false },
+	cookie:            { maxAge: 4 * 60 * 60 * 1000, sameSite: 'strict', secure: false },
 	cookieName:        'itrS',
 	saveUninitialized: false,
 	secret
