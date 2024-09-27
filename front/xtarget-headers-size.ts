@@ -4,6 +4,7 @@ import XTarget from './xtarget.js'
 export type XhrInfo = {
 	screenHeight:  number,
 	screenWidth:   number,
+	target?:       string,
 	targetHeight?: number,
 	targetWidth?:  number,
 	windowHeight:  number,
@@ -32,8 +33,10 @@ export default class XTargetHeadersSize extends Plugin<XTarget>
 				windowHeight: window.innerHeight,
 				windowWidth:  window.innerWidth
 			})
-			const target = this.targetElement(this.targetString(this.element))
+			const targetString = this.targetString(this.element)
+			const target       = this.targetElement(targetString)
 			if (target) {
+				xhrInfo.target       = targetString
 				xhrInfo.targetHeight = target.clientHeight
 				xhrInfo.targetWidth  = target.clientWidth
 			}
