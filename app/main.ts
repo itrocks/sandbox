@@ -67,7 +67,11 @@ async function httpCall(
 	const dot     = request.path.lastIndexOf('.') + 1
 	if ((dot > request.path.length - 6) && !request.path.includes('./')) {
 		const fileExtension = request.path.substring(dot)
-		if ((fileExtension !== 'js') || request.path.startsWith('/front/') || frontScripts.includes(request.path)) {
+		if (
+			!['js', 'ts'].includes(fileExtension)
+			|| request.path.startsWith('/front/')
+			|| frontScripts.includes(request.path.slice(0, -3))
+		) {
 			const filePath = (request.path === '/favicon.ico') ? '/app/style/2020/logo/favicon.ico' : request.path
 			const mimeType = mimeTypes.get(fileExtension)
 			if (mimeType) {

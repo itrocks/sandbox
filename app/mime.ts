@@ -7,6 +7,7 @@ export const mimeTypes = new Map([
 	['png',   'image/png'],
 	['scss',  'text/css'],
 	['svg',   'image/svg+xml'],
+	['ts',    'text/typescript'],
 	['woff',  'font/woff'],
 	['woff2', 'font/woff2']
 ])

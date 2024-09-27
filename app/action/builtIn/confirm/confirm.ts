@@ -31,9 +31,9 @@ export default class Confirm extends Action
 				action:  request.action,
 				hash:    this.generateConfirmHash(request),
 				message: message.replace("\n", "<br>\n\t\t\t"),
+				path:    request.request.path,
 				target:  request.request.headers['xhr-info'] ? JSON.parse(request.request.headers['xhr-info']).target : '',
-				type:    request.type,
-				url:     request.request.url
+				type:    request.type
 			},
 			request,
 			__dirname + '/confirm.html'
