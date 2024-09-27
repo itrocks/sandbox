@@ -1,5 +1,4 @@
 import autoFocus                   from './auto-focus.js'
-import autoRedirect                from './auto-redirect.js'
 import build                       from './build.js'
 import { XTarget, XTargetElement } from './xtarget.js'
 import { XTargetDefaultOptions }   from './xtarget.js'
@@ -10,9 +9,9 @@ import XTargetHistory              from './xtarget-history.js'
 
 XTargetDefaultOptions({ plugins: [ XTargetBeginEnd, XTargetHead, XTargetHeadersSize, XTargetHistory ] })
 
-build<HTMLAnchorElement>('a.auto-redirect', element => autoRedirect(element))
+build<HTMLAnchorElement>('a.auto-redirect', async anchor => (await import('./auto-redirect.js')).default(anchor))
 
-build<HTMLFormElement>('form', element => autoFocus(element))
+build<HTMLFormElement>('form', form => autoFocus(form))
 
 build<XTargetElement>(
 	'a[target="main"], a[target^="#"],'
@@ -21,3 +20,5 @@ build<XTargetElement>(
 	+ ' form input[type="submit"][formtarget="main"], form input[type="submit"][formtarget^="#"]',
 	element => new XTarget(element)
 )
+
+build<HTMLFormElement>('#modal form', async form => new (await import('./modal.js')).default(form))

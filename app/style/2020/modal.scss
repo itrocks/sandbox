@@ -1,0 +1,28 @@
+
+#modal {
+	bottom: 0;
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	transition: background .1s;
+	z-index: 999999;
+
+	> * {
+		background: white;
+		border: 1px solid #d6d6d6;
+		border-radius: 3px;
+		left: calc(50% - 180px);
+		position: absolute;
+		top: calc(50% - 75px);
+		width: 360px;
+	}
+
+	&:empty {
+		pointer-events: none;
+	}
+
+	&:not(:empty) {
+		background: rgba(0, 0, 0, .3);
+	}
+}
