@@ -14,7 +14,7 @@ ul.actions {
     border: 1px solid #d0d0d0;
     border-radius: 4px;
     display: inline-block;
-    transition: background-color .2s; }
+    transition: background-color .1s; }
     ul.actions > li:hover {
       background-color: #f4f4f4; }
     ul.actions > li > * {

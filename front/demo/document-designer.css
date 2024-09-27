@@ -32,7 +32,7 @@ main {
       cursor: pointer;
       display: block;
       padding: 2px 6px;
-      transition: background-color .2s; }
+      transition: background-color .1s; }
       .document-designer > ul.fields > li:hover {
         background-color: #f4f4f4; }
   .document-designer > ul.toolbox {
@@ -48,7 +48,7 @@ main {
       display: inline-block;
       height: 32px;
       margin: 4px 0;
-      transition: background-color .2s;
+      transition: background-color .1s;
       width: 32px; }
       .document-designer > ul.toolbox > li:not(:first-child) {
         margin-left: -1px; }

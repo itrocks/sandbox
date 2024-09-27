@@ -12,7 +12,7 @@ nav.app.menu > ul > li > h3 {
   padding: 1em 0 1em 40px; }
 nav.app.menu > ul > li > ul > li {
   margin: 2px 0;
-  transition: background-color .2s; }
+  transition: background-color .1s; }
   nav.app.menu > ul > li > ul > li:hover {
     background-color: #f4f4f4; }
   nav.app.menu > ul > li > ul > li > a {
