@@ -40,7 +40,12 @@ export default class XTarget extends HasPlugins<XTarget>
 
 	async call(action: string, target: string)
 	{
-		await this.setResponse(await fetch(action, this.requestInit()), this.targetElement(target))
+		if (action === 'about:blank') {
+			this.setHTML('', this.targetElement(target))
+		}
+		else {
+			await this.setResponse(await fetch(action, this.requestInit()), this.targetElement(target))
+		}
 	}
 
 	requestInit(): RequestInit
@@ -48,16 +53,26 @@ export default class XTarget extends HasPlugins<XTarget>
 		return {}
 	}
 
-	setHTML(text: string, target: HTMLElement)
+	setHTML(text: string, target?: HTMLElement)
 	{
-		target.innerHTML = text
+		while (text.includes('<!-- target ')) {
+			const targetIndex = text.indexOf('<!-- target ') + 12
+			const start       = text.indexOf(' -->', targetIndex) + 4
+			const stop        = text.indexOf('<!-- end -->', start)
+			const localTarget = document.querySelector(text.slice(targetIndex, start - 4))
+			if (localTarget) {
+				localTarget.innerHTML = text.slice(start, stop)
+			}
+			text = text.substring(0, targetIndex - 12) + text.substring(stop + 12)
+		}
+		if (target) {
+			target.innerHTML = text
+		}
 	}
 
 	async setResponse(response: Response, target?: HTMLElement)
 	{
-		if (!target) return
-		const text = await response.text()
-		this.setHTML(text, target)
+		this.setHTML(await response.text(), target)
 	}
 
 	targetElement(targetString: string)
