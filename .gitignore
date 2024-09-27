@@ -6,10 +6,12 @@ node_modules
 /local/*
 !/local/*-example.*
 
+*.css
 *.css.map
 *.d.ts
 *.js
 *.js.map
 *.scssc
+*.tsbuildinfo
 !/app/class/caller.js
 !/jest.config.js

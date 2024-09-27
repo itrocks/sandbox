@@ -23,7 +23,7 @@ mkdir ~/itrocks
 cd ~/itrocks
 git clone https://github.com/itrocks/sandbox
 cd sandbox
-npm i
+npm install
 ```
 
 ## Database
@@ -76,7 +76,7 @@ export default 'y~N(3e@"VbO<mE(\~Pw,uzfg%z;YQ-7D'
 
 Install all development dependencies:
 ```bash
-npm i
+npm install
 ```
 
 ### Commands from the terminal
@@ -134,11 +134,11 @@ You will need to build it before you can run it without its development dependen
 
 Build, test, then remove useless dependencies:
 ```bash
-npm i
+npm install
 npm run build
 npm run test
 rm -rf node_modules
-npm i --omit=dev
+npm install --omit=dev
 ```
 
 To run the sandbox application:
@@ -150,7 +150,7 @@ This is the theory, but it may not work and throw "Cannot find module" errors...
 If so: sorry, you have to keep the devDependencies here, don't ask me why: I don't know:
 
 ```bash
-npm i
+npm install
 npm start
 ```
 
