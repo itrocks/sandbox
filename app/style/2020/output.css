@@ -1,31 +1,41 @@
+@import 'action.css';
+@import 'article.css';
 ul.object.properties {
   border-collapse: separate;
-  border-spacing: .5em;
+  border-spacing: 0.5em;
   display: table;
   margin: 0;
-  padding: 0; }
-  ul.object.properties > li {
-    display: table-row; }
-    ul.object.properties > li > * {
-      border: 1px solid;
-      display: table-cell;
-      line-height: 16px; }
-    ul.object.properties > li > label {
-      border-color: transparent;
-      font-weight: 500;
-      padding: .5em 0;
-      text-align: right;
-      vertical-align: top; }
-    ul.object.properties > li > input {
-      border-color: #ddd; }
-      ul.object.properties > li > input[type=checkbox] {
-        margin: 8px 0; }
-    ul.object.properties > li > :not(input[type=checkbox]):not(label) {
-      border-radius: 4px;
-      padding: .5em;
-      white-space: pre-line; }
-      ul.object.properties > li > :not(input[type=checkbox]):not(label):not(input) {
-        background: #f4f4f4;
-        border-color: #f8f8f8; }
+  padding: 0;
+}
+ul.object.properties > li {
+  display: table-row;
+}
+ul.object.properties > li > * {
+  border: 1px solid;
+  display: table-cell;
+  line-height: 16px;
+}
+ul.object.properties > li > label {
+  border-color: transparent;
+  font-weight: 500;
+  padding: 0.5em 0;
+  text-align: right;
+  vertical-align: top;
+}
+ul.object.properties > li > input {
+  border-color: #ddd;
+}
+ul.object.properties > li > input[type=checkbox] {
+  margin: 8px 0;
+}
+ul.object.properties > li > :not(input[type=checkbox]):not(label) {
+  border-radius: 4px;
+  padding: 0.5em;
+  white-space: pre-line;
+}
+ul.object.properties > li > :not(input[type=checkbox]):not(label):not(input) {
+  background: #f4f4f4;
+  border-color: #f8f8f8;
+}
 
 /*# sourceMappingURL=output.css.map */

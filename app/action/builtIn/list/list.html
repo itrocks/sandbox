@@ -1,13 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<link href="../../../../node_modules/normalize.css/normalize.css" rel="stylesheet">
-	<link href="../../../style/2020/action.css" rel="stylesheet">
-	<link href="../../../style/2020/article.css" rel="stylesheet">
-	<link href="../../../style/2020/body.css" rel="stylesheet">
-	<link href="../../../style/2020/global.css" rel="stylesheet">
-	<link href="../../../style/2020/list.css" rel="stylesheet">
-	<link href="../../../style/font/roboto/roboto.css" rel="stylesheet">
+- 	<link href="../../../style/2020/list.css" rel="stylesheet">
 	<meta charset="utf-8">
 	<script src="../../../../front/app.js" type="module"></script>
 	<script src="../../../../front/app/list.js" type="module"></script>
@@ -25,7 +19,7 @@
 				<li class="new"><a href="app://(type.@route)/new" target="main">New</a></li>
 			</ul>
 		</header>
-		<form action="app://(type.@route)" method="post">
+		<form action="app://(type.@route)" method="post" target="main">
 			<table class="objects">
 				<thead>
 					<tr class="properties">
@@ -49,7 +43,9 @@
 			<div id="notification"></div>
 			<footer>
 				<ul class="selection actions">
-					<li class="delete"><input formaction="app://(type.@route)/delete" formtarget="#notification" type="submit" value="Delete"></li>
+					<li class="delete">
+						<input formaction="app://(type.@route)/delete" formtarget="#notification" type="submit" value="Delete">
+					</li>
 				</ul>
 			</footer>
 		</form>

@@ -1,10 +1,16 @@
+@import 'app.css';
 
 article, form {
+
 	> header > h2 {
 		background: #eee;
 		border-bottom: 1px solid #ccc;
 		font-size: inherit;
 		margin: 0;
+		padding: .5em;
+	}
+
+	> p {
 		padding: .5em;
 	}
 }

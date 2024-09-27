@@ -1,0 +1,182 @@
+@import '../../../node_modules/normalize.css/normalize.css';
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 300;
+  src: local("Roboto Light"), local("Roboto-Light"), url("roboto-v20-latin-300.woff2") format("woff2"), url("roboto-v20-latin-300.woff") format("woff");
+}
+@font-face {
+  font-family: "Roboto";
+  font-style: italic;
+  font-weight: 300;
+  src: local("Roboto Light Italic"), local("Roboto-LightItalic"), url("roboto-v20-latin-300italic.woff2") format("woff2"), url("roboto-v20-latin-300italic.woff") format("woff");
+}
+@font-face {
+  font-family: "Roboto";
+  font-style: italic;
+  font-weight: 400;
+  src: local("Roboto Italic"), local("Roboto-Italic"), url("roboto-v20-latin-400italic.woff2") format("woff2"), url("roboto-v20-latin-400italic.woff") format("woff");
+}
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Roboto"), local("Roboto-Regular"), url("roboto-v20-latin-400.woff2") format("woff2"), url("roboto-v20-latin-400.woff") format("woff");
+}
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 500;
+  src: local("Roboto Medium"), local("Roboto-Medium"), url("roboto-v20-latin-500.woff2") format("woff2"), url("roboto-v20-latin-500.woff") format("woff");
+}
+@font-face {
+  font-family: "Roboto";
+  font-style: italic;
+  font-weight: 500;
+  src: local("Roboto Medium Italic"), local("Roboto-MediumItalic"), url("roboto-v20-latin-500italic.woff2") format("woff2"), url("roboto-v20-latin-500italic.woff") format("woff");
+}
+@font-face {
+  font-family: "Roboto";
+  font-style: italic;
+  font-weight: 700;
+  src: local("Roboto Bold Italic"), local("Roboto-BoldItalic"), url("roboto-v20-latin-700italic.woff2") format("woff2"), url("roboto-v20-latin-700italic.woff") format("woff");
+}
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 700;
+  src: local("Roboto Bold"), local("Roboto-Bold"), url("roboto-v20-latin-700.woff2") format("woff2"), url("roboto-v20-latin-700.woff") format("woff");
+}
+body {
+  display: grid;
+  grid-template-areas: "header main   aside " "nav    main   aside " "footer footer footer";
+  grid-template-columns: 200px auto min-content;
+  grid-template-rows: 64px auto min-content;
+  height: 100vh;
+}
+body > header {
+  background-color: #eee;
+  grid-area: header;
+}
+body > nav {
+  background-color: #eee;
+  grid-area: nav;
+  overflow: auto;
+  position: relative;
+}
+body > main {
+  border-left: 1px solid #ccc;
+  grid-area: main;
+}
+body > aside {
+  grid-area: aside;
+}
+body > footer {
+  grid-area: footer;
+}
+
+.main.logo {
+  background: url("logo/itrocks.svg") center no-repeat;
+  background-size: auto calc(100% - 1em);
+  height: 100%;
+}
+
+.collapse {
+  transition: background-size 0.1s;
+  background: url("part/collapse.svg") right no-repeat;
+  background-size: 25%;
+  border: 0;
+  cursor: pointer;
+  display: block;
+  font-size: 0;
+  height: 56px;
+  padding: 0;
+  position: absolute;
+  right: 0;
+  top: -66px;
+  width: 36px;
+}
+.collapse:hover {
+  background-size: 50%;
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+body {
+  color: #444;
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+}
+
+input {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #444;
+  padding: 0.5em;
+}
+
+form[name=global-search] {
+  display: none;
+  padding: 0.8em 1em;
+}
+form[name=global-search] input {
+  box-sizing: border-box;
+  margin: auto;
+  width: 100%;
+}
+form[name=global-search] label {
+  display: none;
+}
+
+nav.app.menu a {
+  display: block;
+}
+nav.app.menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav.app.menu > ul > li > h3 {
+  background: #ddd 10px center no-repeat;
+  background-size: 24px;
+  font-weight: normal;
+  margin: 2px 0;
+  padding: 1em 0 1em 40px;
+}
+nav.app.menu > ul > li > ul > li {
+  margin: 2px 0;
+  transition: background-color 0.1s;
+}
+nav.app.menu > ul > li > ul > li:hover {
+  background-color: #f4f4f4;
+}
+nav.app.menu > ul > li > ul > li > a {
+  padding: 0.8em 0 0.8em 10px;
+}
+nav.app.menu > ul > li.administration > h3 {
+  background-image: url("module/administration.svg");
+}
+
+.connected.user > .name {
+  display: none;
+}
+.connected.user > a {
+  background: url("icon/user.svg") 12px center no-repeat;
+  background-size: 20px;
+  display: inline-block;
+  font-size: 1.17em;
+  padding: 1em 0 1em 40px;
+  transition: background-color 0.1s;
+}
+.connected.user > a:hover {
+  background-color: #f4f4f4;
+}
+
+/*# sourceMappingURL=app.css.map */
