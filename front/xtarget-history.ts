@@ -10,7 +10,7 @@ export default class XTargetHistory extends Plugin<XTarget>
 		super(xTarget)
 
 		let postMethod = false
-		let response: Response
+		let response: Response | undefined
 
 		const superActivateFormElement = xTarget.activateFormElement
 		xTarget.activateFormElement    = function(element)
@@ -22,11 +22,13 @@ export default class XTargetHistory extends Plugin<XTarget>
 		const superSetHTML = xTarget.setHTML
 		xTarget.setHTML    = function(text, target)
 		{
-			if (postMethod || xTarget.options.targetHistoryDisable) return superSetHTML.call(this, text, target)
-
-			const html           = superSetHTML.call(this, text, target)
+			const html = superSetHTML.call(this, text, target)
+			if (!response || postMethod || xTarget.options.targetHistoryDisable || !target) {
+				return html
+			}
 			const targetSelector = target.id ? ('#' + target.id) : target.tagName
 			history.pushState({ reload: true, target: targetSelector, title: document.title }, '', response.url)
+			response = undefined
 			return html
 		}
 
