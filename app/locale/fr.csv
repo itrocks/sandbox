@@ -1,12 +1,16 @@
+?; ?
+!; !
 $1 elements;$1 éléments
 $1 list;$1s
 active;actif
 add;ajouter
 add $1;ajouter $1
+all data will be lost;toutes les données seront perdues
 authenticate user;authentifier l'utilisateur
 back;retour
 cancel;annuler
 close;fermer
+confirm;confirmer
 connect;connecter
 connect user;connecter utilisateur
 continue;continuer
@@ -14,6 +18,7 @@ delete;supprimer
 delete $1;supprimer $1
 disconnect;déconnecter
 display $1;afficher $1
+do you confirm deletion;confirmez-vous la suppression
 edit;modifier
 edit $1;modifier $1
 email;mail
@@ -29,6 +34,8 @@ new $1;nouveau $1
 no;non
 password;mot de passe
 password reset request;demande de réinitialisation de mot de passe
+please confirm;veuillez confirmer
+please confirm $1;veuillez confirmer $1
 please enter your new password;veuillez entrer votre nouveau mot de passe
 please try again later or contact our support team if the issue persists;veuillez réessayer ultérieurement ou contacter notre équipe de support si le problème persiste
 print;imprimer
