@@ -8,8 +8,9 @@ export default class ModalForm
 		if (!modal) {
 			return
 		}
-		form.addEventListener('submit', () => {
-			(form.closest('#modal') as HTMLElement).innerHTML = ''
+		form.addEventListener('submit', () => modal.remove())
+		form.querySelectorAll('a[href="about:blank"]').forEach(anchor => {
+			anchor.addEventListener('click', () => { anchor.closest('#modal')?.remove() })
 		})
 	}
 
