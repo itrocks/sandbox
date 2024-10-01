@@ -25,7 +25,7 @@ export default class XTarget extends HasPlugins<XTarget>
 	{
 		element.addEventListener('click', async event => {
 			event.preventDefault()
-			await this.call(element.href, element.target)
+			await this.call(element)
 		})
 	}
 
@@ -33,59 +33,71 @@ export default class XTarget extends HasPlugins<XTarget>
 	{
 		formFetchOnSubmit(
 			element,
-			(response, targetString) => this.setResponse(response, this.targetElement(targetString)),
-			this.requestInit()
+			(response, targetSelector) => this.setResponse(response, targetSelector),
+			submitter => this.requestInit(submitter as XTargetElement)
 		)
 	}
 
-	async call(action: string, target: string)
+	async call(element: HTMLAnchorElement)
 	{
-		if (action === 'about:blank') {
-			this.setHTML('', this.targetElement(target))
+		if (element.href === 'about:blank') {
+			this.setHTML('', element.target)
 		}
 		else {
-			await this.setResponse(await fetch(action, this.requestInit()), this.targetElement(target))
+			await this.setResponse(await fetch(element.href, this.requestInit(element)), element.target)
 		}
 	}
 
-	requestInit(): RequestInit
+	requestInit(element: XTargetElement): RequestInit
 	{
 		return {}
 	}
 
-	setHTML(text: string, target?: HTMLElement)
+	setHTML(text: string, targetSelector: string)
 	{
+		let global = true
 		while (text.includes('<!-- target ')) {
 			const targetIndex = text.indexOf('<!-- target ') + 12
 			const start       = text.indexOf(' -->', targetIndex) + 4
 			const stop        = text.indexOf('<!-- end -->', start)
-			const localTarget = document.querySelector(text.slice(targetIndex, start - 4))
-			if (localTarget) {
-				localTarget.innerHTML = text.slice(start, stop)
+
+			let   localTargetSelector = text.slice(targetIndex, start - 4)
+			const localText = text.slice(start, stop)
+			text = text.slice(0, targetIndex - 12) + text.slice(stop + 12)
+			this.setHTML(localText, localTargetSelector)
+
+			if (global && localText.trim().length && document.querySelector(localTargetSelector)) {
+				global = false
 			}
-			text = text.substring(0, targetIndex - 12) + text.substring(stop + 12)
 		}
-		if (target) {
-			target.innerHTML = text
+
+		let target = document.querySelector(targetSelector)
+		if (!target && (targetSelector[0] === '#')) {
+			target = document.createElement('div')
+			target.setAttribute('id', targetSelector.slice(1))
+			document.body.append(target)
+		}
+		if (target && (global || text.trim().length)) {
+			target.innerHTML = text.trim().length ? text : ''
 		}
 	}
 
-	async setResponse(response: Response, target?: HTMLElement)
+	async setResponse(response: Response, target: string)
 	{
 		this.setHTML(await response.text(), target)
 	}
 
-	targetElement(targetString: string)
+	targetElement(targetSelector: string)
 	{
-		if (targetString === '') {
+		if (targetSelector === '') {
 			return undefined
 		}
-		return targetString.startsWith('#')
-			? (document.getElementById(targetString.substring(1)) ?? undefined)
-			: (document.querySelector<HTMLElement>(targetString) ?? undefined)
+		return targetSelector.startsWith('#')
+			? (document.getElementById(targetSelector.slice(1)) ?? undefined)
+			: (document.querySelector<HTMLElement>(targetSelector) ?? undefined)
 	}
 
-	targetString(element: XTargetElement)
+	targetSelector(element: XTargetElement)
 	{
 		return ((element instanceof HTMLAnchorElement) || (element instanceof HTMLFormElement))
 			? element.target
@@ -101,7 +113,7 @@ export async function xTargetCall(action: string, target: string, options: Parti
 	anchor.setAttribute('href',   action)
 	anchor.setAttribute('target', target)
 	const xTarget = new XTarget(anchor, options)
-	await xTarget.call(action, target)
+	await xTarget.call(anchor)
 }
 
 export function XTargetDefaultOptions(options: Partial<Options<XTarget>>)

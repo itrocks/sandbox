@@ -21,8 +21,8 @@ export default formFetch
 
 export function formFetchOnSubmit(
 	element:     HTMLButtonElement | HTMLFormElement | HTMLInputElement,
-	setResponse: (response: Response, targetString: string, form: HTMLFormElement) => void,
-	init:        RequestInit = {}
+	setResponse: (response: Response, targetSelector: string, form: HTMLFormElement) => void,
+	init:        (element: HTMLElement) => RequestInit
 ) {
 	const form = (element.form ?? element) as HTMLFormElement
 	if (!form || form.formFetchOnSubmit) return
@@ -32,7 +32,7 @@ export function formFetchOnSubmit(
 		if (!(submitter instanceof HTMLButtonElement) && !(submitter instanceof HTMLInputElement)) return
 		event.preventDefault()
 		const action = submitter.getAttribute('formaction') ? submitter.formAction : undefined
-		const response = await formFetch(form, action, init)
+		const response = await formFetch(form, action, init(submitter))
 		setResponse(response, submitter.formTarget ? submitter.formTarget : form.target, form)
 	})
 }

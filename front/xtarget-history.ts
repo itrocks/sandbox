@@ -20,13 +20,12 @@ export default class XTargetHistory extends Plugin<XTarget>
 		}
 
 		const superSetHTML = xTarget.setHTML
-		xTarget.setHTML    = function(text, target)
+		xTarget.setHTML    = function(text, targetSelector)
 		{
-			const html = superSetHTML.call(this, text, target)
-			if (!response || postMethod || xTarget.options.targetHistoryDisable || !target) {
+			const html = superSetHTML.call(this, text, targetSelector)
+			if (!response || postMethod || xTarget.options.targetHistoryDisable) {
 				return html
 			}
-			const targetSelector = target.id ? ('#' + target.id) : target.tagName
 			history.pushState({ reload: true, target: targetSelector, title: document.title }, '', response.url)
 			response = undefined
 			return html
