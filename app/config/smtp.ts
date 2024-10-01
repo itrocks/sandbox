@@ -1,4 +1,4 @@
 
 export default {
-	'from': {email: 'baptiste@pillot.fr', name: 'Baptiste Pillot' }
+	'from': { email: 'sandbox@lg3.fr', name: 'itrocks sandbox' }
 }
