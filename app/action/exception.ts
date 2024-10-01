@@ -13,4 +13,11 @@ export default class Exception extends Error
 			: response
 	}
 
+	htmlResponse()
+	{
+		const response = Object.assign(new Response(), this.response)
+		response.body = '<p class="error notification">' + response.body + '</p>'
+		return response
+	}
+
 }
