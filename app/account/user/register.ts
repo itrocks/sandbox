@@ -9,28 +9,32 @@ export default class Register extends Action
 
 	async html(request: Request)
 	{
-		let search       = new (request.type) as User
 		let templateName = 'register'
-		let user: User|undefined
+		let user         = new (request.type) as User
 
 		if (Object.keys(request.request.data).length) {
-			new Save().dataToObject(search, request.request.data)
-
-			const { login, password } = search
-			user = (login.length && password.length) ? undefined : search
-			if (login.includes('@') && !user) {
-				user = (await dao.search(User, { email: login, password }))[0]
+			new Save().dataToObject(user, request.request.data)
+			const { email, login, password } = user
+			if (email.length && login.length && password.length) {
+				const found = (await dao.search(User, {email}))[0]
+					|| (await dao.search(User, {login}))[0]
+					|| (await dao.search(User, {email: login}))[0]
+					|| (await dao.search(User, {login: email}))[0]
+				if (found) {
+					user = found
+					templateName = 'register-error'
+				}
+				else {
+					await dao.save(user)
+					templateName = 'registered'
+				}
 			}
-			if (!user) {
-				user = (await dao.search(User, { login, password }))[0]
-			}
-			if (!user) {
-				await dao.save(search)
-				templateName = 'registered'
+			else {
+				templateName = 'register-error'
 			}
 		}
 
-		return this.htmlTemplateResponse(user ?? search, request, __dirname + '/' + templateName + '.html')
+		return this.htmlTemplateResponse(user, request, __dirname + '/' + templateName + '.html')
 	}
 
 }
