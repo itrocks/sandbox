@@ -67,13 +67,16 @@ export default class Forgot extends Action
 						html,
 						subject: tr('Password reset request'),
 						text:    htmlToText(html, {wordwrap: 130}),
-						to:      user.email
+						to:      '"' + user.login + '" <' + user.email + '>'
 					})
 					templateName = 'forgot-sent'
 				}
 				catch (exception) {
 					templateName = 'forgot-error'
 				}
+			}
+			else {
+				templateName = 'forgot-error'
 			}
 		}
 
