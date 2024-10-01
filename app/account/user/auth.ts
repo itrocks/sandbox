@@ -20,12 +20,11 @@ export default class Auth extends Action
 		if (!user) {
 			user = (await dao.search(User, { active: true, login, password }))[0]
 		}
-
-		if (user) {
-			request.request.session.user = user
-		}
-
-		const response = await this.htmlTemplateResponse(user ?? search, request, __dirname + '/auth.html')
+		request.request.session.user = user
+		const templateFile = user
+			? '/auth.html'
+			: '/auth-error.html'
+		const response = await this.htmlTemplateResponse(user ?? search, request, __dirname + templateFile)
 		if (!user) {
 			response.statusCode = 401
 		}
