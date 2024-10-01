@@ -54,7 +54,7 @@ async function execute(request: ActionRequest)
 		return execute(request)
 	}
 	if ((need.need === 'object') && !objects.length && !request.request.data.confirm) {
-		return new Exception('Action ' + request.action + ' needs an object').response
+		throw new Exception('Action ' + request.action + ' needs an object')
 	}
 	return action[request.format](request)
 }
