@@ -2,10 +2,10 @@
 body {
 	display: grid;
 	grid-template-areas:
-		"header main   aside "
-		"nav    main   aside "
-		"footer footer footer";
-	grid-template-columns: min-content 1fr min-content;
+		"header main  "
+		"nav    main  "
+		"footer footer";
+	grid-template-columns: min-content 1fr;
 	grid-template-rows: min-content 1fr min-content;
 	height: 100vh;
 
@@ -25,10 +25,6 @@ body {
 	> main {
 		border-left: 1px solid #ccc;
 		grid-area: main;
-	}
-
-	> aside {
-		grid-area: aside;
 	}
 
 	> footer {
