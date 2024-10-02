@@ -23,7 +23,6 @@ export default class XTargetHead extends Plugin<XTarget>
 					&& !head.querySelector('link[href="' + element.getAttribute('href') + '"]')
 				) {
 					head.append(element)
-					console.log('css', element.href)
 				}
 				if (
 					(element instanceof HTMLScriptElement)
@@ -36,7 +35,6 @@ export default class XTargetHead extends Plugin<XTarget>
 						script.setAttribute(attributeName, attributeValue)
 					}
 					head.append(script)
-					console.log('js', script.src)
 				}
 				if (element instanceof HTMLTitleElement) {
 					document.title = element.innerText
