@@ -90,6 +90,11 @@ body:not(.collapse) > nav.app.menu {
 
 body.collapse {
 
+	> header {
+		height: 0;
+		transition: height .1s;
+	}
+
 	> header > .logo,
 	> nav.app.menu > ul {
 		opacity: 0;
