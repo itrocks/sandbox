@@ -5,13 +5,14 @@ body {
 		"header main   aside "
 		"nav    main   aside "
 		"footer footer footer";
-	grid-template-columns: 200px auto min-content;
-	grid-template-rows: 64px auto min-content;
+	grid-template-columns: min-content 1fr min-content;
+	grid-template-rows: min-content 1fr min-content;
 	height: 100vh;
 
 	> header {
 		background-color: #eee;
 		grid-area: header;
+		height: 64px;
 	}
 
 	> nav {
@@ -39,25 +40,4 @@ body {
 	background: url('logo/itrocks.svg') center no-repeat;
 	background-size: auto calc(100% - 1em);
 	height: 100%;
-}
-
-.collapse {
-	transition: background-size .1s;
-	background: url('part/collapse.svg') right no-repeat;
-	background-size: 25%;
-	border: 0;
-	cursor: pointer;
-	display: block;
-	font-size: 0;
-	height: 56px;
-	padding: 0;
-	position: absolute;
-	right: 0;
-	top: -66px;
-	width: 36px;
-	z-index: 1;
-
-	&:hover {
-		background-size: 50%;
-	}
 }

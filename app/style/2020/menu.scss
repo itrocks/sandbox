@@ -1,5 +1,7 @@
 
 nav.app.menu {
+	position: relative;
+	transition: width .1s;
 
 	a {
 		display: block;
@@ -12,6 +14,7 @@ nav.app.menu {
 	}
 
 	> ul {
+		white-space: nowrap;
 
 		> li {
 
@@ -40,5 +43,59 @@ nav.app.menu {
 				background-image: url('module/administration.svg');
 			}
 		}
+	}
+
+	> .collapse {
+		background: none;
+		border: none;
+		bottom: 0;
+		cursor: pointer;
+		display: block;
+		font-size: 0;
+		margin: 0;
+		padding: 0;
+		position: absolute;
+		right: 0;
+		top: 0;
+		width: 12px;
+
+		&:before {
+			background: #ccc;
+			border-radius: 2px;
+			bottom: 0;
+			content: '';
+			height: 32px;
+			left: 0;
+			margin: auto 4px;
+			position: absolute;
+			right: 0;
+			top: 0;
+			transition: background .1s;
+		}
+
+		&:hover:before {
+			background: white;
+		}
+	}
+}
+
+body > header > .logo,
+body > nav.app.menu > ul {
+	transition: opacity .1s;
+}
+
+body:not(.collapse) > nav.app.menu {
+	width: 200px;
+}
+
+body.collapse {
+
+	> header > .logo,
+	> nav.app.menu > ul {
+		opacity: 0;
+	}
+
+	> nav.app.menu {
+		width: 12px;
 	}
 }

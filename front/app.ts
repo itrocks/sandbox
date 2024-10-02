@@ -1,5 +1,6 @@
 import autoFocus                 from './auto-focus.js'
 import build                     from './build.js'
+import collapse                  from './collapse.js'
 import notification              from './notifications.js'
 import { notifications }         from './notifications.js'
 import XTarget                   from './xtarget.js'
@@ -11,6 +12,8 @@ import XTargetHeadersSize        from './xtarget-headers-size.js'
 import XTargetHistory            from './xtarget-history.js'
 
 build<HTMLAnchorElement>('a.auto-redirect', async anchor => (await import('./auto-redirect.js')).default(anchor))
+
+build<HTMLButtonElement>('button.collapse', button => collapse(button, 'body'))
 
 build<HTMLFormElement>('form', autoFocus)
 
