@@ -5,6 +5,7 @@ node_modules
 /coverage
 /local/*
 !/local/*-example.*
+!/local/session/contains-session-data
 
 *.css
 *.css.map

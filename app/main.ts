@@ -1,28 +1,33 @@
 import './class/compose'
 import 'reflect-metadata'
 
-import fastifyCookie                       from '@fastify/cookie'
-import fastifyFormbody                     from '@fastify/formbody'
-import fastifyMultipart                    from '@fastify/multipart'
-import fastifySession                      from '@fastify/session'
-import fastify                             from 'fastify'
-import { FastifyReply, FastifyRequest }    from 'fastify'
-import { readFile, stat }                  from 'node:fs/promises'
-import secret                              from '../local/secret'
-import Action                              from './action/action'
-import Exception                           from './action/exception'
-import { needOf }                          from './action/need'
-import ActionRequest                       from './action/request'
-import { getActionModule }                 from './action/routes'
-import { appPath }                         from './app'
-import access                              from './config/access'
-import { storeOf }                         from './dao/store'
-import { mimeTypes, utf8Types }            from './mime'
-import                                          './property/filter/primitive'
-import { fastifyRequest, fastifyResponse } from './server/fastify'
-import Request                             from './server/request'
-import Response                            from './server/response'
-import { frontScripts }                    from './view/html/template'
+import fastifyCookie       from '@fastify/cookie'
+import fastifyFormbody     from '@fastify/formbody'
+import fastifyMultipart    from '@fastify/multipart'
+import fastifySession      from '@fastify/session'
+import fastify             from 'fastify'
+import { FastifyReply }    from 'fastify'
+import { FastifyRequest }  from 'fastify'
+import { readFile, stat }  from 'node:fs/promises'
+import secret              from '../local/secret'
+import sessionConfig       from '../local/session'
+import Action              from './action/action'
+import Exception           from './action/exception'
+import { needOf }          from './action/need'
+import ActionRequest       from './action/request'
+import { getActionModule } from './action/routes'
+import { appPath }         from './app'
+import access              from './config/access'
+import { storeOf }         from './dao/store'
+import { mimeTypes }       from './mime'
+import { utf8Types }       from './mime'
+import                          './property/filter/primitive'
+import { fastifyRequest }  from './server/fastify'
+import { fastifyResponse } from './server/fastify'
+import Request             from './server/request'
+import Response            from './server/response'
+import FileStore           from './session-file-store'
+import { frontScripts }    from './view/html/template'
 
 async function execute(request: ActionRequest)
 {
@@ -32,19 +37,18 @@ async function execute(request: ActionRequest)
 	}
 	if (!request.request.session.user && !access.free.includes(request.route + '/' + request.action)) {
 		request.action = 'login'
-		request.route  = '/user'
+		request.route = '/user'
 	}
 	try {
 		action = new (require('.' + await getActionModule(request.route, request.action)).default)
-	}
-	catch (exception) {
+	} catch (exception) {
 		console.error(exception)
 		throw new Exception('Action ' + request.action + ' not found')
 	}
 	if (!action[request.format]) {
 		throw new Exception('Action ' + request.action + ' unavailable in format ' + request.format)
 	}
-	const need    = needOf(action)
+	const need = needOf(action)
 	const objects = storeOf(request.type) ? await request.getObjects() : []
 	if (need.alternative && (
 		((need.need === 'object') && !objects.length)
@@ -62,9 +66,10 @@ async function execute(request: ActionRequest)
 async function httpCall(
 	originRequest: FastifyRequest<{ Params: { [index: string]: string } }>,
 	finalResponse: FastifyReply
-) {
+)
+{
 	const request = await fastifyRequest(originRequest)
-	const dot     = request.path.lastIndexOf('.') + 1
+	const dot = request.path.lastIndexOf('.') + 1
 	if ((dot > request.path.length - 6) && !request.path.includes('./')) {
 		const fileExtension = request.path.substring(dot)
 		if (
@@ -81,8 +86,7 @@ async function httpCall(
 	}
 	try {
 		return fastifyResponse(finalResponse, await execute(new ActionRequest(request)))
-	}
-	catch(exception) {
+	} catch (exception) {
 		console.error(request.path)
 		console.error(exception)
 		if (exception instanceof Exception) {
@@ -96,14 +100,14 @@ async function httpCall(
 
 async function httpAsset(request: Request, filePath: string, mimeType: string)
 {
-	const ifModified   = request.headers['if-modified-since']
+	const ifModified = request.headers['if-modified-since']
 	const lastModified = new Date((await stat(filePath)).mtime)
 	if (ifModified && (new Date(ifModified) >= lastModified)) {
 		return new Response('', 304)
 	}
 	const utf8Type = utf8Types.has(mimeType)
-	const headers  = {
-		'Content-Type':  mimeType + (utf8Type ? '; charset=utf-8' : ''),
+	const headers = {
+		'Content-Type': mimeType + (utf8Type ? '; charset=utf-8' : ''),
 		'Last-Modified': lastModified.toUTCString()
 	}
 	return new Response(await readFile(filePath, utf8Type ? 'utf-8' : undefined), 200, headers)
@@ -116,9 +120,10 @@ server.register(fastifyFormbody)
 server.register(fastifyMultipart)
 server.register(fastifySession, {
 	cookie:            { maxAge: 4 * 60 * 60 * 1000, sameSite: 'strict', secure: false },
-	cookieName:        'itrS',
+	cookieName:        'itrSid',
 	saveUninitialized: false,
-	secret
+	secret,
+	store:             new FileStore(sessionConfig.path)
 })
 server.delete('/*', httpCall)
 server.get   ('/*', httpCall)

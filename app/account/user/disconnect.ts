@@ -10,6 +10,7 @@ export default class Disconnect extends Action
 	async html(request: Request)
 	{
 		delete request.request.session.user
+		request.request.session.destroy()
 		return new Login().html(request)
 	}
 
