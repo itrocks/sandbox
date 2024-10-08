@@ -22,7 +22,7 @@ export default class XTargetHead extends Plugin<XTarget>
 					&& (element.getAttribute('rel') === 'stylesheet')
 					&& !head.querySelector('link[href="' + element.getAttribute('href') + '"]')
 				) {
-					head.append(element)
+					head.appendChild(element)
 				}
 				if (
 					(element instanceof HTMLScriptElement)
@@ -34,7 +34,7 @@ export default class XTargetHead extends Plugin<XTarget>
 						if (!attributeValue) continue
 						script.setAttribute(attributeName, attributeValue)
 					}
-					head.append(script)
+					head.appendChild(script)
 				}
 				if (element instanceof HTMLTitleElement) {
 					document.title = element.innerText

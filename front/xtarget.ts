@@ -75,7 +75,7 @@ export default class XTarget extends HasPlugins<XTarget>
 		if (!target && (targetSelector[0] === '#')) {
 			target = document.createElement('div')
 			target.setAttribute('id', targetSelector.slice(1))
-			document.body.append(target)
+			document.body.appendChild(target)
 		}
 		if (target && (global || text.trim().length)) {
 			target.innerHTML = text.trim().length ? text : ''
