@@ -119,7 +119,7 @@ server.register(fastifyCookie)
 server.register(fastifyFormbody)
 server.register(fastifyMultipart)
 server.register(fastifySession, {
-	cookie:            { maxAge: 4 * 60 * 60 * 1000, sameSite: 'strict', secure: false },
+	cookie:            { maxAge: 30 * 24 * 60 * 60 * 1000, sameSite: 'strict', secure: false },
 	cookieName:        'itrSid',
 	saveUninitialized: false,
 	secret,
