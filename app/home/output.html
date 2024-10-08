@@ -3,6 +3,7 @@
 <head>
 	<link href="../style/2020/app.css" rel="stylesheet">
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script src="../../front/app.js" type="module"></script>
 	<title>Application title</title>
 </head>
@@ -14,7 +15,6 @@
 
 <!--session.user?-->
 <nav class="app menu">
-	<button class="collapse">collapse</button>
 	<form name="global-search">
 		<label for="global-search">Global search</label>
 		<input id="global-search" name="global-search" placeholder="global search">
@@ -33,6 +33,12 @@
 	</ul>
 </nav>
 <!--end-->
+
+<button class="collapse">collapse</button>
+
+<ol class="breadcrumb">
+	<li class="home"><a href="/">home</a></li>
+</ol>
 
 <main>
 	{content}

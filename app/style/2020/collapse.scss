@@ -1,0 +1,54 @@
+
+body {
+
+	> header, > .app.menu, > main {
+		transition: width .1s;
+	}
+
+	> .collapse {
+		background: url('action/back.svg') center no-repeat;
+		border: none;
+		cursor: pointer;
+		font-size: 0;
+		width: 24px;
+	}
+
+	&.collapse {
+
+		> .collapse {
+			background-image: url('action/menu.svg');
+		}
+
+		> header, > .app.menu {
+			width: 0;
+		}
+	}
+}
+
+@media (max-width: 600px) {
+
+	body:not(.collapse) {
+
+		> .app.menu {
+			width: calc(100vw - 25px);
+		}
+
+		> .collapse {
+			min-height: 32px;
+		}
+
+		> .breadcrumb {
+			display: none;
+		}
+
+		> main {
+			overflow: hidden;
+			width: 24px;
+
+			> * {
+				opacity: 0;
+			}
+		}
+	}
+
+}

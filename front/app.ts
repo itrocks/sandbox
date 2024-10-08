@@ -1,5 +1,6 @@
 import autoFocus                 from './auto-focus.js'
 import build                     from './build.js'
+import breadcrumb                from './breadcrumb.js'
 import collapse                  from './collapse.js'
 import notification              from './notifications.js'
 import { notifications }         from './notifications.js'
@@ -12,6 +13,8 @@ import XTargetHeadersSize        from './xtarget-headers-size.js'
 import XTargetHistory            from './xtarget-history.js'
 
 build<HTMLAnchorElement>('a.auto-redirect', async anchor => (await import('./auto-redirect.js')).default(anchor))
+
+build<HTMLHeadingElement>('main > * > h2, main > * > header > h2', breadcrumb)
 
 build<HTMLButtonElement>('button.collapse', button => collapse(button, 'body'))
 

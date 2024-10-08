@@ -1,13 +1,24 @@
+@import 'breadcrumb.scss';
+@import 'collapse.scss';
 
 body {
 	display: grid;
 	grid-template-areas:
-		"header main  "
-		"nav    main  "
-		"footer footer";
-	grid-template-columns: min-content 1fr;
-	grid-template-rows: min-content 1fr min-content;
+		"header collapse breadcrumb"
+		"header main     main      "
+		"menu   main     main      "
+		"footer footer   footer    ";
+	grid-template-columns: min-content min-content 1fr;
+	grid-template-rows: min-content min-content 1fr min-content;
 	height: 100vh;
+
+	> .breadcrumb {
+		grid-area: breadcrumb;
+	}
+
+	> .collapse {
+		grid-area: collapse;
+	}
 
 	> header {
 		background-color: #eee;
@@ -15,15 +26,17 @@ body {
 		height: 64px;
 	}
 
-	> nav {
+	> .menu {
+		grid-area: menu;
+	}
+
+	> .breadcrumb, > .collapse, > .menu {
 		background-color: #eee;
-		grid-area: nav;
-		overflow: auto;
-		position: relative;
 	}
 
 	> main {
 		border-left: 1px solid #ccc;
+		border-top: 1px solid #ccc;
 		grid-area: main;
 	}
 
