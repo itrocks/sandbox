@@ -18,8 +18,7 @@ const walk = async (directoryName: string): Promise<string[]> =>
 }
 
 const readDirRecursive = async (directoryName: string) =>
-	walk(directoryName)
-	.then(entries => entries.map(entry => entry.substring(directoryName.length)))
+	walk(directoryName).then(entries => entries.map(entry => entry.substring(directoryName.length)))
 
 export async function accessModule(path: string)
 {
