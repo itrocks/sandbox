@@ -69,7 +69,7 @@ const chainedSelectors = (selector: string[]) =>
 const observer = new MutationObserver(mutations => {
 	for (const mutation of mutations) {
 		mutation.addedNodes.forEach(addedNode => {
-			if (addedNode instanceof Element) {
+			if ((addedNode instanceof HTMLElement) && addedNode.closest('html')) {
 				for (const callback of callbacks) {
 					callback.applyInto(addedNode)
 				}
