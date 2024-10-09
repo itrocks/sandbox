@@ -23,10 +23,22 @@ export default class XTarget extends HasPlugins<XTarget>
 
 	activateAnchorElement(element: HTMLAnchorElement)
 	{
-		element.addEventListener('click', async event => {
+		element.addEventListener('click', this.activateAnchorEvent.bind(this))
+	}
+
+	async activateAnchorEvent(event: MouseEvent)
+	{
+		const element = event.target as HTMLAnchorElement
+		if (element.dataset.preventDefault !== '0') {
 			event.preventDefault()
-			await this.call(element)
-		})
+		}
+		if (element.dataset.stopImmediatePropagation === '1') {
+			event.stopImmediatePropagation()
+		}
+		if (element.dataset.stopPropagation === '1') {
+			event.stopPropagation()
+		}
+		await this.call(element)
 	}
 
 	activateFormElement(element: Exclude<XTargetElement, HTMLAnchorElement>)
@@ -48,7 +60,7 @@ export default class XTarget extends HasPlugins<XTarget>
 		}
 	}
 
-	requestInit(element: XTargetElement): RequestInit
+	requestInit(_element: XTargetElement): RequestInit
 	{
 		return {}
 	}
@@ -75,10 +87,14 @@ export default class XTarget extends HasPlugins<XTarget>
 		if (!target && (targetSelector[0] === '#')) {
 			target = document.createElement('div')
 			target.setAttribute('id', targetSelector.slice(1))
+			target.innerHTML = text
 			document.body.appendChild(target)
 		}
-		if (target && (global || text.trim().length)) {
+		else if (target && (global || text.trim().length)) {
 			target.innerHTML = text.trim().length ? text : ''
+		}
+		else {
+			console.error('target not found', targetSelector)
 		}
 	}
 
