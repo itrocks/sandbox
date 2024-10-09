@@ -24,7 +24,7 @@ export default class Action
 			{ action: request.action, request, session: request.request.session }
 		)
 		template.included = (request.request.headers['sec-fetch-dest'] === 'empty')
-		return this.htmlResponse(await template.parseFile(templateFile, __dirname + '/../home/output.html'))
+		return this.htmlResponse(await template.parseFile(templateFile, __dirname + '/../home/container.html'))
 	}
 
 }
