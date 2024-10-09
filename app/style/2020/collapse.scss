@@ -30,14 +30,14 @@ body {
 	body:not(.collapse) {
 
 		> .app.menu {
-			width: calc(100vw - 25px);
+			width: calc(100vw - 24px);
 		}
 
 		> .collapse {
 			min-height: 32px;
 		}
 
-		> .breadcrumb {
+		> .breadcrumb, #notifications {
 			display: none;
 		}
 
