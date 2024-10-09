@@ -13,8 +13,8 @@ export default function notification(element: HTMLElement)
 		notification.classList.remove('notification')
 		li.classList.add('new', ...Array.from(notification.classList))
 		li.innerHTML = notification.innerHTML
-		notification.remove()
 		list.prepend(li)
+		notification.remove()
 		if (list.children.length > 5) {
 			list.lastElementChild?.remove()
 		}
