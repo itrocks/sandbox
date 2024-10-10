@@ -10,7 +10,8 @@ body {
 		"footer footer   footer    ";
 	grid-template-columns: min-content min-content 1fr;
 	grid-template-rows: min-content min-content 1fr min-content;
-	height: calc(100vh - env(safe-area-inset-bottom, 0));
+	height: var(--real-vh, 100vh);
+	overflow: hidden;
 
 	> .breadcrumb {
 		grid-area: breadcrumb;
