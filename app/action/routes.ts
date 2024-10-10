@@ -18,7 +18,7 @@ const walk = async (directoryName: string): Promise<string[]> =>
 }
 
 const readDirRecursive = async (directoryName: string) =>
-	walk(directoryName).then(entries => entries.map(entry => entry.substring(directoryName.length)))
+	walk(directoryName).then(entries => entries.map(entry => entry.slice(directoryName.length)))
 
 export async function accessModule(path: string)
 {
@@ -27,6 +27,28 @@ export async function accessModule(path: string)
 	catch { return }
 	if (DEBUG) console.log('> OK')
 	return path
+}
+
+function addRoute(routePath: string, moduleFile: string)
+{
+	let   route  = routes
+	const names  = routePath.split(sep).slice(1).reverse()
+	const length = names.length - 1
+	for (let index = 0; index < length; index ++) {
+		const name      = names[index]
+		let   routeStep = route[name]
+		if (!routeStep) {
+			routeStep = {}
+		}
+		if (typeof routeStep === 'string') {
+			routeStep = { ':': routeStep }
+		}
+		route = route[name] = routeStep
+	}
+	const name = names[names.length - 1]
+	route[name]
+		? Object.assign(route[name], { ':': moduleFile })
+		: (route[name] = moduleFile)
 }
 
 export async function getActionModule(ofRoute: string, action: string)
@@ -40,7 +62,7 @@ export async function getActionModule(ofRoute: string, action: string)
 export function getModule(ofRoute: string)
 {
 	let route = routes as Routes | string
-	for (const name of ofRoute.substring(1).split('/').reverse()) {
+	for (const name of ofRoute.slice(1).split('/').reverse()) {
 		if (typeof route === 'string') return route
 		const routeStep = route[name] as Routes | string | undefined
 		if (!routeStep) break
@@ -56,7 +78,7 @@ export function getRoute(ofModule: string)
 {
 	let getRoute = ''
 	let route    = routes as Routes | string
-	for (const name of ofModule.substring((ofModule[1] === ':') ? 3 : 1).split(sep).reverse()) {
+	for (const name of ofModule.slice((ofModule[1] === ':') ? 3 : 1).split(sep).reverse()) {
 		if (typeof route === 'string') return getRoute
 		const routeStep = route[name] as Routes | string | undefined
 		if (!routeStep) break
@@ -73,28 +95,11 @@ type Routes = { [name: string]: Routes | string }
 
 const routes = {} as Routes
 
-readDirRecursive(__dirname.substring(0, __dirname.lastIndexOf(sep))).then(entries => {
+readDirRecursive(__dirname.slice(0, __dirname.lastIndexOf(sep))).then(entries => {
 	for (let entry of entries) {
-		if (!entry.endsWith('.ts') || entry.endsWith('.d.ts') || entry.endsWith('.test.ts')) continue
+		if (!entry.endsWith('.js') || entry.endsWith('.test.js')) continue
 		entry = entry.slice(0, -3)
-		let   route  = routes
-		const names  = entry.split(sep).slice(1).reverse()
-		const length = names.length - 1
-		for (let index = 0; index < length; index ++) {
-			const name      = names[index]
-			let   routeStep = route[name]
-			if (!routeStep) {
-				routeStep = {}
-			}
-			if (typeof routeStep === 'string') {
-				routeStep = { ':': routeStep }
-			}
-			route = route[name] = routeStep
-		}
-		const name = names[names.length - 1]
-		route[name]
-			? Object.assign(route[name], { ':': entry })
-			: (route[name] = entry)
+		addRoute(entry, entry)
 	}
 	const simplify = (routes: Routes, name: string, route: Routes | string) => {
 		if (typeof route === 'string') {
