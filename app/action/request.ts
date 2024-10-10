@@ -27,7 +27,7 @@ export default class Request
 	{
 		const module = getModule(this.route)
 		if (!module) {
-			throw new Exception('Module ' + this.route.substring(1) + ' not found')
+			return {} as Type
 		}
 		const type = require('..' + module).default
 		if ((typeof type)[0] !== 'f') {
