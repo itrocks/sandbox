@@ -16,6 +16,7 @@ import Exception           from './action/exception'
 import { needOf }          from './action/need'
 import ActionRequest       from './action/request'
 import { getActionModule } from './action/routes'
+import staticRoutes        from './action/static-routes'
 import { appPath }         from './app'
 import access              from './config/access'
 import { storeOf }         from './dao/store'
@@ -32,15 +33,26 @@ import { frontScripts }    from './view/html/template'
 async function execute(request: ActionRequest)
 {
 	let action: Action & { [index: string]: (request: ActionRequest) => Promise<Response> }
+	let staticRoute = staticRoutes[request.request.path]
+	if (staticRoute) {
+		const position = staticRoute.lastIndexOf('/')
+		request.route  = staticRoute.slice(0, position)
+		request.action = staticRoute.slice(position + 1)
+		request.format = request.request.headers['accept'].split(',')[0].split('/')[1]
+		if (request.format === '*') {
+			request.format = 'html'
+		}
+	}
 	if (!request.action) {
 		throw new Exception('Action is missing')
 	}
 	if (!request.request.session.user && !access.free.includes(request.route + '/' + request.action)) {
 		request.action = 'login'
-		request.route = '/user'
+		request.route  = '/user'
+		staticRoute    = undefined
 	}
 	try {
-		action = new (require('.' + await getActionModule(request.route, request.action)).default)
+		action = new (require('.' + (staticRoute ?? await getActionModule(request.route, request.action))).default)
 	} catch (exception) {
 		console.error(exception)
 		throw new Exception('Action ' + request.action + ' not found')
@@ -48,9 +60,9 @@ async function execute(request: ActionRequest)
 	if (!action[request.format]) {
 		throw new Exception('Action ' + request.action + ' unavailable in format ' + request.format)
 	}
-	const need = needOf(action)
+	const need    = needOf(action)
 	const objects = storeOf(request.type) ? await request.getObjects() : []
-	if (need.alternative && (
+	if (need.alternative && (need.alternative !== request.action) && (
 		((need.need === 'object') && !objects.length)
 		|| ((need.need === 'Store') && !storeOf(request.type))
 	)) {
