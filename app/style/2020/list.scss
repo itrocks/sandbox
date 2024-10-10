@@ -66,6 +66,7 @@ main > article[data-action="list"] {
 
 		> footer {
 			grid-area: footer;
+			position: relative;
 		}
 	}
 }
