@@ -1,7 +1,7 @@
 
 main > article[data-action="list"] {
 	display: grid;
-	grid-template-areas: "header" "content";
+	grid-template-areas: "header" "form";
 	grid-template-rows: min-content 1fr;
 	height: 100%;
 
@@ -17,11 +17,19 @@ main > article[data-action="list"] {
 	}
 
 	> form {
-		position: relative;
+		display: grid;
+		grid-area: form;
+		grid-template-areas: "table" "footer";
+		grid-template-rows: 1fr min-content;
+		height: 100%;
+		overflow: auto;
 
 		> table {
 			border-collapse: collapse;
-			margin-bottom: 38px;
+			display: block;
+			grid-area: table;
+			margin: 0 -1px -1px 0;
+			overflow-y: auto;
 
 			tr {
 				> td, > th {
@@ -47,15 +55,17 @@ main > article[data-action="list"] {
 				display: none;
 			}
 
-			> tbody > tr:nth-child(2n) > * {
+			> tbody > tr:nth-child(even) > * {
 				background: #f8f8f8;
+			}
+
+			> tbody > tr:nth-child(odd) > * {
+				background: white;
 			}
 		}
 
 		> footer {
-			position: absolute;
-			bottom: 0;
-			width: 100%;
+			grid-area: footer;
 		}
 	}
 }
