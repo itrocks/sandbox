@@ -118,13 +118,14 @@ Shortcuts:
 
 If you use WebStorm, you do not need to use those npm run:
 
-- check *Settings > TypeScript > Recompile on changes* to automatically build changed .ts files,
-- create a *run/debug configuration* named *watch* with:
-  - node parameters: *node_modules/.bin/nodemon*
-  - javascript file: *app/main.js*
+- uncheck **Settings > TypeScript > Recompile on changes**,
+- create a **run/debug configuration** named **watch** with:
+  - node parameters: **node_modules/.bin/nodemon**,
+  - javascript file: **app/main.js**,
+- open a terminal and run **npm run build:watch** to ensure files will be transpiled after each source change.
 
 You can run tests with a right-click+run on the *jest.config.js* file
-You can run/debug/test your app using the run panel and the *play* button.
+You can run/debug/test your app using the run panel and the **play** button applied to the **watch** configuration.
 
 ### Run for production
 
