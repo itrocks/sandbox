@@ -16,25 +16,35 @@ readFile(__dirname + '/fr.csv', 'utf-8')
 
 const lang = 'fr'
 
-export default function tr(text: string, parts = [] as string[])
+export default function tr(text: string, parts = [] as string[]): string
 {
+	const [firstSpaces, lastSpaces] = (text.match(/^(\s*).*(\s*)$/) ?? []).slice(1)
+	text = text.trim()
 	let   partsCount = parts.length
 	const firstChar  = text[0]
 	const ucFirst    = (firstChar >= 'A') && (firstChar <= 'Z')
-	text = translations.get(text)
+	let   translated = translations.get(text)
 		?? (ucFirst ? translations.get(firstChar.toLocaleLowerCase() + text.slice(1)) : undefined)
 		?? translations.get(text.toLocaleLowerCase())
 		?? trMatch(text, parts)
+	if (!translated) {
+		const separator = (text.length > 1) ? text.match(/[.?!;:,()]/)?.[0] : undefined
+		if (separator) {
+			translated = text.split(separator).map(text => tr(text, parts)).join(tr(separator).replace(/ /g, '\u00A0'))
+			return firstSpaces + translated + lastSpaces
+		}
+		translated = text
+	}
 	while (partsCount) {
-		text = text.replaceAll('$' + partsCount, parts[--partsCount])
+		translated = translated.replaceAll('$' + partsCount, parts[--partsCount])
 	}
 	if (ucFirst) {
-		return text[0].toLocaleUpperCase() + text.slice(1)
+		translated = translated[0].toLocaleUpperCase() + translated.slice(1)
 	}
-	return text
+	return firstSpaces + translated + lastSpaces
 }
 
-function trMatch(text: string, parts: string[])
+function trMatch(text: string, parts: string[]): string | undefined
 {
 	for (const expression of expressions) {
 		const match = text.match(expression)
@@ -50,7 +60,6 @@ function trMatch(text: string, parts: string[])
 		const trText = expression.source.slice(1, -1).replaceAll('(.*)', () => '$' + ++counter)
 		return tr(trText, trParts)
 	}
-	return text
 }
 
 export { lang, tr }
