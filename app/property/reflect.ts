@@ -1,8 +1,10 @@
 import { ReflectClass } from '../class/reflect'
-import { Type }         from '../class/type'
+import { Object, Type } from '../class/type'
 import { applyFilter }  from './filter/filter'
+import { EDIT, OUTPUT } from './filter/filter'
+import { HTML }         from './filter/filter'
 
-export class ReflectProperty<T extends { [index: string]: any } = {}>
+export class ReflectProperty<T extends Object = {}>
 {
 	readonly #class: T | ReflectClass<T> | Type<T>
 	readonly name:   string
@@ -22,24 +24,24 @@ export class ReflectProperty<T extends { [index: string]: any } = {}>
 		return value
 	}
 
-	edit(format: string = 'html')
+	edit(format: string = HTML)
 	{
 		return this.object
-			? applyFilter(this.object[this.name], this.class.type, this.name, format, 'edit')
+			? applyFilter(this.object[this.name], this.class.type, this.name, format, EDIT)
 			: undefined
 	}
 
-	get object() : { [index: string]: any } | undefined
+	get object() : Object | undefined
 	{
 		const value = this.class.object
 		Object.defineProperty(this, 'object', { value, writable: false })
 		return value
 	}
 
-	output(format: string = 'html')
+	output(format: string = HTML)
 	{
 		return this.object
-			? applyFilter(this.object[this.name], this.class.type, this.name, format, 'output')
+			? applyFilter(this.object[this.name], this.class.type, this.name, format, OUTPUT)
 			: undefined
 	}
 
