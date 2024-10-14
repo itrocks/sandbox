@@ -3,6 +3,8 @@ import { writeFileSync } from 'node:fs'
 import path              from 'path'
 import ts                from 'typescript'
 
+// TODO support aliasing: import { Route as Alias } from './route' ; @Alias('/')
+
 const staticRoutesFile = __dirname + '/static-routes.json'
 
 const routes  = JSON.parse(readFileSync(staticRoutesFile).toString()) as { [path: string]: string }
