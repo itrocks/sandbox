@@ -1,13 +1,15 @@
-import Action                     from '../../../action/action'
-import Request                    from '../../../action/request'
-import ReflectClass               from '../../../class/reflect'
-import dao                        from '../../../dao/dao'
-import { applyFilter, UNCHANGED } from '../../../property/filter/filter'
+import Action          from '../../../action/action'
+import Request         from '../../../action/request'
+import ReflectClass    from '../../../class/reflect'
+import { Object }      from '../../../class/type'
+import dao             from '../../../dao/dao'
+import { applyFilter } from '../../../property/filter/filter'
+import { UNCHANGED }   from '../../../property/filter/filter'
 
 export default class Save extends Action
 {
 
-	dataToObject(object: { [index: string]: any }, data: { [index: string]: string })
+	dataToObject(object: Object, data: { [index: string]: string })
 	{
 		const reflectClass  = new ReflectClass(object)
 		const propertyTypes = reflectClass.propertyTypes

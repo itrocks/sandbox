@@ -1,10 +1,11 @@
-import { ReflectProperty }                      from '../property/reflect'
-import { PropertyTypes, propertyTypesFromFile } from '../property/types'
-import { fileOf }                               from './file'
-import { Type, typeOf }                         from './type'
-import { usesOf }                               from './uses'
+import { ReflectProperty }       from '../property/reflect'
+import { PropertyTypes }         from '../property/types'
+import { propertyTypesFromFile } from '../property/types'
+import { fileOf }                from './file'
+import { Object, Type, typeOf }  from './type'
+import { usesOf }                from './uses'
 
-export class ReflectClass<T extends { [index: string]: any } = {}>
+export class ReflectClass<T extends Object = {}>
 {
 	readonly name:    string
 	readonly object?: T

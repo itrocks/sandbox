@@ -1,4 +1,6 @@
 
+export type Object = { [property: string]: any }
+
 export const objectOf = <T extends object>(target: T | Type<T>): T => (typeof target === 'object')
 	? target
 	: new target as T

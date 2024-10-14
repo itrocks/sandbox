@@ -1,4 +1,4 @@
-import Type                                      from '../../class/type'
+import { Object, Type }                          from '../../class/type'
 import { decorateCallback, decoratorOfCallback } from '../../decorator/class'
 import { requiredOf }                            from '../../property/validate/required'
 
@@ -21,5 +21,5 @@ export default Representative
 export const representativeOf = (target: object | Type) =>
 	decoratorOfCallback<string[]>(target, REPRESENTATIVE, defaultValue)
 
-export const representativeValueOf = (target: { [property: string]: any }) =>
+export const representativeValueOf = (target: Object) =>
 	representativeOf(target).map(property => target[property]).filter(value => value.length).join(' ')
