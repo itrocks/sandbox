@@ -5,7 +5,15 @@ const parseCsv = require('papaparse').parse
 export const expressions  = new Set<RegExp>
 export const translations = new Map<string, string>
 
-readFile(__dirname + '/fr.csv', 'utf-8')
+export const DefaultOptions: Options = {
+	ucFirst: true
+}
+
+export type Options = {
+	ucFirst?: boolean
+}
+
+readFile(__dirname + '/fr-FR.csv', 'utf-8')
 	.then(data => parseCsv(data, { delimiter: ';' }).data as [string, string][])
 	.then(data => data.forEach(row => {
 		translations.set(row[0], row[1])
@@ -14,15 +22,22 @@ readFile(__dirname + '/fr.csv', 'utf-8')
 		}
 	}))
 
-const lang = 'fr'
+const lang = 'fr-FR'
 
-export default function tr(text: string, parts = [] as string[]): string
+export default function tr(text: string, parts?: string[] | Options, options?: Options): string
 {
+	if (!parts) {
+		parts = []
+	}
+	else if (parts && !Array.isArray(parts)) {
+		options = parts
+		parts   = []
+	}
 	const [firstSpaces, lastSpaces] = (text.match(/^(\s*).*(\s*)$/) ?? []).slice(1)
 	text = text.trim()
 	let   partsCount = parts.length
 	const firstChar  = text[0]
-	const ucFirst    = (firstChar >= 'A') && (firstChar <= 'Z')
+	const ucFirst    = (options?.ucFirst ?? DefaultOptions.ucFirst) && (firstChar >= 'A') && (firstChar <= 'Z')
 	let   translated = translations.get(text)
 		?? (ucFirst ? translations.get(firstChar.toLocaleLowerCase() + text.slice(1)) : undefined)
 		?? translations.get(text.toLocaleLowerCase())

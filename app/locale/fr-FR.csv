@@ -5,13 +5,15 @@ $1 $2 deleted;$1 $2 supprimés
 $1 elements;$1 éléments
 $1 list;$1s
 $1 saved;$1 enregistré
-a password reset email was sent to you;un mail de réinitialisation de mot de passe vous a été envoyé
+an email for password reset was sent to you;un mail de réinitialisation de mot de passe vous a été envoyé
 active;actif
 add;ajouter
 add $1;ajouter $1
+age;age
 all data will be lost;toutes les données seront perdues
 authenticate user;authentifier l'utilisateur
 back;retour
+birthday;date de naissance
 cancel;annuler
 close;fermer
 confirm;confirmer
@@ -21,6 +23,7 @@ continue;continuer
 could not create this user account;impossible de créer ce compte utilisateur
 delete;supprimer
 delete $1;supprimer $1
+demo objects;objets démo
 disconnect;déconnecter
 display $1;afficher $1
 do you confirm deletion;confirmez-vous la suppression
@@ -35,6 +38,8 @@ home;accueil
 id;id
 login;identifiant
 main module;module principal
+dd/MM/yyyy;dd/MM/yyyy
+name;nom
 new;nouveau
 new $1;nouveau $1
 no;non
