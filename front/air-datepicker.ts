@@ -4,9 +4,19 @@ const locales = {} as { [lang: string]: object }
 function init(input: HTMLInputElement)
 {
 	const locale = locales[document.documentElement.lang]
-	if (AirDatepicker && locale) {
-		new AirDatepicker(input, { locale })
-	}
+	if (!AirDatepicker || !locale) return
+
+	const datePicker = new AirDatepicker(input, { locale })
+
+	input.addEventListener('keydown', event => {
+		if (!datePicker.visible) return
+		if (event.key === 'Enter') {
+			event.preventDefault()
+		}
+		if (['ArrowLeft', 'ArrowRight'].includes(event.key) && !event.ctrlKey && !event.metaKey) {
+			event.stopPropagation()
+		}
+	}, true)
 }
 
 export default (input: HTMLInputElement) =>
