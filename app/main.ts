@@ -30,6 +30,10 @@ import Response            from './server/response'
 import FileStore           from './session-file-store'
 import { frontScripts }    from './view/html/template'
 
+frontScripts.push('/node_modules/air-datepicker/locale/en.js')
+frontScripts.push('/node_modules/air-datepicker/locale/fr.js')
+frontScripts.push('/node_modules/air-datepicker/air-datepicker.js')
+
 async function execute(request: ActionRequest)
 {
 	let action: Action & { [index: string]: (request: ActionRequest) => Promise<Response> }
@@ -87,7 +91,7 @@ async function httpCall(
 		if (
 			!['js', 'ts'].includes(fileExtension)
 			|| request.path.startsWith('/front/')
-			|| frontScripts.includes(request.path.slice(0, -3))
+			|| frontScripts.includes(request.path)
 		) {
 			const filePath = (request.path === '/favicon.ico') ? '/app/style/2020/logo/favicon.ico' : request.path
 			const mimeType = mimeTypes.get(fileExtension)

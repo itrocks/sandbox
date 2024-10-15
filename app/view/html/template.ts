@@ -682,7 +682,7 @@ export default class Template
 									frontScript = frontScript.replaceAll(sep, '/')
 								}
 								if (!frontScripts.includes(frontScript)) {
-									frontScripts.push(frontScript.slice(0, -3))
+									frontScripts.push(frontScript)
 								}
 								target += frontScript
 								start   = index
