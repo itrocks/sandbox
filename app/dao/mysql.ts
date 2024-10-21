@@ -1,5 +1,6 @@
 import mariadb          from 'mariadb'
 import { Object, Type } from '../class/type'
+import { ObjectOrType } from '../class/type'
 import { applyFilter }  from '../property/filter/filter'
 import { READ, SAVE }   from '../property/filter/filter'
 import { SQL }          from '../property/filter/filter'
@@ -25,7 +26,7 @@ export default class Mysql implements Dao
 		return this.connection = await mariadb.createConnection(mariaDbConfig)
 	}
 
-	async delete<T extends Object>(object: T & Entity, property = 'id'): Promise<T>
+	async delete<T extends Object>(object: T & Entity, property = 'id')
 	{
 		const connection = this.connection ?? await this.connect()
 		if (!connection) throw 'Not connected'
@@ -37,7 +38,7 @@ export default class Mysql implements Dao
 		)
 		delete (object as any).id
 
-		return object
+		return object as T
 	}
 
 	async insert<T extends object>(object: T)
@@ -65,7 +66,7 @@ export default class Mysql implements Dao
 			[id]
 		)
 
-		return this.valuesFromDb(Object.assign(new type, rows[0])) as (T & Entity)
+		return this.valuesFromDb(type, rows[0])
 	}
 
 	async save<T extends object>(object: T | (T & Entity))
@@ -104,10 +105,10 @@ export default class Mysql implements Dao
 			searchValues
 		)
 
-		return rows.map(row => Object.assign(new type, row))
+		return rows.map(row => this.valuesFromDb(type, row))
 	}
 
-	async update<T extends object>(object: T & Entity)
+	async update<T extends object & Entity>(object: T)
 	{
 		const connection = this.connection ?? await this.connect()
 		if (!connection) throw 'Not connected'
@@ -124,15 +125,16 @@ export default class Mysql implements Dao
 		return object
 	}
 
-	valuesFromDb<T extends Object>(object: T & Entity): T & Entity
+	valuesFromDb<T extends Object>(type: Type<T>, row: T & Entity)
 	{
-		for (const [property, value] of Object.entries(object)) {
-			object[property as keyof T] = applyFilter(value, object, property, SQL, READ)
+		const object = new type
+		for (const property of Object.keys(row)) {
+			object[property as keyof T] = applyFilter(row[property], object, property, SQL, READ)
 		}
-		return object
+		return object as T & Entity
 	}
 
-	valuesToDb(object: object, type?: object | Type)
+	valuesToDb(object: object, type?: ObjectOrType)
 	{
 		if (!type) {
 			type = object
