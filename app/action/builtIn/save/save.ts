@@ -11,15 +11,11 @@ export default class Save extends Action
 
 	dataToObject(object: Object, data: { [index: string]: string })
 	{
-		const reflectClass  = new ReflectClass(object)
-		const propertyTypes = reflectClass.propertyTypes
-		for (const propertyName in propertyTypes) {
-			if (propertyName in data) {
-				const value = applyFilter(data[propertyName], reflectClass.type, propertyName, 'html', 'input')
-				if (value !== UNCHANGED) {
-					object[propertyName] = value
-				}
-			}
+		const type = new ReflectClass(object).type
+		for (const propertyName of Object.keys(data)) {
+			const value = applyFilter(data[propertyName], type, propertyName, 'html', 'input')
+			if (value === UNCHANGED) continue
+			object[propertyName] = value
 		}
 	}
 
