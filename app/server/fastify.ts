@@ -4,7 +4,7 @@ import Response                         from './response'
 
 export const fastifyRequest = async (request: FastifyRequest<{ Params: { [index: string]: string } }>) =>
 {
-	const data = request.body as { [key: string]: string } ?? request.query
+	const data = (request.body ?? request.query) as { [key: string]: string }
 	const files: { [key: string]: Buffer } = {}
 	const params = { ...request.params }
 	const path   = '/' + request.params['*']

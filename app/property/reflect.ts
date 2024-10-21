@@ -1,8 +1,8 @@
-import { ReflectClass } from '../class/reflect'
-import { Object, Type } from '../class/type'
-import { applyFilter }  from './filter/filter'
-import { EDIT, OUTPUT } from './filter/filter'
-import { HTML }         from './filter/filter'
+import { ReflectClass }  from '../class/reflect'
+import { Object, Type }  from '../class/type'
+import { applyFilter }   from './filter/filter'
+import { EDIT, OUTPUT }  from './filter/filter'
+import { HTML }          from './filter/filter'
 
 export class ReflectProperty<T extends Object = {}>
 {
@@ -27,7 +27,7 @@ export class ReflectProperty<T extends Object = {}>
 	edit(format: string = HTML)
 	{
 		return this.object
-			? applyFilter(this.object[this.name], this.class.type, this.name, format, EDIT)
+			? applyFilter(this.object[this.name], this.object, this.name, format, EDIT)
 			: undefined
 	}
 

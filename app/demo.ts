@@ -6,8 +6,8 @@ export default class Demo
 
 	age?: number
 
-	birthday?: Date = new Date
+	birthday = new Date
 
-	name: string = ''
+	name = ''
 
 }

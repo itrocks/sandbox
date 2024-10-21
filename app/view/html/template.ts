@@ -350,7 +350,7 @@ export default class Template
 			return undefined
 		}
 		if ((expression[0] === '.') && (expression.startsWith('./') || expression.startsWith('../'))) {
-			return await this.include(expression, data)
+			return this.include(expression, data)
 		}
 		blockBack = 0
 		for (const variable of expression.split('.')) {
