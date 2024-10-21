@@ -7,6 +7,16 @@ export type PrimitiveType = typeof BigInt | Boolean | Number | Object | String |
 
 export type PropertyTypes = { [property: string]: PrimitiveType | Type }
 
+export function primitiveType(type: string): PrimitiveType
+{
+	const first = type[0]
+	if (first === 'b') return (type[1] === 'i') ? typeof BigInt : Boolean
+	if (first === 'n') return Number
+	if (first === 'o') return Object
+	if (first === 's') return (type[1] === 't') ? String : Symbol
+	if (first === 'u') return undefined
+}
+
 export function propertyTypesFromFile(file: string)
 {
 	const content       = fs.readFileSync(file.substring(0, file.lastIndexOf('.')) + '.d.ts', 'utf8')
@@ -34,15 +44,16 @@ export function propertyTypesFromFile(file: string)
 		if (ts.isClassDeclaration(node)) {
 			node.members.forEach(member =>
 			{
-				if (ts.isPropertyDeclaration(member) && member.type) {
-					const type = member.type.getText()
-					let propertyType: PrimitiveType | Type
-					const typeImport = typeImports[type]
-					propertyType = typeImport
-						? require(typeImport.import)[typeImport.name] as Type
-						: (globalThis as any)[type]
-					propertyTypes[(member.name as ts.Identifier).text] = propertyType
+				if (!(ts.isPropertyDeclaration(member) && member.type)) {
+					return
 				}
+				const type = member.type.getText()
+				let propertyType: PrimitiveType | Type
+				const typeImport = typeImports[type]
+				propertyType = typeImport
+					? require(typeImport.import)[typeImport.name] as Type
+					: primitiveType(type)
+				propertyTypes[(member.name as ts.Identifier).text] = propertyType
 			})
 			return
 		}
