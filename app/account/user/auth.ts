@@ -12,8 +12,8 @@ export default class Auth extends Action
 		let search = new (request.type) as User
 		new Save().dataToObject(search, request.request.data)
 
-		let user
 		const { login, password } = search
+		let user: User | undefined
 		if (search.login.includes('@')) {
 			user = (await dao.search(User, { active: true, email: login, password }))[0]
 		}
@@ -21,14 +21,10 @@ export default class Auth extends Action
 			user = (await dao.search(User, { active: true, login, password }))[0]
 		}
 		request.request.session.user = user
-		const templateFile = user
-			? '/auth.html'
-			: '/auth-error.html'
-		const response = await this.htmlTemplateResponse(user ?? search, request, __dirname + templateFile)
-		if (!user) {
-			response.statusCode = 401
-		}
-		return response
+		const [templateFile, statusCode] = user
+			? ['/auth.html', 200]
+			: ['/auth-error.html', 401]
+		return this.htmlTemplateResponse(user ?? search, request, __dirname + templateFile, statusCode)
 	}
 
 }
