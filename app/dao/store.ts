@@ -1,4 +1,4 @@
-import Type                              from '../class/type'
+import { ObjectOrType }                  from '../class/type'
 import { decorateCallback, decoratorOf } from '../decorator/class'
 
 const STORE = Symbol('store')
@@ -9,4 +9,4 @@ export const Store = (name: false | string = '') => decorateCallback(
 )
 export default Store
 
-export const storeOf = (target: object | Type) => decoratorOf<false | string>(target, STORE, false)
+export const storeOf = (target: ObjectOrType) => decoratorOf<false | string>(target, STORE, false)

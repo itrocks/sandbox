@@ -1,4 +1,4 @@
-import Type                                      from '../../class/type'
+import { ObjectOrType }                          from '../../class/type'
 import { decorateCallback, decoratorOfCallback } from '../../decorator/property'
 import { toDisplay }                             from '../rename'
 
@@ -10,7 +10,7 @@ export const Display = (name = '') => decorateCallback(
 )
 export default Display
 
-export const displayOf = (target: object | Type, property: string) => decoratorOfCallback<string>(
+export const displayOf = (target: ObjectOrType, property: string) => decoratorOfCallback<string>(
 	target,
 	property,
 	DISPLAY,

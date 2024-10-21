@@ -1,4 +1,4 @@
-import Type                      from '../class/type'
+import { ObjectOrType }          from '../class/type'
 import { decorate, decoratorOf } from '../decorator/class'
 
 const NEED = Symbol('need')
@@ -12,4 +12,4 @@ type Need = { alternative?: string, need: Needs }
 export const Need = (need: Needs, alternative?: string) => decorate(NEED, { alternative, need })
 export default Need
 
-export const needOf = (target: object | Type) => decoratorOf<Need>(target, NEED, { need: NOTHING })
+export const needOf = (target: ObjectOrType) => decoratorOf<Need>(target, NEED, { need: NOTHING })

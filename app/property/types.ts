@@ -3,17 +3,9 @@ import path from 'node:path'
 import ts   from 'typescript'
 import Type from '../class/type'
 
-export type PrimitiveType
-	= 'bigint' | 'boolean' | 'number' | 'object' | 'string' | 'symbol' | 'undefined'
+export type PrimitiveType = typeof BigInt | Boolean | Number | Object | String | Symbol | undefined
 
-export const primitiveTypes
-	= ['bigint', 'boolean', 'number', 'object', 'string', 'symbol', 'undefined'] as PrimitiveType[]
-
-export type PropertyTypes
-	= { [property: string]: PrimitiveType | Type }
-
-export const isPrimitiveType
-	= (value: string): value is PrimitiveType => primitiveTypes.includes(value as PrimitiveType)
+export type PropertyTypes = { [property: string]: PrimitiveType | Type }
 
 export function propertyTypesFromFile(file: string)
 {
@@ -45,15 +37,10 @@ export function propertyTypesFromFile(file: string)
 				if (ts.isPropertyDeclaration(member) && member.type) {
 					const type = member.type.getText()
 					let propertyType: PrimitiveType | Type
-					if (isPrimitiveType(type)) {
-						propertyType = type
-					}
-					else {
-						const typeImport = typeImports[type]
-						propertyType = typeImport
-							? require(typeImport.import)[typeImport.name] as Type
-							: (globalThis as any)[type]
-					}
+					const typeImport = typeImports[type]
+					propertyType = typeImport
+						? require(typeImport.import)[typeImport.name] as Type
+						: (globalThis as any)[type]
 					propertyTypes[(member.name as ts.Identifier).text] = propertyType
 				}
 			})

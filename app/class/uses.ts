@@ -1,5 +1,5 @@
 import { decorate, decoratorOf } from '../decorator/class'
-import Type                      from './type'
+import { ObjectOrType, Type }    from './type'
 
 export function Super<T extends object>(self: object): T
 {
@@ -49,7 +49,7 @@ export const Uses = (...mixins: Type[]) => <T extends Type>(target: T): T =>
 }
 export default Uses
 
-export const usesOf = (target: object | Type, resolveBuiltClass = false) => {
+export const usesOf = (target: ObjectOrType, resolveBuiltClass = false) => {
 	const usesOf = decoratorOf<Type[]>(target, USES, [])
 	if (!resolveBuiltClass) {
 		return usesOf

@@ -1,4 +1,4 @@
-import { Object, Type }                          from '../../class/type'
+import { Object, ObjectOrType }                  from '../../class/type'
 import { decorateCallback, decoratorOfCallback } from '../../decorator/class'
 import { requiredOf }                            from '../../property/validate/required'
 
@@ -7,7 +7,7 @@ const defaultValue = (target: object) =>
 
 const REPRESENTATIVE = Symbol('representative')
 
-export const Representative = (...properties: string[]) => decorateCallback(REPRESENTATIVE, target =>
+export const Representative = (...properties: string[]) => decorateCallback(REPRESENTATIVE, function(target)
 {
 	if (!target.prototype.hasOwnProperty('toString')) {
 		target.prototype.toString = function() {
@@ -18,7 +18,7 @@ export const Representative = (...properties: string[]) => decorateCallback(REPR
 })
 export default Representative
 
-export const representativeOf = (target: object | Type) =>
+export const representativeOf = (target: ObjectOrType) =>
 	decoratorOfCallback<string[]>(target, REPRESENTATIVE, defaultValue)
 
 export const representativeValueOf = (target: Object) =>
