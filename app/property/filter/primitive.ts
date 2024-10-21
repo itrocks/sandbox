@@ -3,10 +3,10 @@ import { parse }        from 'date-fns'
 import { ObjectOrType } from '../../class/type'
 import tr               from '../../locale/translate'
 import { displayOf }    from '../../view/property/display'
-import { HTML, SQL }    from './filter'
+import { HTML }         from './filter'
 import { setFilter }    from './filter'
 import { setFilters }   from './filter'
-import { EDIT, INPUT, OUTPUT, READ, SAVE } from './filter'
+import { EDIT, INPUT, OUTPUT } from './filter'
 
 const lfTab = '\n\t\t\t\t'
 
@@ -51,9 +51,7 @@ const dateOutput = (value: Date)   => value ? format(value, tr('dd/MM/yyyy', { u
 setFilters(null, Date, [
 	{ format: HTML, direction: EDIT,   filter: dateEdit },
 	{ format: HTML, direction: INPUT,  filter: dateInput },
-	{ format: HTML, direction: OUTPUT, filter: dateOutput },
-	{ format: SQL,  direction: READ,   filter: (value: string) => new Date(value) },
-	{ format: SQL,  direction: SAVE,   filter: (value: Date) => format(value, 'yyyy-MM-dd') }
+	{ format: HTML, direction: OUTPUT, filter: dateOutput }
 ])
 
 // Number
