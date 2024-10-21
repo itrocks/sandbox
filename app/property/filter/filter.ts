@@ -26,7 +26,7 @@ type Direction      = '' | 'edit' | 'input' | 'output' | 'read' | 'save'
 type FilterType     = ObjectOrType | null
 type PropertyFilter = DecoratorOfType | PrimitiveType | Type | null
 
-export type Filter = (value: any, target: ObjectOrType, property: string, format: string, direction: Direction) => any
+export type Filter = (value: any, target: object, property: string, format: string, direction: Direction) => any
 type Filters = Array<{ format?: string, direction?: Direction, filter: Filter }>
 
 type DirectionFilters = { [direction: string]: Filter }
@@ -34,7 +34,7 @@ type FormatFilters    = { [format:    string]: DirectionFilters }
 
 const filters = new Map<PropertyFilter, FormatFilters>()
 
-export function applyFilter(value: any, target: ObjectOrType, property: string, format: string, direction: Direction)
+export function applyFilter(value: any, target: object, property: string, format: string, direction: Direction)
 {
 	let filter = getFilter(target, property, format, direction)
 	if (filter) {

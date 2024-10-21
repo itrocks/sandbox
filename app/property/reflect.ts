@@ -41,7 +41,7 @@ export class ReflectProperty<T extends Object = {}>
 	output(format: string = HTML)
 	{
 		return this.object
-			? applyFilter(this.object[this.name], this.class.type, this.name, format, OUTPUT)
+			? applyFilter(this.object[this.name], this.object, this.name, format, OUTPUT)
 			: undefined
 	}
 
