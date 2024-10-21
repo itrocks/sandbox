@@ -1,20 +1,22 @@
-import { format }     from 'date-fns'
-import { parse }      from 'date-fns'
-import tr             from '../../locale/translate'
-import { displayOf }  from '../../view/property/display'
-import { HTML, SQL }  from './filter'
-import { setFilter}   from './filter'
-import { setFilters } from './filter'
-import { TypeType }   from './filter'
+import { format }       from 'date-fns'
+import { parse }        from 'date-fns'
+import { ObjectOrType } from '../../class/type'
+import tr               from '../../locale/translate'
+import { displayOf }    from '../../view/property/display'
+import { HTML, SQL }    from './filter'
+import { setFilter }    from './filter'
+import { setFilters }   from './filter'
 import { EDIT, INPUT, OUTPUT, READ, SAVE } from './filter'
-
-setFilter(undefined, 'bigint', 'html', 'input', value => BigInt(value))
 
 const lfTab = '\n\t\t\t\t'
 
-// boolean
+// Bigint
 
-function booleanEdit(value: boolean, type: TypeType, property: string): string
+setFilter(null, BigInt, 'html', 'input', (value: string) => BigInt(value))
+
+// Boolean
+
+function booleanEdit(value: boolean, type: ObjectOrType, property: string)
 {
 	const label    = `<label for="${property}">${tr(displayOf(type, property))}</label>`
 	const name     = `id="${property}" name="${property}"`
@@ -26,31 +28,15 @@ function booleanEdit(value: boolean, type: TypeType, property: string): string
 
 const booleanInput = (value: string) => !['', '0', 'false', 'no', tr('false'), tr('no')].includes(value)
 
-setFilters(undefined, 'boolean', [
+setFilters(null, Boolean, [
 	{ format: HTML, direction: EDIT,   filter: booleanEdit },
 	{ format: HTML, direction: INPUT,  filter: booleanInput },
-	{ format: HTML, direction: OUTPUT, filter: value => value ? tr('yes') : tr('no') }
-])
-
-// number
-
-function numberEdit(value: number, type: TypeType, property: string): string
-{
-	const label      = `<label for="${property}">${tr(displayOf(type, property))}</label>`
-	const name       = `id="${property}" name="${property}"`
-	const inputValue = value ? ` value="${value}"` : ''
-	const input      = `<input data-number ${name}${inputValue}>`
-	return label + lfTab + input
-}
-
-setFilters(undefined, 'number', [
-	{ format: HTML, direction: EDIT,  filter: numberEdit },
-	{ format: HTML, direction: INPUT,	filter: (value: string) => Number(value) }
+	{ format: HTML, direction: OUTPUT, filter: (value: boolean) => value ? tr('yes') : tr('no') }
 ])
 
 // Date
 
-function dateEdit(value: Date, type: TypeType, property: string): string
+function dateEdit(value: Date, type: ObjectOrType, property: string)
 {
 	const label      = `<label for="${property}">${tr(displayOf(type, property))}</label>`
 	const name       = `id="${property}" name="${property}"`
@@ -62,10 +48,48 @@ function dateEdit(value: Date, type: TypeType, property: string): string
 const dateInput  = (value: string) => parse(value, tr('dd/MM/yyyy', { ucFirst: false }), new Date)
 const dateOutput = (value: Date)   => value ? format(value, tr('dd/MM/yyyy', { ucFirst: false })) : ''
 
-setFilters(undefined, Date, [
+setFilters(null, Date, [
 	{ format: HTML, direction: EDIT,   filter: dateEdit },
 	{ format: HTML, direction: INPUT,  filter: dateInput },
 	{ format: HTML, direction: OUTPUT, filter: dateOutput },
-	{ format: SQL,  direction: READ,   filter: value => new Date(value) },
-	{ format: SQL,  direction: SAVE,   filter: value => format(value, 'yyyy-MM-dd') }
+	{ format: SQL,  direction: READ,   filter: (value: string) => new Date(value) },
+	{ format: SQL,  direction: SAVE,   filter: (value: Date) => format(value, 'yyyy-MM-dd') }
+])
+
+// Number
+
+function numberEdit(value: number, type: ObjectOrType, property: string)
+{
+	const label      = `<label for="${property}">${tr(displayOf(type, property))}</label>`
+	const name       = `id="${property}" name="${property}"`
+	const inputValue = value ? ` value="${value}"` : ''
+	const input      = `<input data-number ${name}${inputValue}>`
+	return label + lfTab + input
+}
+
+setFilters(null, Number, [
+	{ format: HTML, direction: EDIT,  filter: numberEdit },
+	{ format: HTML, direction: INPUT,	filter: (value: string) => Number(value) }
+])
+
+// @Store
+
+setFilters(null, Object, [
+	{ format: HTML, direction: OUTPUT, filter: (value: object) => value?.toString() },
+	//{ format: SQL, direction: READ, filter: (value: bigint) => isClass(typeof value) ? value : new (ty) }
+])
+
+// default
+
+function defaultEdit(value: any, type: ObjectOrType, property: string)
+{
+	const label      = `<label for="${property}">${tr(displayOf(type, property))}</label>`
+	const name       = `id="${property}" name="${property}"`
+	const inputValue = value ? ` value="${value}"` : ''
+	const input      = `<input ${name}${inputValue}>`
+	return label + lfTab + input
+}
+
+setFilters(null, null, [
+	{ format: HTML, direction: EDIT, filter: defaultEdit }
 ])

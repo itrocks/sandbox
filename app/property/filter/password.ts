@@ -1,5 +1,5 @@
 import { createHash }            from 'crypto'
-import { Type }                  from '../../class/type'
+import { ObjectOrType, Type }    from '../../class/type'
 import { decorate, decoratorOf } from '../../decorator/property'
 import tr                        from '../../locale/translate'
 import { displayOf }             from '../../view/property/display'
@@ -29,7 +29,7 @@ export function Password(value = true)
 {
 	const parent = decorate(PASSWORD, value)
 	return value
-		? (target: object, property: string) => {
+		? (target: Type, property: string) => {
 			parent(target, property)
 			setFilters(target, property, [
 				{ format: HTML, direction: INPUT, filter: inputPassword },
@@ -42,5 +42,5 @@ export function Password(value = true)
 }
 export default Password
 
-export const passwordOf = (target: object | Type, property: string) =>
+export const passwordOf = (target: ObjectOrType, property: string) =>
 	decoratorOf<boolean>(target, property, PASSWORD, false)
