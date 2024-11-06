@@ -1,3 +1,4 @@
+import User  from './account/user'
 import Store from './dao/store'
 
 @Store()
@@ -9,5 +10,7 @@ export default class Demo
 	birthday = new Date
 
 	name = ''
+
+	user?: User
 
 }

@@ -15,6 +15,7 @@ export function primitiveType(type: string): PrimitiveType
 	if (first === 'o') return Object
 	if (first === 's') return (type[1] === 't') ? String : Symbol
 	if (first === 'u') return undefined
+	return (globalThis as any)[type] as Type
 }
 
 export function propertyTypesFromFile(file: string)

@@ -1,6 +1,8 @@
 import { format }       from 'date-fns'
 import { parse }        from 'date-fns'
+import { Object }       from '../../class/type'
 import { ObjectOrType } from '../../class/type'
+import Store            from '../../dao/store'
 import tr               from '../../locale/translate'
 import { displayOf }    from '../../view/property/display'
 import { HTML }         from './filter'
@@ -72,8 +74,10 @@ setFilters(null, Number, [
 
 // @Store
 
-setFilters(null, Object, [
-	{ format: HTML, direction: OUTPUT, filter: (value: object) => value?.toString() },
+setFilters(null, Store, [
+	{ format: HTML, direction: OUTPUT, filter: (_value, target: Object, property: string) => {
+		return target[property + '_id']?.toString()
+	} },
 	//{ format: SQL, direction: READ, filter: (value: bigint) => isClass(typeof value) ? value : new (ty) }
 ])
 
