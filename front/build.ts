@@ -1,4 +1,4 @@
-import { SortedArrayKey } from './sorted-array.js'
+import { SortedArrayBy } from '../node_modules/@itrocks/sorted-array/esm/sorted-array.js'
 
 export const ALWAYS = 'always'
 export const CALL   = 'call'
@@ -45,7 +45,7 @@ class Callback
 
 }
 
-const callbacks = new SortedArrayKey<Callback>('priority')
+const callbacks = new SortedArrayBy<Callback>('priority')
 
 const chainedSelectors = (selector: string[]) =>
 {
@@ -119,7 +119,7 @@ export function build<E extends Element>(
 	event.priority = (event.priority * 1000000) + callbacks.length
 	event.selector = (typeof event.selector === 'string') ? [event.selector] : chainedSelectors(event.selector)
 
-	const buildCallback = new Callback(event.name, event.selector, event.callback, event.priority, event.parameters)
+	const buildCallback = new Callback(event.name, event.selector, event.callback, event.priority ?? 0, event.parameters)
 	buildCallback.applyInto(document.body)
 	callbacks.push(buildCallback)
 }

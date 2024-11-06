@@ -1,8 +1,8 @@
+import { SortedArray } from '@itrocks/sorted-array'
 import { readFile }    from 'node:fs/promises'
 import path, { sep }   from 'path'
 import { appPath }     from '../../app'
 import tr              from '../../locale/translate'
-import { SortedArray } from '../../sorted-array'
 import Str             from '../str'
 import parseDecorator  from './parseDecorator'
 import parseReflect    from './parseReflect'
@@ -28,11 +28,11 @@ let translatePartStack: string[][]
 let translateParts:     string[]
 let translating:        boolean
 
-export const frontScripts = new SortedArray<string>
+export const frontScripts = new SortedArray<string>()
 frontScripts.distinct = true
 
-let doneLinks      = new SortedArray<string>
-let headLinks      = new SortedArray<string>
+let doneLinks      = new SortedArray<string>()
+let headLinks      = new SortedArray<string>()
 let headTitle      = undefined as string|undefined
 doneLinks.distinct = true
 headLinks.distinct = true
@@ -681,9 +681,7 @@ export default class Template
 								if (sep !== '/') {
 									frontScript = frontScript.replaceAll(sep, '/')
 								}
-								if (!frontScripts.includes(frontScript)) {
-									frontScripts.push(frontScript)
-								}
+								frontScripts.insert(frontScript)
 								target += frontScript
 								start   = index
 							}

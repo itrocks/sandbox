@@ -30,9 +30,12 @@ import Response            from './server/response'
 import FileStore           from './session-file-store'
 import { frontScripts }    from './view/html/template'
 
-frontScripts.push('/node_modules/air-datepicker/locale/en.js')
-frontScripts.push('/node_modules/air-datepicker/locale/fr.js')
-frontScripts.push('/node_modules/air-datepicker/air-datepicker.js')
+frontScripts.push(
+	'/node_modules/@itrocks/sorted-array/esm/sorted-array.js',
+	'/node_modules/air-datepicker/air-datepicker.js',
+	'/node_modules/air-datepicker/locale/en.js',
+	'/node_modules/air-datepicker/locale/fr.js'
+)
 
 async function execute(request: ActionRequest)
 {
