@@ -1,5 +1,5 @@
-import config     from '../../local/dao'
-import Type       from '../class/type'
+import config from '../../local/dao'
+import Type   from '../class/type'
 
 export interface Dao
 {

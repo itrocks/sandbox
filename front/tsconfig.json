@@ -3,12 +3,12 @@
 		"allowSyntheticDefaultImports": true,
 		"composite": true,
 		"forceConsistentCasingInFileNames": true,
-		"lib": ["dom", "esnext"],
-		"module": "esnext",
+		"lib": ["DOM", "ESNext"],
+		"module": "ESNext",
 		"rootDir": "..",
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
-		"target": "es2022"
+		"target": "ES2022"
 	}
 }

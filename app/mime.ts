@@ -1,9 +1,11 @@
 export const mimeTypes = new Map([
+	['cjs',   'text/javascript'],
 	['css',   'text/css'],
 	['ico',   'image/x-icon'],
 	['jpg',   'image/jpeg'],
 	['js',    'text/javascript'],
 	['map',   'application/json'],
+	['mjs',   'text/javascript'],
 	['png',   'image/png'],
 	['scss',  'text/css'],
 	['svg',   'image/svg+xml'],

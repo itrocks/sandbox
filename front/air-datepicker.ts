@@ -77,11 +77,11 @@ export declare type AirDatepickerButton = {
 	onClick?: (dp: AirDatepicker) => void
 }
 
-export declare type AirDatepickerButtonPresets = 'clear' | 'today';
+export declare type AirDatepickerButtonPresets = 'clear' | 'today'
 
-export declare type AirDatepickerPosition = 'left' | 'left top' | 'left bottom' | 'top' | 'top left' | 'top right' | 'right' | 'right top' | 'right bottom' | 'bottom' | 'bottom left' | 'bottom right';
-export declare type AirDatepickerViews = 'days' | 'months' | 'years';
-export declare type AirDatepickerViewsSingle = 'day' | 'month' | 'year';
+export declare type AirDatepickerPosition = 'left' | 'left top' | 'left bottom' | 'top' | 'top left' | 'top right' | 'right' | 'right top' | 'right bottom' | 'bottom' | 'bottom left' | 'bottom right'
+export declare type AirDatepickerViews = 'days' | 'months' | 'years'
+export declare type AirDatepickerViewsSingle = 'day' | 'month' | 'year'
 export declare type AirDatepickerDate = string | number | Date;
 export declare type AirDatepickerNavEntry = string | ((dp: AirDatepicker) => string);
 export declare type AirDatepickerDecade = [number, number];

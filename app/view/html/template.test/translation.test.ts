@@ -1,5 +1,5 @@
-import { translations } from '../../../locale/translate';
-import Template         from '../template';
+import { translations } from '../../../locale/translate'
+import Template         from '../template'
 
 class TemplateMockTranslate extends Template
 {

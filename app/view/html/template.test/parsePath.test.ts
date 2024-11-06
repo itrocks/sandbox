@@ -1,4 +1,4 @@
-import Template from '../template';
+import Template from '../template'
 
 const template = new Template
 template.parseVariable = (variable: string, data: any): any =>
