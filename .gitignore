@@ -4,8 +4,9 @@ node_modules
 
 /coverage
 /local/*
-!/local/*-example.*
-!/local/session/contains-session-data
+	!/local/*-example.*
+	!/local/session/contains-session-data
+/package-lock.json
 
 *.css
 *.css.map
@@ -14,5 +15,6 @@ node_modules
 *.js.map
 *.scssc
 *.tsbuildinfo
+
 !/app/class/caller.js
 !/jest.config.js
