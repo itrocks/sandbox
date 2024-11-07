@@ -1,4 +1,4 @@
-import build                     from '../build.js'
+import build                     from '../../node_modules/@itrocks/build/build.js'
 import FixTable                  from '../fix-table.js'
 import FixTableInheritBackground from '../fix-table-inherit-background.js'
 import FixTableInheritBorder     from '../fix-table-inherit-border.js'

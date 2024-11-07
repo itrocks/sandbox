@@ -1,5 +1,5 @@
+import build                     from '../node_modules/@itrocks/build/build.js'
 import autoFocus                 from './auto-focus.js'
-import build                     from './build.js'
 import breadcrumb                from './breadcrumb.js'
 import collapse                  from './collapse.js'
 import notification              from './notifications.js'

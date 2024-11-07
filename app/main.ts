@@ -31,7 +31,8 @@ import FileStore           from './session-file-store'
 import { frontScripts }    from './view/html/template'
 
 frontScripts.push(
-	'/node_modules/@itrocks/sorted-array/esm/sorted-array.js',
+	'/node_modules/@itrocks/build/build.js',
+	'/node_modules/@itrocks/sorted-array/sorted-array.js',
 	'/node_modules/air-datepicker/air-datepicker.js',
 	'/node_modules/air-datepicker/locale/en.js',
 	'/node_modules/air-datepicker/locale/fr.js'

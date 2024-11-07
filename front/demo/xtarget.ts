@@ -1,4 +1,4 @@
-import build              from '../build.js'
+import build              from '../../node_modules/@itrocks/build/build.js'
 import { Options }        from '../plugin.js'
 import XTarget            from '../xtarget.js'
 import XTargetBeginEnd    from '../xtarget-begin-end.js'
