@@ -1,9 +1,9 @@
 import build                     from '../../node_modules/@itrocks/build/build.js'
+import { xTargetCall }           from '../../node_modules/@itrocks/xtarget/xtarget.js'
 import FixTable                  from '../fix-table.js'
 import FixTableInheritBackground from '../fix-table-inherit-background.js'
 import FixTableInheritBorder     from '../fix-table-inherit-border.js'
 import { tableByElement }        from '../table.js'
-import { xTargetCall }           from '../xtarget.js'
 
 build<HTMLTableElement>(
 	'article[data-action="list"] > form > table.objects',

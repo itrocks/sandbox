@@ -32,6 +32,14 @@ import { frontScripts }    from './view/html/template'
 
 frontScripts.push(
 	'/node_modules/@itrocks/build/build.js',
+	'/node_modules/@itrocks/form-fetch/form-fetch.js',
+	'/node_modules/@itrocks/xtarget/begin-end.js',
+	'/node_modules/@itrocks/xtarget/build.js',
+	'/node_modules/@itrocks/xtarget/head.js',
+	'/node_modules/@itrocks/xtarget/headers-size.js',
+	'/node_modules/@itrocks/xtarget/history.js',
+	'/node_modules/@itrocks/xtarget/plugin.js',
+	'/node_modules/@itrocks/xtarget/xtarget.js',
 	'/node_modules/@itrocks/sorted-array/sorted-array.js',
 	'/node_modules/air-datepicker/air-datepicker.js',
 	'/node_modules/air-datepicker/locale/en.js',
