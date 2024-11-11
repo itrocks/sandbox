@@ -79,14 +79,32 @@ export class TableEdit extends Plugin<Table>
 	{
 		const editable = document.createElement('div') as HTMLDivElement
 		editable.setAttribute('contenteditable', '')
+		if (!selected.innerText.includes('\n'))
+			editable.style.lineHeight  = selectedStyle.height
 		editable.style.minHeight     = selectedStyle.height
 		editable.style.paddingBottom = selectedStyle.paddingBottom
 		editable.style.paddingLeft   = selectedStyle.paddingLeft
 		editable.style.paddingRight  = selectedStyle.paddingRight
 		editable.style.paddingTop    = selectedStyle.paddingTop
-		editable.addEventListener(
-			'keyup', event => this.setSelectedText((event.target as HTMLDivElement)?.innerHTML ?? '')
-		)
+		editable.addEventListener('input', event => {
+			const editable = event.target as HTMLDivElement
+			let   text     = editable.innerHTML ?? ''
+			let   indexOf  = text.indexOf('<br>')
+			if ((text.length > 3) && (indexOf + 4 === text.length)) {
+				const range = new RangeCopy(this.getSelectionRange())
+				editable.innerHTML = text = text.slice(0, -4)
+				if (this.inEditable(range)) this.setSelectionRange(range.toRange())
+				indexOf = -1
+			}
+			console.log(text)
+			if (editable.style.lineHeight && ((indexOf > -1) || (text.indexOf('<div') > -1))) {
+				editable.style.removeProperty('line-height')
+			}
+			else if (!editable.style.lineHeight && (indexOf < 0) && (text.indexOf('<div') < 0)) {
+				editable.style.lineHeight = editable.style.minHeight
+			}
+			this.setSelectedText(text)
+		})
 		while (selected.childNodes.length) {
 			editable.appendChild(selected.childNodes[0])
 		}
@@ -143,6 +161,26 @@ export class TableEdit extends Plugin<Table>
 		)
 	}
 
+	rangeTextContent(range: Range)
+	{
+		if (
+			(range.startContainer === range.endContainer)
+			&& (range.startOffset === range.endOffset)
+		) {
+			return ''
+		}
+		const element = document.createElement('div')
+		element.appendChild(range.cloneContents())
+		let text = element.innerHTML
+		if (text.startsWith('<div>') && text.endsWith('</div>')) {
+			text = text.slice(5, -6)
+		}
+		if (text.endsWith('<br>') && !this.textContentAfterRange(range).length) {
+			text = text.slice(0, -4)
+		}
+		return text.replaceAll('<br>', "\n").replaceAll('</div><div>', "\n").replace(/(<[^>]+>)/g, '')
+	}
+
 	/** If cell is not already selected : unselects old cell, then selects this new one */
 	selectCell(cell: HTMLTableCellElement)
 	{
@@ -184,7 +222,7 @@ export class TableEdit extends Plugin<Table>
 	{
 		if (newText === selectedText) return
 		selectedText = newText
-		this.of.reset()
+		//this.of.reset()
 	}
 
 	setSelectionRange(range: Range)
@@ -195,11 +233,40 @@ export class TableEdit extends Plugin<Table>
 		selection.addRange(range)
 	}
 
+	textContent(range: Range)
+	{
+		return this.closestEditable(range.commonAncestorContainer).innerText
+	}
+
+	textContentAfterRange(range: Range)
+	{
+		const editable = this.closestEditable(range.commonAncestorContainer)
+		const next     = new Range
+		next.setStart(range.endContainer, range.endOffset)
+		editable.lastChild
+			? next.setEndAfter(editable.lastChild)
+			: next.setEnd(editable, editable.textContent?.length ?? 0)
+		return this.rangeTextContent(next)
+	}
+
+	textContentBeforeRange(range: Range)
+	{
+		const editable = this.closestEditable(range.commonAncestorContainer)
+		const previous = new Range
+		previous.setStart(editable, 0)
+		previous.setEnd(range.startContainer, range.startOffset)
+		return this.rangeTextContent(previous)
+	}
+
 	unselectCell()
 	{
 		if (!editable || !selected) return
 		while (editable.childNodes.length) {
 			selected.appendChild(editable.childNodes[0])
+		}
+		const lastChild = selected.lastChild
+		if ((lastChild?.nodeName === 'BR') && (lastChild.previousSibling?.nodeName !== 'BR')) {
+			lastChild.remove()
 		}
 		editable.remove()
 		selectedStyle.length

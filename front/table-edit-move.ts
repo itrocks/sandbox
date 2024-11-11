@@ -17,26 +17,6 @@ export class TableEditMove extends Plugin<Table>
 		)
 	}
 
-	rangeTextContent(range: Range)
-	{
-		if (
-			(range.startContainer === range.endContainer)
-			&& (range.startOffset === range.endOffset)
-		) {
-			return ''
-		}
-		const element = document.createElement('div')
-		element.appendChild(range.cloneContents())
-		let text = element.innerHTML
-		if (text.startsWith('<div>') && text.endsWith('</div>')) {
-			text = text.substring(5, text.length - 6)
-		}
-		if (text.endsWith('<br>') && !this.textContentAfterRange(range).length) {
-			text = text.substring(0, text.length - 4)
-		}
-		return text.replaceAll('<br>', "\n").replaceAll('</div><div>', "\n").replace(/(<[^>]+>)/g, '')
-	}
-
 	selectNextColumn()
 	{
 		const tableEdit = this.tableEdit
@@ -99,62 +79,43 @@ export class TableEditMove extends Plugin<Table>
 			if (event.altKey || event.ctrlKey || event.shiftKey) return
 			switch (event.key) {
 				case 'ArrowDown':
-					if (this.textContentAfterRange(tableEdit.getSelectionRange()).includes("\n")) return
+					if (tableEdit.textContentAfterRange(tableEdit.getSelectionRange()).includes("\n")) return
 					this.selectNextRow()
 					event.preventDefault()
 					return
 				case 'ArrowLeft':
-					if (this.textContentBeforeRange(tableEdit.getSelectionRange()).length) return
+					if (tableEdit.textContentBeforeRange(tableEdit.getSelectionRange()).length) return
 					this.selectPreviousColumn()
 					event.preventDefault()
 					return
 				case 'ArrowRight':
-					if (this.textContentAfterRange(tableEdit.getSelectionRange()).length) return
+					if (tableEdit.textContentAfterRange(tableEdit.getSelectionRange()).length) return
 					this.selectNextColumn()
 					event.preventDefault()
 					return
 				case 'ArrowUp':
-					if (this.textContentBeforeRange(tableEdit.getSelectionRange()).includes("\n")) return
+					if (tableEdit.textContentBeforeRange(tableEdit.getSelectionRange()).includes("\n")) return
 					this.selectPreviousRow()
 					event.preventDefault()
 					return
 				case 'Enter':
-					if (this.textContentAfterRange(tableEdit.getSelectionRange()).length) return
+					if (tableEdit.textContentAfterRange(tableEdit.getSelectionRange()).length) return
 					this.selectNextRow()
 					event.preventDefault()
 					return
 				case 'Escape':
 					tableEdit.setSelectionRange(tableEdit.editableFullRange(tableEdit.getSelectionRange()))
 					return
-				case 'F2':
+				case 'F2': {
 					const range = tableEdit.getSelectionRange()
-					if (this.rangeTextContent(range) === this.rangeTextContent(tableEdit.editableFullRange(range))) {
+					if (tableEdit.rangeTextContent(range) === tableEdit.rangeTextContent(tableEdit.editableFullRange(range))) {
 						tableEdit.setSelectionRange(tableEdit.editableEndRange(range))
 					}
 					return
+				}
 			}
 		})
 		return editable
-	}
-
-	textContentAfterRange(range: Range)
-	{
-		const editable = this.tableEdit.closestEditable(range.commonAncestorContainer)
-		const next     = new Range
-		next.setStart(range.endContainer, range.endOffset)
-		editable.lastChild
-			? next.setEndAfter(editable.lastChild)
-			: next.setEnd(editable, editable.textContent?.length ?? 0)
-		return this.rangeTextContent(next)
-	}
-
-	textContentBeforeRange(range: Range)
-	{
-		const editable = this.tableEdit.closestEditable(range.commonAncestorContainer)
-		const previous = new Range
-		previous.setStart(editable, 0)
-		previous.setEnd(range.startContainer, range.startOffset)
-		return this.rangeTextContent(previous)
 	}
 
 }
