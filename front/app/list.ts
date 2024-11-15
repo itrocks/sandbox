@@ -1,14 +1,14 @@
-import build                     from '../../node_modules/@itrocks/build/build.js'
-import { xTargetCall }           from '../../node_modules/@itrocks/xtarget/xtarget.js'
-import FixTable                  from '../fix-table.js'
-import FixTableInheritBackground from '../fix-table-inherit-background.js'
-import FixTableInheritBorder     from '../fix-table-inherit-border.js'
-import { tableByElement }        from '../table.js'
+import build                        from '../../node_modules/@itrocks/build/build.js'
+import { xTargetCall }              from '../../node_modules/@itrocks/xtarget/xtarget.js'
+import TableFreeze                  from '../../node_modules/@itrocks/table/freeze.js'
+import TableFreezeInheritBackground from '../../node_modules/@itrocks/table/freeze/inherit-background.js'
+import TableFreezeInheritBorder     from '../../node_modules/@itrocks/table/freeze/inherit-border.js'
+import { tableByElement }           from '../../node_modules/@itrocks/table/table.js'
 
 build<HTMLTableElement>(
 	'article[data-action="list"] > form > table.objects',
 	element => {
-		tableByElement(element, { plugins: [ FixTable, FixTableInheritBackground, FixTableInheritBorder ] })
+		tableByElement(element, { plugins: [ TableFreeze, TableFreezeInheritBackground, TableFreezeInheritBorder ] })
 		element.querySelector(':scope > tbody')?.addEventListener('click', async event =>
 		{
 			const td = event.target
