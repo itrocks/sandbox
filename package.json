@@ -6,6 +6,7 @@
 		"@fastify/multipart": "^9.0",
 		"@fastify/session": "^11.0",
 		"@itrocks/build": "latest",
+		"@itrocks/contenteditable": "latest",
 		"@itrocks/xtarget": "latest",
 		"air-datepicker": "^3.5",
 		"date-fns": "^4.1",

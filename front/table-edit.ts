@@ -1,10 +1,12 @@
-import Plugin from './plugin.js'
-import Table  from './table.js'
+import ContentEditable         from '../node_modules/@itrocks/contenteditable/contenteditable.js'
+import { HTMLEditableElement } from '../node_modules/@itrocks/contenteditable/contenteditable.js'
+import Plugin                  from '../node_modules/@itrocks/plugin/plugin.js'
+import Table                   from './table.js'
 
-let editable:      HTMLDivElement | undefined
-let selected:      HTMLTableCellElement | undefined
-let selectedStyle: string
-let selectedText:  string
+let editable:        HTMLEditableElement | undefined
+let selected:        HTMLTableCellElement | undefined
+let selectedStyle:   string
+let selectedText:    string
 
 export class RangeCopy
 {
@@ -77,42 +79,40 @@ export class TableEdit extends Plugin<Table>
 
 	createEditable(selected: HTMLTableCellElement, selectedStyle: CSSStyleDeclaration)
 	{
-		const editable = document.createElement('div') as HTMLDivElement
-		editable.setAttribute('contenteditable', '')
-		if (!selected.innerText.includes('\n'))
+		const contentEditable = new ContentEditable(document.createElement('div'))
+		const editable        = contentEditable.element
+
+		editable.innerHTML = selected.innerHTML
+		if (!contentEditable.value().includes(contentEditable.br()))
 			editable.style.lineHeight  = selectedStyle.height
 		editable.style.minHeight     = selectedStyle.height
 		editable.style.paddingBottom = selectedStyle.paddingBottom
 		editable.style.paddingLeft   = selectedStyle.paddingLeft
 		editable.style.paddingRight  = selectedStyle.paddingRight
 		editable.style.paddingTop    = selectedStyle.paddingTop
-		editable.addEventListener('input', event => {
-			const editable = event.target as HTMLDivElement
-			let   text     = editable.innerHTML ?? ''
-			let   indexOf  = text.indexOf('<br>')
-			if ((text.length > 3) && (indexOf + 4 === text.length)) {
-				const range = new RangeCopy(this.getSelectionRange())
-				editable.innerHTML = text = text.slice(0, -4)
-				if (this.inEditable(range)) this.setSelectionRange(range.toRange())
-				indexOf = -1
+
+		editable.addEventListener('input', event =>
+		{
+			const editable        = event.target as HTMLEditableElement
+			const contentEditable = editable.editable
+			const text            = contentEditable.value()
+			if (text.includes(contentEditable.br())) {
+				if (editable.style.lineHeight) {
+					editable.style.removeProperty('line-height')
+				}
 			}
-			console.log(text)
-			if (editable.style.lineHeight && ((indexOf > -1) || (text.indexOf('<div') > -1))) {
-				editable.style.removeProperty('line-height')
-			}
-			else if (!editable.style.lineHeight && (indexOf < 0) && (text.indexOf('<div') < 0)) {
+			else if (!editable.style.lineHeight) {
 				editable.style.lineHeight = editable.style.minHeight
 			}
 			this.setSelectedText(text)
 		})
-		while (selected.childNodes.length) {
-			editable.appendChild(selected.childNodes[0])
-		}
+
 		selected.replaceChildren(editable)
 		selected.style.padding = '0'
 		if (selectedStyle.position === 'sticky') {
 			selected.style.zIndex = this.zIndex
 		}
+
 		return editable
 	}
 
@@ -149,6 +149,7 @@ export class TableEdit extends Plugin<Table>
 		return range
 	}
 
+
 	inEditable(node: Node | Range | RangeCopy): boolean
 	{
 		if ((node instanceof Range) || (node instanceof RangeCopy)) {
@@ -163,22 +164,9 @@ export class TableEdit extends Plugin<Table>
 
 	rangeTextContent(range: Range)
 	{
-		if (
-			(range.startContainer === range.endContainer)
-			&& (range.startOffset === range.endOffset)
-		) {
-			return ''
-		}
 		const element = document.createElement('div')
 		element.appendChild(range.cloneContents())
-		let text = element.innerHTML
-		if (text.startsWith('<div>') && text.endsWith('</div>')) {
-			text = text.slice(5, -6)
-		}
-		if (text.endsWith('<br>') && !this.textContentAfterRange(range).length) {
-			text = text.slice(0, -4)
-		}
-		return text.replaceAll('<br>', "\n").replaceAll('</div><div>', "\n").replace(/(<[^>]+>)/g, '')
+		return element.innerHTML
 	}
 
 	/** If cell is not already selected : unselects old cell, then selects this new one */
@@ -233,11 +221,6 @@ export class TableEdit extends Plugin<Table>
 		selection.addRange(range)
 	}
 
-	textContent(range: Range)
-	{
-		return this.closestEditable(range.commonAncestorContainer).innerText
-	}
-
 	textContentAfterRange(range: Range)
 	{
 		const editable = this.closestEditable(range.commonAncestorContainer)
@@ -261,14 +244,8 @@ export class TableEdit extends Plugin<Table>
 	unselectCell()
 	{
 		if (!editable || !selected) return
-		while (editable.childNodes.length) {
-			selected.appendChild(editable.childNodes[0])
-		}
-		const lastChild = selected.lastChild
-		if ((lastChild?.nodeName === 'BR') && (lastChild.previousSibling?.nodeName !== 'BR')) {
-			lastChild.remove()
-		}
-		editable.remove()
+		editable.editable.deactivate()
+		selected.innerHTML = editable.innerHTML
 		selectedStyle.length
 			? selected.setAttribute('style', selectedStyle)
 			: selected.removeAttribute('style')

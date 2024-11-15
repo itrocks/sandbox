@@ -1,4 +1,4 @@
-import Plugin    from './plugin.js'
+import Plugin    from '../node_modules/@itrocks/plugin/plugin.js'
 import Table     from './table.js'
 import TableEdit from './table-edit.js'
 
@@ -19,9 +19,9 @@ export class TableEditLock extends Plugin<Table>
 		super(table)
 		Object.assign(this.options, options)
 
-		const tableEdit               = table.plugins.TableEdit as TableEdit
-		const original                = tableEdit.closestEditableCell
-		tableEdit.closestEditableCell = target => this.closestEditableCell(original.call(tableEdit, target))
+		const tableEdit = table.plugins.TableEdit as TableEdit
+		const superClosestEditableCell = tableEdit.closestEditableCell
+		tableEdit.closestEditableCell = target => this.closestEditableCell(superClosestEditableCell.call(tableEdit, target))
 	}
 
 	colCell(cell: HTMLTableCellElement)

@@ -1,4 +1,4 @@
-import { HasPlugins, Options as PluginOptions } from './plugin.js'
+import { HasPlugins, Options as PluginOptions } from '../node_modules/@itrocks/plugin/plugin.js'
 
 export type HTMLTableFixElement = HTMLTableCellElement | HTMLTableColElement
 

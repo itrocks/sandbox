@@ -1,4 +1,4 @@
-import Plugin                         from './plugin.js'
+import Plugin                         from '../node_modules/@itrocks/plugin/plugin.js'
 import { HTMLTableFixElement, Table } from './table.js'
 
 export class ColumnReorderTable extends Plugin<Table>

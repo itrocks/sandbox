@@ -1,5 +1,5 @@
+import Plugin    from '../node_modules/@itrocks/plugin/plugin.js'
 import FixTable  from './fix-table.js'
-import Plugin    from './plugin.js'
 import Table     from './table.js'
 import TableEdit from './table-edit.js'
 
@@ -13,8 +13,8 @@ export class TableEditFixScroll extends Plugin<Table>
 		this.fixTable = table.plugins.FixTable as FixTable
 
 		const tableEdit = table.plugins.TableEdit as TableEdit
-		const original  = tableEdit.setSelectedCell
-		tableEdit.setSelectedCell = cell => original.call(tableEdit, this.scrollToCell(cell))
+		const superSetSelectedCell = tableEdit.setSelectedCell
+		tableEdit.setSelectedCell  = cell => superSetSelectedCell.call(tableEdit, this.scrollToCell(cell))
 	}
 
 	scrollToCell(cell: HTMLTableCellElement)

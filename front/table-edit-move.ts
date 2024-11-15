@@ -1,6 +1,7 @@
-import Plugin    from './plugin.js'
-import Table     from './table.js'
-import TableEdit from './table-edit.js'
+import { HTMLEditableElement } from '../node_modules/@itrocks/contenteditable/contenteditable.js'
+import Plugin                  from '../node_modules/@itrocks/plugin/plugin.js'
+import Table                   from './table.js'
+import TableEdit               from './table-edit.js'
 
 export class TableEditMove extends Plugin<Table>
 {
@@ -11,9 +12,9 @@ export class TableEditMove extends Plugin<Table>
 		super(table)
 		this.tableEdit = table.plugins.TableEdit as TableEdit
 
-		const original = this.tableEdit.createEditable
+		const superCreateEditable = this.tableEdit.createEditable
 		this.tableEdit.createEditable = (selected, selectedStyle) => this.setEditableKeydownListener(
-			original.call(this.tableEdit, selected, selectedStyle)
+			superCreateEditable.call(this.tableEdit, selected, selectedStyle)
 		)
 	}
 
@@ -72,49 +73,67 @@ export class TableEditMove extends Plugin<Table>
 		return this.selectSiblingRow('previousElementSibling', 'lastElementChild')
 	}
 
-	setEditableKeydownListener(editable: HTMLDivElement)
+	setEditableKeydownListener(editable: HTMLEditableElement)
 	{
 		editable.addEventListener('keydown', event => {
 			const tableEdit = this.tableEdit
 			if (event.altKey || event.ctrlKey || event.shiftKey) return
 			switch (event.key) {
-				case 'ArrowDown':
-					if (tableEdit.textContentAfterRange(tableEdit.getSelectionRange()).includes("\n")) return
-					this.selectNextRow()
-					event.preventDefault()
+				case 'ArrowDown': {
+					const br        = editable.editable.br()
+					const textAfter = tableEdit.textContentAfterRange(tableEdit.getSelectionRange())
+					if ((textAfter === br) || (textAfter.indexOf(br) < 0) || (textAfter.indexOf(br) + 4 === textAfter.length)) {
+						this.selectNextRow()
+						event.preventDefault()
+					}
 					return
-				case 'ArrowLeft':
+				}
+				case 'ArrowLeft': {
 					if (tableEdit.textContentBeforeRange(tableEdit.getSelectionRange()).length) return
 					this.selectPreviousColumn()
 					event.preventDefault()
 					return
-				case 'ArrowRight':
-					if (tableEdit.textContentAfterRange(tableEdit.getSelectionRange()).length) return
-					this.selectNextColumn()
-					event.preventDefault()
+				}
+				case 'ArrowRight': {
+					const br        = editable.editable.br()
+					const textAfter = tableEdit.textContentAfterRange(tableEdit.getSelectionRange())
+					if (['', br].includes(textAfter)) {
+						this.selectNextColumn()
+						event.preventDefault()
+					}
 					return
-				case 'ArrowUp':
-					if (tableEdit.textContentBeforeRange(tableEdit.getSelectionRange()).includes("\n")) return
+				}
+				case 'ArrowUp': {
+					if (tableEdit.textContentBeforeRange(tableEdit.getSelectionRange()).includes(editable.editable.br())) return
 					this.selectPreviousRow()
 					event.preventDefault()
 					return
-				case 'Enter':
-					if (tableEdit.textContentAfterRange(tableEdit.getSelectionRange()).length) return
-					this.selectNextRow()
-					event.preventDefault()
+				}
+				case 'Enter': {
+					const br        = editable.editable.br()
+					const textAfter = tableEdit.textContentAfterRange(tableEdit.getSelectionRange())
+					if (['', br].includes(textAfter)) {
+						this.selectNextRow()
+						event.preventDefault()
+						event.stopImmediatePropagation()
+					}
 					return
-				case 'Escape':
+				}
+				case 'Escape': {
 					tableEdit.setSelectionRange(tableEdit.editableFullRange(tableEdit.getSelectionRange()))
 					return
+				}
 				case 'F2': {
-					const range = tableEdit.getSelectionRange()
-					if (tableEdit.rangeTextContent(range) === tableEdit.rangeTextContent(tableEdit.editableFullRange(range))) {
+					const range     = tableEdit.getSelectionRange()
+					const selection = document.createElement('div')
+					selection.appendChild(range.cloneContents())
+					if (selection.innerHTML === tableEdit.editable()?.editable.value()) {
 						tableEdit.setSelectionRange(tableEdit.editableEndRange(range))
 					}
 					return
 				}
 			}
-		})
+		}, { capture: true })
 		return editable
 	}
 

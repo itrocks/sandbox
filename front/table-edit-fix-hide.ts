@@ -1,7 +1,8 @@
-import FixTable  from './fix-table.js'
-import Plugin    from './plugin.js'
-import Table     from './table.js'
-import TableEdit from './table-edit.js'
+import { HTMLEditableElement } from '../node_modules/@itrocks/contenteditable/contenteditable.js'
+import Plugin                  from '../node_modules/@itrocks/plugin/plugin.js'
+import FixTable                from './fix-table.js'
+import Table                   from './table.js'
+import TableEdit               from './table-edit.js'
 
 const zIndex = {
 	back:     false,
@@ -27,28 +28,30 @@ export class TableEditFixHide extends Plugin<Table>
 		fixTable.full    = { column: '2', corner: '6', row: '4' }
 		tableEdit.zIndex = '7'
 
-		table.addEventListener(scrollable, 'scroll', () => this.autoHide(tableEdit.editable(), tableEdit.selected()))
-		table.addEventListener(window,     'resize', () => this.autoHide(tableEdit.editable(), tableEdit.selected()))
+		table.addEventListener(scrollable, 'scroll', () => this.autoHide())
+		table.addEventListener(window,     'resize', () => this.autoHide())
 
-		const original = tableEdit.createEditable
+		const superCreateEditable = tableEdit.createEditable
 		tableEdit.createEditable = (selected, selectedStyle) => this.addEditableEventListeners(
-			original.call(tableEdit, selected, selectedStyle), selected
+			superCreateEditable.call(tableEdit, selected, selectedStyle)
 		)
 	}
 
-	addEditableEventListeners(editable: HTMLDivElement, selected: HTMLTableCellElement)
+	addEditableEventListeners(editable: HTMLEditableElement)
 	{
 		zIndex.back = false
-		this.autoHide(editable, selected)
-		const goAhead = () => this.goAhead(editable, selected)
+		this.autoHide()
+		const goAhead = () => this.goAhead()
 		editable.addEventListener('keydown', goAhead)
 		editable.addEventListener('keyup',   goAhead)
 		editable.addEventListener('click',   goAhead)
 		return editable
 	}
 
-	autoHide(editable?: HTMLDivElement, selected?: HTMLTableCellElement)
+	autoHide()
 	{
+		const editable = this.tableEdit.editable()
+		const selected = this.tableEdit.selected()
 		if (!editable || !selected) return
 
 		const into = this.fixTable.visibleInnerRect()
@@ -68,15 +71,17 @@ export class TableEditFixHide extends Plugin<Table>
 		const backVertical   = !fixRow    && ((rect.top < into.top) || (rect.bottom > into.bottom))
 
 		if (backHorizontal || backVertical) {
-			this.goBack(editable, selected)
+			this.goBack()
 		}
 		else {
-			this.goAhead(editable, selected)
+			this.goAhead()
 		}
 	}
 
-	goAhead(editable?: HTMLDivElement, selected?: HTMLTableCellElement)
+	goAhead()
 	{
+		const editable = this.tableEdit.editable()
+		const selected = this.tableEdit.selected()
 		if (!zIndex.back || !editable || !selected) return
 
 		zIndex.editable.length ? (editable.style.zIndex = zIndex.editable) : editable.style.removeProperty('z-index')
@@ -87,8 +92,10 @@ export class TableEditFixHide extends Plugin<Table>
 		zIndex.selected = ''
 	}
 
-	goBack(editable?: HTMLDivElement, selected?: HTMLTableCellElement)
+	goBack()
 	{
+		const editable = this.tableEdit.editable()
+		const selected = this.tableEdit.selected()
 		if (zIndex.back || !editable || !selected) return
 
 		zIndex.back     = true

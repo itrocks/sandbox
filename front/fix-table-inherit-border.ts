@@ -1,5 +1,5 @@
+import Plugin                         from '../node_modules/@itrocks/plugin/plugin.js'
 import FixTable                       from './fix-table.js'
-import Plugin                         from './plugin.js'
 import { HTMLTableFixElement, Table } from './table.js'
 
 /**
@@ -18,8 +18,8 @@ export class InheritBorder extends Plugin<Table>
 		this.tableStyle = getComputedStyle(table.element)
 		if (this.tableStyle.borderCollapse !== 'collapse') return
 
-		const original         = this.fixTable.position
-		this.fixTable.position = (position, counter, colCell, side) => original.call(
+		const superPosition    = this.fixTable.position
+		this.fixTable.position = (position, counter, colCell, side) => superPosition.call(
 			this.of.plugins.FixTable, this.position(position, counter, colCell, side), counter, colCell, side
 		)
 	}
