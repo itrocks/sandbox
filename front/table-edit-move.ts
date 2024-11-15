@@ -81,7 +81,7 @@ export class TableEditMove extends Plugin<Table>
 			switch (event.key) {
 				case 'ArrowDown': {
 					const br        = editable.editable.br()
-					const textAfter = tableEdit.textContentAfterRange(tableEdit.getSelectionRange())
+					const textAfter = tableEdit.textContentAfterRange()
 					if ((textAfter === br) || (textAfter.indexOf(br) < 0) || (textAfter.indexOf(br) + 4 === textAfter.length)) {
 						this.selectNextRow()
 						event.preventDefault()
@@ -89,14 +89,14 @@ export class TableEditMove extends Plugin<Table>
 					return
 				}
 				case 'ArrowLeft': {
-					if (tableEdit.textContentBeforeRange(tableEdit.getSelectionRange()).length) return
+					if (tableEdit.textContentBeforeRange().length) return
 					this.selectPreviousColumn()
 					event.preventDefault()
 					return
 				}
 				case 'ArrowRight': {
 					const br        = editable.editable.br()
-					const textAfter = tableEdit.textContentAfterRange(tableEdit.getSelectionRange())
+					const textAfter = tableEdit.textContentAfterRange()
 					if (['', br].includes(textAfter)) {
 						this.selectNextColumn()
 						event.preventDefault()
@@ -104,14 +104,14 @@ export class TableEditMove extends Plugin<Table>
 					return
 				}
 				case 'ArrowUp': {
-					if (tableEdit.textContentBeforeRange(tableEdit.getSelectionRange()).includes(editable.editable.br())) return
+					if (tableEdit.textContentBeforeRange().includes(editable.editable.br())) return
 					this.selectPreviousRow()
 					event.preventDefault()
 					return
 				}
 				case 'Enter': {
 					const br        = editable.editable.br()
-					const textAfter = tableEdit.textContentAfterRange(tableEdit.getSelectionRange())
+					const textAfter = tableEdit.textContentAfterRange()
 					if (['', br].includes(textAfter)) {
 						this.selectNextRow()
 						event.preventDefault()

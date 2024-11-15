@@ -221,8 +221,9 @@ export class TableEdit extends Plugin<Table>
 		selection.addRange(range)
 	}
 
-	textContentAfterRange(range: Range)
+	textContentAfterRange()
 	{
+		const range    = this.getSelectionRange()
 		const editable = this.closestEditable(range.commonAncestorContainer)
 		const next     = new Range
 		next.setStart(range.endContainer, range.endOffset)
@@ -232,8 +233,9 @@ export class TableEdit extends Plugin<Table>
 		return this.rangeTextContent(next)
 	}
 
-	textContentBeforeRange(range: Range)
+	textContentBeforeRange()
 	{
+		const range    = this.getSelectionRange()
 		const editable = this.closestEditable(range.commonAncestorContainer)
 		const previous = new Range
 		previous.setStart(editable, 0)
