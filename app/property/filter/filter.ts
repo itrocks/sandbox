@@ -37,14 +37,13 @@ const filters = new Map<PropertyFilter, FormatFilters>()
 export function applyFilter(value: any, target: object, property: string, format: string, direction: Direction)
 {
 	let filter = getFilter(target, property, format, direction)
-	if (filter) {
-		return filter(value, target, property, format, direction)
+	if (!filter) {
+		const propertyType = new ReflectProperty(target, property).type
+		filter = getFilter(null, propertyType, format, direction)
+			|| getFilter(null, null, format, direction)
+			|| (value => value)
+		setFilter(target, property, format, direction, filter)
 	}
-	const propertyType = new ReflectProperty(target, property).type
-	filter = getFilter(null, propertyType, format, direction)
-		|| getFilter(null, null, format, direction)
-		|| (value => value)
-	setFilter(target, property, format, direction, filter)
 	return filter(value, target, property, format, direction)
 }
 

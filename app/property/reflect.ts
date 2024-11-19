@@ -20,29 +20,29 @@ export class ReflectProperty<T extends Object = {}>
 		const value = (this.#class instanceof ReflectClass)
 			? this.#class
 			: new ReflectClass(this.#class)
-		Object.defineProperty(this, 'class', { value, writable: false })
+		Object.defineProperty(this, 'class', { value })
 		return value
 	}
 
-	edit(format: string = HTML)
+	async edit(format: string = HTML)
 	{
-		return this.object
-			? applyFilter(this.object[this.name], this.object, this.name, format, EDIT)
-			: undefined
+		if (!this.object) return
+		let value = this.object[this.name]
+		return applyFilter((value instanceof Promise) ? await value : value, this.object, this.name, format, EDIT)
 	}
 
-	get object() : Object | undefined
+	get object()
 	{
 		const value = this.class.object
-		Object.defineProperty(this, 'object', { value, writable: false })
+		Object.defineProperty(this, 'object', { value })
 		return value
 	}
 
-	output(format: string = HTML)
+	async output(format: string = HTML)
 	{
-		return this.object
-			? applyFilter(this.object[this.name], this.object, this.name, format, OUTPUT)
-			: undefined
+		if (!this.object) return
+		const value = this.object[this.name]
+		return applyFilter((value instanceof Promise) ? await value : value, this.object, this.name, format, OUTPUT)
 	}
 
 	get type()

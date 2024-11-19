@@ -1,13 +1,11 @@
 import { format }       from 'date-fns'
 import { parse }        from 'date-fns'
-import { Object }       from '../../class/type'
 import { ObjectOrType } from '../../class/type'
-import Store            from '../../dao/store'
 import tr               from '../../locale/translate'
 import { displayOf }    from '../../view/property/display'
-import { HTML }         from './filter'
 import { setFilter }    from './filter'
 import { setFilters }   from './filter'
+import { HTML }         from './filter'
 import { EDIT, INPUT, OUTPUT } from './filter'
 
 const lfTab = '\n\t\t\t\t'
@@ -70,15 +68,6 @@ function numberEdit(value: number, type: ObjectOrType, property: string)
 setFilters(null, Number, [
 	{ format: HTML, direction: EDIT,  filter: numberEdit },
 	{ format: HTML, direction: INPUT,	filter: (value: string) => Number(value) }
-])
-
-// @Store
-
-setFilters(null, Store, [
-	{ format: HTML, direction: OUTPUT, filter: (_value, target: Object, property: string) => {
-		return target[property + '_id']?.toString()
-	} },
-	//{ format: SQL, direction: READ, filter: (value: bigint) => isClass(typeof value) ? value : new (ty) }
 ])
 
 // default

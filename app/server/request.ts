@@ -21,7 +21,7 @@ export class Request
 	{
 		const port  = (this.port ? (':' + this.port) : '')
 		const value = new URL(this.scheme + '://' + this.host + port + this.path)
-		Object.defineProperty(this, 'url', { value, writable: false })
+		Object.defineProperty(this, 'url', { value })
 		return value
 	}
 

@@ -134,11 +134,11 @@ export default class Mysql implements Dao
 
 	valuesFromDb<T extends Object>(row: T & Entity, type: Type<T>)
 	{
-		const object = new type
+		const object = new type as T & Entity
 		for (const property of Object.keys(row)) {
 			object[property as keyof T] = applyFilter(row[property], object, property, SQL, READ)
 		}
-		return object as T & Entity
+		return object
 	}
 
 	valuesToDb(object: object, type?: Type)

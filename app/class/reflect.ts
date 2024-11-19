@@ -21,7 +21,7 @@ export class ReflectClass<T extends Object = {}>
 	get parent()
 	{
 		const value = new ReflectClass(Object.getPrototypeOf(this.type))
-		Object.defineProperty(this, 'parent', { value, writable: false })
+		Object.defineProperty(this, 'parent', { value })
 		return value
 	}
 
@@ -31,14 +31,24 @@ export class ReflectClass<T extends Object = {}>
 		for (const name of this.propertyNames) {
 			value[name] = new ReflectProperty(this, name)
 		}
-		Object.defineProperty(this, 'properties', { value, writable: false })
+		Object.defineProperty(this, 'properties', { value })
 		return value
 	}
 
 	get propertyNames()
 	{
-		const value = Object.getOwnPropertyNames(new (this.type))
-		Object.defineProperty(this, 'propertyNames', { value, writable: false })
+		let   current = new this.type
+		const value = Object.getOwnPropertyNames(current)
+		while (current) {
+			Object.entries(Object.getOwnPropertyDescriptors(current)).forEach(([name, descriptor]) => {
+				if (!descriptor.get || (name[0] === '_') || value.includes(name)) {
+					return
+				}
+				value.push(name)
+			})
+			current = Object.getPrototypeOf(current)
+		}
+		Object.defineProperty(this, 'propertyNames', { value })
 		return value
 	}
 
@@ -50,14 +60,14 @@ export class ReflectClass<T extends Object = {}>
 			Object.assign(value, new ReflectClass(uses).propertyTypes)
 		}
 		Object.assign(value, propertyTypesFromFile(fileOf(this.type)))
-		Object.defineProperty(this, 'propertyTypes', { value, writable: false })
+		Object.defineProperty(this, 'propertyTypes', { value })
 		return value
 	}
 
 	get uses()
 	{
 		const value = usesOf(this.type)
-		Object.defineProperty(this, 'uses', { value, writable: false })
+		Object.defineProperty(this, 'uses', { value })
 		return value
 	}
 

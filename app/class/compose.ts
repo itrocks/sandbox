@@ -1,10 +1,11 @@
-import path         from 'path'
-import Route        from '../action/route'
-import { getRoute } from '../action/routes'
-import File         from '../class/file'
-import config       from '../config/compose'
-import Type         from './type'
-import Uses         from './uses'
+import path          from 'path'
+import Route         from '../action/route'
+import { getRoute }  from '../action/routes'
+import File          from '../class/file'
+import config        from '../config/compose'
+import { initClass } from '../orm'
+import Type          from './type'
+import Uses          from './uses'
 
 type SubstitutionModule = { __esModule: true, default?: Type }
 
@@ -16,6 +17,10 @@ function applyFileToType(module: any, file: string)
 		const route = getRoute(file.slice(0, -3))
 		if (route) {
 			Route(route)(type)
+		}
+		const withORM = initClass(type)
+		if (withORM) {
+			module.default = withORM
 		}
 	}
 	return module

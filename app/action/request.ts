@@ -33,7 +33,7 @@ export default class Request
 		if ((typeof type)[0] !== 'f') {
 			throw new Exception('Module ' + this.route.substring(1) + ' default is not a class')
 		}
-		Object.defineProperty(this, 'type', { value: type, writable: false })
+		Object.defineProperty(this, 'type', { value: type })
 		return type as Type
 	}
 
