@@ -29,7 +29,9 @@ export function initClass(classType: Type): Type | undefined
 			configurable: true,
 			enumerable:   true,
 			async get() {
-				const value = await Dao.read(type as Type, this[property.name + '_id'])
+				const property_id = property.name + '_id'
+				const value = this[property_id] ? await Dao.read(type as Type, this[property_id]) : undefined
+				delete this[property_id]
 				Object.defineProperty(this, property.name, { configurable: true, enumerable: true, value, writable: true })
 				return value
 			},
