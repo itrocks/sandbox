@@ -1,9 +1,9 @@
 import { createHash }            from 'crypto'
-import { ObjectOrType, Type }    from '../../class/type'
+import { ObjectOrType }          from '../../class/type'
 import { decorate, decoratorOf } from '../../decorator/property'
 import tr                        from '../../locale/translate'
 import { displayOf }             from '../../view/property/display'
-import { Filter, setFilters }    from './filter'
+import { setFilters }            from './filter'
 import { EDIT, HTML, INPUT, JSON, UNCHANGED } from './filter'
 
 const PASSWORD = Symbol('password')
@@ -29,11 +29,11 @@ export function Password(value = true)
 {
 	const parent = decorate(PASSWORD, value)
 	return value
-		? (target: Type, property: string) => {
+		? (target: object, property: string) => {
 			parent(target, property)
 			setFilters(target, property, [
+				{ format: HTML, direction: EDIT,  filter: editPassword },
 				{ format: HTML, direction: INPUT, filter: inputPassword },
-				{ format: HTML, direction: EDIT,  filter: editPassword as Filter },
 				{ format: HTML,                   filter: value => value.length ? '***********' : '' },
 				{ format: JSON,                   filter: value => value.length ? '*PASSWORD*' : '*EMPTY*' }
 			])
