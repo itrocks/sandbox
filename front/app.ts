@@ -18,7 +18,7 @@ build<HTMLHeadingElement>('main > * > h2, main > * > header > h2', breadcrumb)
 
 build<HTMLButtonElement>('button.collapse', button => collapse(button, 'body'))
 
-build<HTMLInputElement>('input[data-date]', async input => (await import('./air-datepicker.js')).default(input))
+build<HTMLInputElement>('input[data-type=date]', async input => (await import('./air-datepicker.js')).default(input))
 
 build<HTMLFormElement>('form', autoFocus)
 

@@ -41,7 +41,7 @@ function dateEdit(value: Date, type: ObjectOrType, property: string)
 	const label      = `<label for="${property}">${tr(displayOf(type, property))}</label>`
 	const name       = `id="${property}" name="${property}"`
 	const inputValue = value ? ` value="${format(value, tr('dd/MM/yyyy', { ucFirst: false }))}"` : ''
-	const input      = `<input data-date ${name}${inputValue}>`
+	const input      = `<input data-type="date" ${name}${inputValue}>`
 	return label + lfTab + input
 }
 
@@ -61,7 +61,7 @@ function numberEdit(value: number, type: ObjectOrType, property: string)
 	const label      = `<label for="${property}">${tr(displayOf(type, property))}</label>`
 	const name       = `id="${property}" name="${property}"`
 	const inputValue = value ? ` value="${value}"` : ''
-	const input      = `<input data-number ${name}${inputValue}>`
+	const input      = `<input data-type="number" ${name}${inputValue}>`
 	return label + lfTab + input
 }
 
