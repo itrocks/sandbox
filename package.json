@@ -10,6 +10,7 @@
 		"@itrocks/table": "latest",
 		"@itrocks/xtarget": "latest",
 		"air-datepicker": "^3.5",
+		"autocompleter": "^9.3.2",
 		"date-fns": "^4.1",
 		"fastify": "~5.0",
 		"html-to-text": "^9.0",
@@ -40,13 +41,20 @@
 	},
 	"name": "sandbox",
 	"scripts": {
-		"build": "tspc && sass app:app front:front",
-		"build:force": "tspc -b -f && sass app:app front:front",
-		"build:watch": "npm-run-all --parallel build:watch:ts build:watch:scss",
-		"build:watch:ts": "tspc -w",
-		"build:watch:scss": "sass -w app:app front:front",
+		"build": "npm-run-all --parallel build:app build:front build:sass:app build:sass:front",
+		"build:ts": "npm-run-all --parallel build:app build:front",
+		"build:app": "tspc -p tsconfig-app.json",
+		"build:front": "npm run types && tspc -p tsconfig-front.json",
+		"build:sass": "npm-run-all --parallel build:sass:app build:sass:front",
+		"build:sass:app": "sass app:app",
+		"build:sass:front": "sass front:front",
+		"build:watch": "npm-run-all --parallel build:watch:app build:watch:front build:watch:sass",
+		"build:watch:app": "tspc -p tsconfig-app.json -w",
+		"build:watch:front": "npm run types && tspc -p tsconfig-front.json -w",
+		"build:watch:sass": "sass -w app:app front:front",
 		"start": "node app/main",
 		"start:watch": "nodemon",
-		"test": "jest"
+		"test": "jest",
+		"types": "cp node_modules/autocompleter/autocomplete.d.ts node_modules/autocompleter/autocomplete.es.d.ts"
 	}
 }

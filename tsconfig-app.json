@@ -1,18 +1,13 @@
 {
 	"compilerOptions": {
 		"allowSyntheticDefaultImports": true,
-		"declaration": true,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
-		"forceConsistentCasingInFileNames": true,
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
 		"plugins": [{ "transform":  "./app/action/static-routes-plugin.ts", "type": "program" }],
-		"skipLibCheck": true,
-		"sourceMap": true,
-		"strict": true,
 		"target": "ESNext"
 	},
-	"include": ["app/**/*", "local/**/*", "tests/**/*"],
-	"references": [{ "path": "./front" }]
+	"extends": "./tsconfig-common.json",
+	"include": ["app/**/*", "local/**/*", "tests/**/*"]
 }
