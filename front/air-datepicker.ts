@@ -1,3 +1,5 @@
+import loadCss    from './load-css.js'
+import loadScript from './load-script.js'
 
 const locales = {} as { [lang: string]: object }
 
@@ -21,21 +23,8 @@ function init(input: HTMLInputElement)
 
 export default (input: HTMLInputElement) =>
 {
-	if (!document.head.querySelector('link[href="/node_modules/air-datepicker/air-datepicker.css"]')) {
-		const link = document.createElement('link')
-		link.setAttribute('href', '/node_modules/air-datepicker/air-datepicker.css')
-		link.setAttribute('rel', 'stylesheet')
-		document.head.appendChild(link)
-	}
-	if (document.head.querySelector('script[src="/node_modules/air-datepicker/air-datepicker.js"]')) {
-		init(input)
-	}
-	else {
-		const script  = document.createElement('script')
-		script.onload = () => init(input)
-		script.src    = '/node_modules/air-datepicker/air-datepicker.js'
-		document.head.appendChild(script)
-	}
+	loadCss('/node_modules/air-datepicker/air-datepicker.css')
+	loadScript('/node_modules/air-datepicker/air-datepicker.js', () => init(input))
 	const lang = document.documentElement.lang
 	if (locales[lang]) {
 		return

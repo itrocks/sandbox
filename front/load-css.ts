@@ -1,28 +1,14 @@
 
-export default (fileName: string) => new Promise<void>(resolve =>
+export default (fileName: string, onLoad?: (link: HTMLLinkElement) => void) =>
 {
-	if (!fileName.endsWith('.css')) {
-		fileName = fileName.slice(0, fileName.lastIndexOf('.')) + '.css'
+	const exists = document.head.querySelector('link[href="' + fileName + '"]') as HTMLLinkElement
+	if (exists) return onLoad?.(exists)
+
+	const link = document.createElement('link')
+	link.setAttribute('href', fileName)
+	link.setAttribute('rel', 'stylesheet')
+	if (onLoad) {
+		link.addEventListener('load', function() { onLoad(this) })
 	}
-	if (!fileName.startsWith('http')) {
-		fileName = (new URL(fileName)).href
-	}
-	const links = document.head.querySelectorAll(':scope > link[rel="stylesheet"]') as NodeListOf<HTMLLinkElement>
-	let   link  = Array.from(links).filter(link => link.href === fileName)[0]
-	if (!link) {
-		const origin = new URL(fileName).origin
-		if (origin === new URL(document.location.href).origin) {
-			fileName = fileName.slice(origin.length)
-		}
-		link = document.createElement('link')
-		link.setAttribute('href', fileName)
-		link.setAttribute('rel', 'stylesheet')
-		document.head.insertBefore(link, document.head.querySelector(':scope > link:first-of-type'))
-	}
-	if (link.sheet) {
-		resolve()
-	}
-	else {
-		link.onload = () => resolve()
-	}
-})
+	document.head.appendChild(link)
+}
