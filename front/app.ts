@@ -29,3 +29,5 @@ build<HTMLFormElement>('#modal form', async form => (await import('./modal.js'))
 
 build<HTMLElement>('#notification', notification)
 build<HTMLOListElement>('ol#notifications', notifications)
+
+build<HTMLInputElement>('input[data-type=object]', async input => (await import('./autocompleter.js')).default(input))

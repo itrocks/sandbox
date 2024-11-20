@@ -47,7 +47,8 @@ frontScripts.push(
 	'/node_modules/@itrocks/sorted-array/sorted-array.js',
 	'/node_modules/air-datepicker/air-datepicker.js',
 	'/node_modules/air-datepicker/locale/en.js',
-	'/node_modules/air-datepicker/locale/fr.js'
+	'/node_modules/air-datepicker/locale/fr.js',
+	'/node_modules/autocompleter/autocomplete.es.js'
 )
 
 async function execute(request: ActionRequest)
