@@ -1,19 +1,19 @@
-import { ReflectProperty }       from '../property/reflect'
-import { PropertyTypes }         from '../property/types'
-import { propertyTypesFromFile } from '../property/types'
-import { fileOf }                from './file'
-import { Object, Type, typeOf }  from './type'
-import { usesOf }                from './uses'
+import { ReflectProperty }        from '../property/reflect'
+import { PropertyTypes }          from '../property/types'
+import { propertyTypesFromFile }  from '../property/types'
+import { fileOf }                 from './file'
+import { isObject, Type, typeOf } from './type'
+import { usesOf }                 from './uses'
 
-export class ReflectClass<T extends Object = {}>
+export class ReflectClass<T extends object>
 {
-	readonly name:    string
-	readonly object?: T
-	readonly type:    Type<T>
+	readonly name:   string
+	readonly object: T | undefined
+	readonly type:   Type<T>
 
 	constructor(object: T | Type<T>)
 	{
-		this.object = (typeof object === 'object') ? object : undefined
+		this.object = isObject(object) ? object : undefined
 		this.type   = typeOf(object)
 		this.name   = this.type.name
 	}
@@ -27,7 +27,7 @@ export class ReflectClass<T extends Object = {}>
 
 	get properties()
 	{
-		const value = {} as { [name: string]: ReflectProperty }
+		const value = {} as { [name: string]: ReflectProperty<T> }
 		for (const name of this.propertyNames) {
 			value[name] = new ReflectProperty(this, name)
 		}
