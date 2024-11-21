@@ -5,9 +5,9 @@
 		"experimentalDecorators": true,
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
-		"plugins": [{ "transform":  "./app/action/static-routes-plugin.ts", "type": "program" }],
+		"plugins": [{ "transform":  "./action/static-routes-plugin.ts", "type": "program" }],
 		"target": "ESNext"
 	},
-	"extends": "./tsconfig-common.json",
-	"include": ["app/**/*", "local/**/*", "tests/**/*"]
+	"extends": "../tsconfig.json",
+	"include": ["./**/*", "../local/**/*", "../tests/**/*"]
 }
