@@ -17,10 +17,12 @@ export function decoratorOf<T>(target: ObjectOrType, name: Symbol, undefinedValu
 	return (result === undefined) ? undefinedValue : result
 }
 
+export function decoratorOfCallback<T>(target: ObjectOrType, name: Symbol): T | undefined
 export function decoratorOfCallback<T>(target: ObjectOrType, name: Symbol, undefinedCallback: (target: object) => T): T
+export function decoratorOfCallback<T>(target: ObjectOrType, name: Symbol, undefinedCallback?: (target: object) => T): T | undefined
 {
 	target = objectOf(target)
-	return Reflect.getMetadata(name, target) ?? undefinedCallback(target)
+	return Reflect.getMetadata(name, target) ?? undefinedCallback?.(target)
 }
 
 export type DecoratorOfType<T = any> = (target: ObjectOrType, name: Symbol, undefinedValue: T) => T

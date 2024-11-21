@@ -8,7 +8,7 @@ export function initClass(classType: Type): Type | undefined
 	try { if (!storeOf(classType)) return }
 	catch { return }
 
-	const finalClass = class extends classType {
+	const BuiltClass = class extends classType {
 		[property: string]: any
 		constructor(...args: any) {
 			super(...args)
@@ -25,7 +25,7 @@ export function initClass(classType: Type): Type | undefined
 		const type = property.type
 		if (!type || ((typeof type)[0] !== 'f') || (type.toString()[0] !== 'c')) continue
 		properties.push(property.name)
-		Object.defineProperty(finalClass.prototype, property.name, {
+		Object.defineProperty(BuiltClass.prototype, property.name, {
 			configurable: true,
 			enumerable:   true,
 			async get() {
@@ -41,5 +41,5 @@ export function initClass(classType: Type): Type | undefined
 		})
 	}
 
-	return properties.length ? finalClass : undefined
+	return properties.length ? BuiltClass : undefined
 }
