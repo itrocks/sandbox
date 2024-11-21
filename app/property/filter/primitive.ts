@@ -56,11 +56,11 @@ setFilters(null, Date, [
 
 // Number
 
-function numberEdit(value: number, type: ObjectOrType, property: string)
+function numberEdit(value: number | undefined, type: ObjectOrType, property: string)
 {
 	const label      = `<label for="${property}">${tr(displayOf(type, property))}</label>`
 	const name       = `id="${property}" name="${property}"`
-	const inputValue = value ? ` value="${value}"` : ''
+	const inputValue = (value !== undefined) ? ` value="${value}"` : ''
 	const input      = `<input data-type="number" ${name}${inputValue}>`
 	return label + lfTab + input
 }
