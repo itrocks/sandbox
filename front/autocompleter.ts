@@ -1,25 +1,41 @@
-import autocomplete from '../node_modules/autocompleter/autocomplete.es.js'
-import loadCss      from './load-css.js'
+import autocomplete      from '../node_modules/autocompleter/autocomplete.es.js'
+import { PreventSubmit } from '../node_modules/autocompleter/autocomplete.es.js'
+import loadCss           from './load-css.js'
+
+type Item = {
+	label: string,
+	value: number
+}
 
 export default function autoCompleter(input: HTMLInputElement)
 {
+	loadCss('/app/style/2020/autocompleter.css')
 	loadCss('/node_modules/autocompleter/autocomplete.css')
-	const countries = [
-		{ label: 'France', value: 'FR' },
-		{ label: 'United Kingdom', value: 'UK' },
-		{ label: 'United States', value: 'US' }
-	];
+
 	autocomplete({
 		input,
-		fetch: (text, update) => {
-			text = text.toLowerCase()
-			// you can also use AJAX requests instead of preloaded data
-			const suggestions = countries.filter(n => n.label.toLowerCase().startsWith(text))
-			update(suggestions)
+
+		fetch: (text, update) =>
+		{
+			const requestInit: RequestInit = { headers: { Accept: 'application/json' } }
+			const summaryRoute = input.getAttribute('data-fetch') + '?startsWith=' + text
+			fetch(summaryRoute, requestInit).then(response => response.text()).then((json) => {
+				const summary     = JSON.parse(json) as [string, string][]
+				const startsWith  = input.value.toLowerCase()
+				const suggestions = summary.map(([id, summary]) => ({ label: summary, value: Number(id) }))
+					.filter(item => item.label.toLowerCase().startsWith(startsWith))
+				update(suggestions)
+			})
 		},
+
 		minLength: 0,
-		onSelect: (item, input: HTMLInputElement | HTMLTextAreaElement) => {
+
+		onSelect: (item: Item, input: HTMLInputElement | HTMLTextAreaElement) =>
+		{
+			if (item.value) (input.nextElementSibling as HTMLInputElement).value = item.value.toString()
 			if (item.label) input.value = item.label
-		}
+		},
+
+		preventSubmit: PreventSubmit.OnSelect
 	})
 }
