@@ -10,7 +10,7 @@ export default class Auth extends Action
 	async html(request: Request)
 	{
 		let search = new (request.type) as User
-		new Save().dataToObject(search, request.request.data)
+		await ((new Save).dataToObject(search, request.request.data))
 
 		const { login, password } = search
 		let user: User | undefined

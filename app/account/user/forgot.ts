@@ -34,7 +34,7 @@ export default class Forgot extends Action
 				}
 				if (token.user) {
 					if (request.request.data.password) {
-						new Save().dataToObject(token.user, { password: request.request.data.password })
+						await ((new Save).dataToObject(token.user, { password: request.request.data.password }))
 						await dao.save(token.user)
 						await dao.delete(token, 'token')
 						return this.htmlTemplateResponse(token.user, request, __dirname + '/forgot-done.html')

@@ -13,7 +13,7 @@ export default class Register extends Action
 		let user         = new (request.type) as User
 
 		if (Object.keys(request.request.data).length) {
-			new Save().dataToObject(user, request.request.data)
+			await ((new Save).dataToObject(user, request.request.data))
 			const { email, login, password } = user
 			if (email.length && login.length && password.length) {
 				const found = (await dao.search(User, {email}))[0]
