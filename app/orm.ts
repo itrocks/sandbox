@@ -1,7 +1,8 @@
-import ReflectClass from './class/reflect'
-import Type         from './class/type'
-import Dao          from './dao/dao'
-import { storeOf }  from './dao/store'
+import ReflectClass    from './class/reflect'
+import Type            from './class/type'
+import Dao             from './dao/dao'
+import { storeOf }     from './dao/store'
+import ReflectProperty from './property/reflect'
 
 export function initClass(classType: Type): Type | undefined
 {
@@ -20,24 +21,26 @@ export function initClass(classType: Type): Type | undefined
 		}
 	}
 
-	const properties = [] as string[]
-	for (const property of Object.values(new ReflectClass(classType).properties)) {
-		const type = property.type
+	const properties = new Array<string>
+	for (const property of Object.values(new ReflectClass(classType).properties) as ReflectProperty<object>[]) {
+		const type = property.type as Type
 		if (!type || ((typeof type)[0] !== 'f') || (type.toString()[0] !== 'c')) continue
+
 		properties.push(property.name)
 		Object.defineProperty(BuiltClass.prototype, property.name, {
 			configurable: true,
 			enumerable:   true,
+
 			async get() {
 				const property_id = property.name + '_id'
-				const value = this[property_id] ? await Dao.read(type as Type, this[property_id]) : undefined
-				delete this[property_id]
-				Object.defineProperty(this, property.name, { configurable: true, enumerable: true, value, writable: true })
-				return value
+				return this[property.name] = this[property_id] ? await Dao.read(type, this[property_id]) : undefined
 			},
+
 			set(value) {
+				delete this[property.name + '_id']
 				Object.defineProperty(this, property.name, { configurable: true, enumerable: true, value, writable: true })
 			},
+
 		})
 	}
 
