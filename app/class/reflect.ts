@@ -1,9 +1,22 @@
-import { ReflectProperty }        from '../property/reflect'
-import { PropertyTypes }          from '../property/types'
-import { propertyTypesFromFile }  from '../property/types'
-import { fileOf }                 from './file'
-import { isObject, Type, typeOf } from './type'
-import { usesOf }                 from './uses'
+import { SortedArray }                   from '@itrocks/sorted-array'
+import { ReflectProperty }               from '../property/reflect'
+import { PropertyTypes }                 from '../property/types'
+import { propertyTypesFromFile }         from '../property/types'
+import { fileOf }                        from './file'
+import { isObject, KeyOf, Type, typeOf } from './type'
+import { usesOf }                        from './uses'
+
+class SortedPropertyNames<T extends object> extends SortedArray<KeyOf<T>>
+{
+	constructor(object: T) {
+		super(...Object.getOwnPropertyNames(object).sort() as KeyOf<T>[])
+	}
+}
+
+interface SortedPropertyNames<T extends object> extends SortedArray<KeyOf<T>>
+{
+	includes(property: string): property is KeyOf<T>
+}
 
 export class ReflectClass<T extends object>
 {
@@ -27,35 +40,35 @@ export class ReflectClass<T extends object>
 
 	get properties()
 	{
-		const value = {} as { [name: string]: ReflectProperty<T> }
+		const properties = {} as Record<KeyOf<T>, ReflectProperty<T>>
 		for (const name of this.propertyNames) {
-			value[name] = new ReflectProperty(this, name)
+			properties[name] = new ReflectProperty(this, name)
 		}
-		Object.defineProperty(this, 'properties', { value })
-		return value
+		Object.defineProperty(this, 'properties', { value: properties })
+		return properties
 	}
 
 	get propertyNames()
 	{
-		let   current = new this.type
-		const value = Object.getOwnPropertyNames(current)
-		while (current) {
-			Object.entries(Object.getOwnPropertyDescriptors(current)).forEach(([name, descriptor]) => {
-				if (!descriptor.get || (name[0] === '_') || value.includes(name)) {
+		let   object        = new this.type
+		const propertyNames = new SortedPropertyNames(object)
+		while (object) {
+			Object.entries(Object.getOwnPropertyDescriptors(object)).forEach(([name, descriptor]) => {
+				if (!descriptor.get || (name[0] === '_') || propertyNames.includes(name)) {
 					return
 				}
-				value.push(name)
+				propertyNames.push(name as KeyOf<T>)
 			})
-			current = Object.getPrototypeOf(current)
+			object = Object.getPrototypeOf(object)
 		}
-		Object.defineProperty(this, 'propertyNames', { value })
-		return value
+		Object.defineProperty(this, 'propertyNames', { value: propertyNames })
+		return propertyNames
 	}
 
 	get propertyTypes() : PropertyTypes
 	{
 		const parent = this.parent
-		const value  = parent.name ? parent.propertyTypes : {} as PropertyTypes
+		const value  = parent.name ? parent.propertyTypes : {}
 		for (const uses of this.uses) {
 			Object.assign(value, new ReflectClass(uses).propertyTypes)
 		}
