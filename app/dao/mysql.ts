@@ -1,33 +1,34 @@
-import mariadb          from 'mariadb'
-import { Object, Type } from '../class/type'
-import { applyFilter }  from '../property/filter/filter'
-import { READ, SAVE }   from '../property/filter/filter'
-import { SQL }          from '../property/filter/filter'
-import { Dao, Entity }  from './dao'
-import { Identifier }   from './dao'
-import Function         from './functions'
-import { storeOf }      from './store'
+import mariadb                    from 'mariadb'
+import { AnyObject, KeyOf, Type } from '../class/type'
+import { applyFilter, UNCHANGED } from '../property/filter/filter'
+import { READ, SAVE, SQL }        from '../property/filter/filter'
+import { Dao, Entity }            from './dao'
+import { Identifier, SearchType } from './dao'
+import Function                   from './functions'
+import { storeOf }                from './store'
 
 const DEBUG = false
 
-export default class Mysql implements Dao
+export default class Mysql extends Dao
 {
 
 	connection?: mariadb.Connection
 
 	constructor(public config: { host: string, user: string, password: string, database: string })
-	{}
+	{
+		super()
+	}
 
 	async connect()
 	{
-		const mariaDbConfig = Object.assign(this.config as mariadb.ConnectionConfig, {
+		const mariaDbConfig = Object.assign(this.config, {
 			allowPublicKeyRetrieval: true,
 			dateStrings: false
 		})
 		return this.connection = await mariadb.createConnection(mariaDbConfig)
 	}
 
-	async delete<T extends Object>(object: T & Entity, property = 'id')
+	async delete<T extends object>(object: T & Entity, property: KeyOf<T & Entity> = 'id')
 	{
 		const connection = this.connection ?? await this.connect()
 
@@ -36,26 +37,24 @@ export default class Mysql implements Dao
 			'DELETE FROM `' + storeOf(object) + '` WHERE ' + property + ' = ?',
 			[object[property]]
 		)
-		delete (object as any).id
 
-		return object as T
+		return this.disconnectObject(object)
 	}
 
 	async insert<T extends object>(object: T)
 	{
 		const connection = this.connection ?? await this.connect()
 
-		const sql    = this.propertiesToSql(object)
 		const values = this.valuesToDb(object)
+		const sql    = this.propertiesToSql(object)
 		const query  = 'INSERT INTO `' + storeOf(object) + '` SET '  + sql
 		if (DEBUG) console.log(query, values)
 		const result = await connection.query(query, values);
-		(object as Entity).id = result.insertId
 
-		return object as T & Entity
+		return this.connectObject(object, result.insertId)
 	}
 
-	propertiesToSearchSql(search: Object)
+	propertiesToSearchSql(search: AnyObject)
 	{
 		const sql = Object.entries(search)
 			.map(([name, value]) => {
@@ -95,60 +94,64 @@ export default class Mysql implements Dao
 
 	async save<T extends object>(object: T | (T & Entity))
 	{
-		return (('id' in object) && object.id)
+		return this.isObjectConnected(object)
 			? this.update(object)
 			: this.insert(object)
 	}
 
-	async search<T extends object>(type: Type<T>, search: Object = {})
+	async search<T extends object>(type: Type<T>, search: SearchType<T> = {})
 	{
 		const connection = this.connection ?? await this.connect()
 
-		const sql    = this.propertiesToSearchSql(search)
-		const values = this.valuesToDb(search, type)
+		const searchValues = Object.values(search).filter(value => value instanceof Function)
+			? Object.assign({}, search)
+			: search
+			const sql    = this.propertiesToSearchSql(searchValues)
+			const values = this.valuesToDb(searchValues, type)
 		if (DEBUG) console.log('SELECT * FROM `' + storeOf(type) + '`' + sql, values)
 		const rows: (T & Entity)[] = await connection.query(
 			'SELECT * FROM `' + storeOf(type) + '`' + sql,
 			values
 		)
 
-		return rows.map(row => this.valuesFromDb(row, type))
+		return await Promise.all(rows.map(async row => this.valuesFromDb(row, type)))
 	}
 
-	async update<T extends object & Entity>(object: T)
+	async update<T extends (object & Entity)>(object: T)
 	{
 		const connection = this.connection ?? await this.connect()
 
-		const id        = object.id
-		const valObject = object as T
-		delete (valObject as any).id
-		const sql    = this.propertiesToSql(valObject)
-		const values = this.valuesToDb(valObject)
+		const id     = object.id
+		object       = this.disconnectObject(object)
+		const values = await this.valuesToDb(object)
+		const sql    = this.propertiesToSql(object)
 		const query  = 'UPDATE `' + storeOf(object) + '` SET '  + sql + ' WHERE id = ?'
-		if (DEBUG) console.log(query, values)
+		if (DEBUG) console.log(query, JSON.stringify(values))
 		await connection.query(query, values.concat([id]))
-		object.id = id
 
-		return object
+		return this.connectObject(object, id)
 	}
 
-	valuesFromDb<T extends Object>(row: T & Entity, type: Type<T>)
+	async valuesFromDb<T extends object>(row: T & Entity, type: Type<T>)
 	{
-		const object = new type as T & Entity
-		for (const property of Object.keys(row)) {
-			object[property as keyof T] = applyFilter(row[property], object, property, SQL, READ)
+		const object = (new type) as T & Entity
+		let property: KeyOf<T & Entity>
+		for (property in row) {
+			const value = await applyFilter(row[property], object, property, SQL, READ, this)
+			if (value === UNCHANGED) continue
+			object[property] = value
 		}
 		return object
 	}
 
-	valuesToDb(object: object, type?: Type)
+	async valuesToDb<T extends object>(object: T, type?: Type<T>)
 	{
-		const properties = Object.keys(object)
 		const typeObject = type ? new type : object
-		const values     = Object.values(object)
-		for (let n = 0; n < properties.length; n ++) {
-			const value = applyFilter(values[n], typeObject, properties[n], SQL, SAVE)
-			values[n] = ((typeof value === 'object') && (value as Entity).id) ? (value as Entity).id : value
+		const values     = []
+		for (const property of Object.keys(object) as KeyOf<T>[]) {
+			const value = await applyFilter(object[property], typeObject, property, SQL, SAVE, this)
+			if (value === UNCHANGED) continue
+			values.push(value)
 		}
 		return values
 	}
