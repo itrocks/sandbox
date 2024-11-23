@@ -1,22 +1,22 @@
-import { format }       from 'date-fns'
-import { parse }        from 'date-fns'
-import { ObjectOrType } from '../../class/type'
-import tr               from '../../locale/translate'
-import { displayOf }    from '../../view/property/display'
-import { setFilter }    from './filter'
-import { setFilters }   from './filter'
-import { HTML }         from './filter'
-import { EDIT, INPUT, OUTPUT } from './filter'
+import { format, parse }             from 'date-fns'
+import { KeyOf, ObjectOrType }       from '../../class/type'
+import tr                            from '../../locale/translate'
+import { displayOf }                 from '../../view/property/display'
+import { setPropertyTypeFilters }    from './filter'
+import { EDIT, HTML, INPUT, OUTPUT } from './filter'
+import { READ, SAVE, SQL }           from './filter'
 
 const lfTab = '\n\t\t\t\t'
 
 // Bigint
 
-setFilter(null, BigInt, 'html', 'input', (value: string) => BigInt(value))
+setPropertyTypeFilters(BigInt, [
+	{ format: HTML, direction: INPUT, filter: (value: string) => BigInt(value) }
+])
 
 // Boolean
 
-function booleanEdit(value: boolean, type: ObjectOrType, property: string)
+function booleanEdit<T extends object>(value: boolean, type: ObjectOrType<T>, property: KeyOf<T>)
 {
 	const label    = `<label for="${property}">${tr(displayOf(type, property))}</label>`
 	const name     = `id="${property}" name="${property}"`
@@ -28,15 +28,17 @@ function booleanEdit(value: boolean, type: ObjectOrType, property: string)
 
 const booleanInput = (value: string) => !['', '0', 'false', 'no', tr('false'), tr('no')].includes(value)
 
-setFilters(null, Boolean, [
+setPropertyTypeFilters(Boolean, [
 	{ format: HTML, direction: EDIT,   filter: booleanEdit },
 	{ format: HTML, direction: INPUT,  filter: booleanInput },
-	{ format: HTML, direction: OUTPUT, filter: (value: boolean) => value ? tr('yes') : tr('no') }
+	{ format: HTML, direction: OUTPUT, filter: (value: boolean) => value ? tr('yes') : tr('no') },
+	{ format: SQL,  direction: READ,   filter: (value: string)  => Boolean(value)},
+	{ format: SQL,  direction: SAVE,   filter: (value: boolean) => Number(value)}
 ])
 
 // Date
 
-function dateEdit(value: Date, type: ObjectOrType, property: string)
+function dateEdit<T extends object>(value: Date, type: ObjectOrType<T>, property: KeyOf<T>)
 {
 	const label      = `<label for="${property}">${tr(displayOf(type, property))}</label>`
 	const name       = `id="${property}" name="${property}"`
@@ -48,7 +50,7 @@ function dateEdit(value: Date, type: ObjectOrType, property: string)
 const dateInput  = (value: string) => parse(value, tr('dd/MM/yyyy', { ucFirst: false }), new Date)
 const dateOutput = (value: Date)   => value ? format(value, tr('dd/MM/yyyy', { ucFirst: false })) : ''
 
-setFilters(null, Date, [
+setPropertyTypeFilters(Date, [
 	{ format: HTML, direction: EDIT,   filter: dateEdit },
 	{ format: HTML, direction: INPUT,  filter: dateInput },
 	{ format: HTML, direction: OUTPUT, filter: dateOutput }
@@ -56,7 +58,7 @@ setFilters(null, Date, [
 
 // Number
 
-function numberEdit(value: number | undefined, type: ObjectOrType, property: string)
+function numberEdit<T extends object>(value: number | undefined, type: ObjectOrType<T>, property: KeyOf<T>)
 {
 	const label      = `<label for="${property}">${tr(displayOf(type, property))}</label>`
 	const name       = `id="${property}" name="${property}"`
@@ -65,14 +67,14 @@ function numberEdit(value: number | undefined, type: ObjectOrType, property: str
 	return label + lfTab + input
 }
 
-setFilters(null, Number, [
+setPropertyTypeFilters(Number, [
 	{ format: HTML, direction: EDIT,  filter: numberEdit },
 	{ format: HTML, direction: INPUT,	filter: (value: string) => Number(value) }
 ])
 
 // default
 
-function defaultEdit(value: any, type: ObjectOrType, property: string)
+function defaultEdit<T extends object>(value: any, type: ObjectOrType<T>, property: KeyOf<T>)
 {
 	const label      = `<label for="${property}">${tr(displayOf(type, property))}</label>`
 	const name       = `id="${property}" name="${property}"`
@@ -81,6 +83,6 @@ function defaultEdit(value: any, type: ObjectOrType, property: string)
 	return label + lfTab + input
 }
 
-setFilters(null, null, [
+setPropertyTypeFilters(null, [
 	{ format: HTML, direction: EDIT, filter: defaultEdit }
 ])

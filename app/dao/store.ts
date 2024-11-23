@@ -1,18 +1,21 @@
 import { routeOf }                       from '../action/route'
-import { ObjectOrType, Type }            from '../class/type'
+import { KeyOf, ObjectOrType }           from '../class/type'
+import { StringObject, Type }            from '../class/type'
 import { decorateCallback, decoratorOf } from '../decorator/class'
 import tr                                from '../locale/translate'
-import { EDIT, HTML, setFilter }         from '../property/filter/filter'
+import { Filter, setPropertyTypeFilter } from '../property/filter/filter'
+import { UNCHANGED }                     from '../property/filter/filter'
+import { EDIT, HTML, INPUT, SAVE, SQL }  from '../property/filter/filter'
 import ReflectProperty                   from '../property/reflect'
+import { representativeValueOf }         from '../view/class/representative'
 import { displayOf }                     from '../view/property/display'
-import { Entity }                        from './dao'
-import {representativeValueOf} from '../view/class/representative'
+import { dao, Entity }                   from './dao'
 
 const lfTab = '\n\t\t\t\t'
 
 const STORE = Symbol('store')
 
-function storeOutput(value: object & Entity | undefined, type: ObjectOrType, property: string)
+function storeEdit<T extends object>(value: (object & Entity) | undefined, type: ObjectOrType<T>, property: KeyOf<T>)
 {
 	const propertyType   = new ReflectProperty(type, property).type as Type
 	const representative = value ? representativeValueOf(value) : ''
@@ -25,13 +28,39 @@ function storeOutput(value: object & Entity | undefined, type: ObjectOrType, pro
 	return label + lfTab + input + input_id
 }
 
-export const Store = (name: false | string = '') => decorateCallback(STORE, target =>
+const storeInput: Filter = <T extends object>(_value: string, object: T, property: KeyOf<T>, data: StringObject) =>
+{
+	const property_id = property + '_id'
+	if (
+		(property_id in data)
+		&& ((property_id in object)
+			? (data[property_id] !== String(object[property_id as KeyOf<T>]))
+			: (data[property_id] !== String((object[property] as Entity).id))
+		)
+	) {
+		delete object[property]
+		Object.assign(object, { [property_id]: Number(data[property_id]) })
+	}
+	return UNCHANGED
+}
+
+const storeSave: Filter = <T extends object>(value: T | (T & Entity) | undefined, object: T, property: KeyOf<T>) =>
+{
+	if (value && dao.isObjectConnected(value)) {
+		Object.assign(object, { [property + '_id']: value.id })
+	}
+	return UNCHANGED
+}
+
+export const Store = (name: string | false = '') => decorateCallback(STORE, target =>
 {
 	if (name !== false) {
-		setFilter(null, target, HTML, EDIT, storeOutput)
+		setPropertyTypeFilter(target, HTML, EDIT,  storeEdit)
+		setPropertyTypeFilter(target, HTML, INPUT, storeInput)
+		setPropertyTypeFilter(target, SQL,  SAVE,  storeSave)
 	}
 	return (name === '') ? target.name.toLowerCase() : name
 })
 export default Store
 
-export const storeOf = (target: ObjectOrType) => decoratorOf<false | string>(target, STORE, false)
+export const storeOf = (target: ObjectOrType) => decoratorOf<string | false>(target, STORE, false)

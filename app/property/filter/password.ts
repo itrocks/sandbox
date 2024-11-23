@@ -1,19 +1,19 @@
 import { createHash }            from 'crypto'
-import { ObjectOrType }          from '../../class/type'
+import { KeyOf, ObjectOrType }   from '../../class/type'
 import { decorate, decoratorOf } from '../../decorator/property'
 import tr                        from '../../locale/translate'
 import { displayOf }             from '../../view/property/display'
-import { setFilters }            from './filter'
+import { setPropertyFilters }    from './filter'
 import { EDIT, HTML, INPUT, JSON, UNCHANGED } from './filter'
 
 const PASSWORD = Symbol('password')
 
 const lfTab = '\n\t\t\t\t'
 
-function editPassword(value: string, object: object, property: string)
+function editPassword<T extends object>(value: string, target: T, property: KeyOf<T>)
 {
 	const inputValue = value.length ? ` value="${UNCHANGED}"` : ''
-	const label      = `<label for="${property}">${tr(displayOf(object, property))}</label>`
+	const label      = `<label for="${property}">${tr(displayOf(target, property))}</label>`
 	const input      = `<input id="${property}" name="${property}" type="password"${inputValue}>`
 	return label + lfTab + input
 }
@@ -25,22 +25,22 @@ function inputPassword(value: string)
 		: createHash('sha512').update(value, 'utf8').digest('hex')
 }
 
-export function Password(value = true)
+export default Password
+export function Password<T extends object>(value = true)
 {
-	const parent = decorate(PASSWORD, value)
+	const parent = decorate<T>(PASSWORD, value)
 	return value
-		? (target: object, property: string) => {
+		? (target: T, property: KeyOf<T>) => {
 			parent(target, property)
-			setFilters(target, property, [
-				{ format: HTML, direction: EDIT,  filter: editPassword },
+			setPropertyFilters(target, property, [
+				{ format: HTML, direction: EDIT,  filter: editPassword<T> },
 				{ format: HTML, direction: INPUT, filter: inputPassword },
-				{ format: HTML,                   filter: value => value.length ? '***********' : '' },
-				{ format: JSON,                   filter: value => value.length ? '*PASSWORD*' : '*EMPTY*' }
+				{ format: HTML,                   filter: (value: string) => value.length ? '***********' : '' },
+				{ format: JSON,                   filter: (value: string) => value.length ? '*PASSWORD*' : '*EMPTY*' }
 			])
 		}
 		: parent
 }
-export default Password
 
-export const passwordOf = (target: ObjectOrType, property: string) =>
-	decoratorOf<boolean>(target, property, PASSWORD, false)
+export const passwordOf = <T extends object>(target: ObjectOrType<T>, property: KeyOf<T>) =>
+	decoratorOf(target, property, PASSWORD, false)

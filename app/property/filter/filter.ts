@@ -1,6 +1,5 @@
 import { objectOf }        from '../../class/type'
-import { ObjectOrType }    from '../../class/type'
-import Type                from '../../class/type'
+import { KeyOf, Type }     from '../../class/type'
 import { DecoratorOfType } from '../../decorator/class'
 import { decorate }        from '../../decorator/property'
 import { decoratorOf }     from '../../decorator/property'
@@ -22,73 +21,89 @@ export const SQL  = 'sql'
 
 export const UNCHANGED = '¤~!~!~!~!~¤'
 
-type Direction      = '' | 'edit' | 'input' | 'output' | 'read' | 'save'
-type FilterType     = ObjectOrType | null
-type PropertyFilter = DecoratorOfType | PrimitiveType | Type | null
+type Direction = string | '' | 'edit' | 'input' | 'output' | 'read' | 'save'
+type Format    = string | '' | 'html' | 'json' | 'sql'
 
-export type Filter = (value: any, target: object, property: string, format: string, direction: Direction) => any
-type Filters = Array<{ format?: string, direction?: Direction, filter: Filter }>
+export type Filter<T extends object = object>
+	= (value: any, target: T, property: KeyOf<T>, data: any, format: Format, direction: Direction) => any
 
-type DirectionFilters = { [direction: string]: Filter }
-type FormatFilters    = { [format:    string]: DirectionFilters }
+type PropertyType<PT extends object = object> = DecoratorOfType<PT> | PrimitiveType | Type<PT> | null
 
-const filters = new Map<PropertyFilter, FormatFilters>()
+type DirectionFilters<T extends object = object> = { [direction: Direction]: Filter<T> }
+type FormatFilters<T extends object = object>     = { [format: Format]: DirectionFilters<T> }
 
-export function applyFilter(value: any, target: object, property: string, format: string, direction: Direction)
-{
-	let filter = getFilter(target, property, format, direction)
+const filters = new Map<PropertyType, FormatFilters>()
+
+type Filters<T extends object = object> = Array<{ format?: Format, direction?: Direction, filter: Filter<T> }>
+
+export async function applyFilter<T extends object>(
+	value: any, target: T, property: KeyOf<T>, format: Format, direction: Direction, data?: any
+) {
+	let filter = getPropertyFilter<T>(target, property, format, direction)
 	if (!filter) {
 		const propertyType = new ReflectProperty(target, property).type
-		filter = getFilter(null, propertyType, format, direction)
-			|| getFilter(null, null, format, direction)
-			|| (value => value)
-		setFilter(target, property, format, direction, filter)
+		filter = setPropertyFilter<T>(target, property, format, direction,
+			(
+				getPropertyTypeFilter(propertyType, format, direction)
+				|| getPropertyTypeFilter(null, format, direction)
+				|| ((value: any) => value)
+			) as unknown as Filter<T>
+		)
 	}
-	return filter(value, target, property, format, direction)
+	return filter(value, target, property, data, format, direction)
 }
 
-function getFilter<T extends FilterType>(
-	type: T, property: T extends Type ? string : PrimitiveType | Type | null, format: string, direction: string
-) {
-	const formatFilters = type
-		? decoratorOf(type, property as string, FILTERS, null)
-		: filters.get(property as Type)
+function getPropertyFilter<T extends object>(target: T, property: KeyOf<T>, format: Format, direction: Direction)
+{
+	const formatFilters = decoratorOf<FormatFilters<T> | null, T>(target, property, FILTERS, null)
 	if (!formatFilters) return
 	const directionFilters = formatFilters[format] ?? formatFilters['']
 	if (!directionFilters) return
 	return directionFilters[direction] ?? directionFilters['']
 }
 
-export function setFilter<T extends FilterType>(
-	type:      T,
-	property:  T extends Type ? string : PropertyFilter,
-	format:    string,
-	direction: string,
-	filter:    Filter
+function getPropertyTypeFilter(type: PropertyType, format: Format, direction: Direction)
+{
+	const formatFilters = filters.get(type)
+	if (!formatFilters) return
+	const directionFilters = formatFilters[format] ?? formatFilters['']
+	if (!directionFilters) return
+	return directionFilters[direction] ?? directionFilters['']
+}
+
+export function setPropertyFilter<T extends object>(
+	type: T, property: KeyOf<T>, format: Format, direction: Direction, filter: Filter<T>
 ) {
-	let propertyFilters: FormatFilters | undefined
-	if (type) {
-		propertyFilters = decoratorOf(type, property as string, FILTERS, undefined)
-		if (!propertyFilters) {
-			decorate(FILTERS, propertyFilters = {})(objectOf(type), property as string)
-		}
+	let propertyFilters = decoratorOf<FormatFilters<T> | null, T>(type, property, FILTERS, null)
+	if (!propertyFilters) {
+		decorate<T>(FILTERS, propertyFilters = {})(objectOf(type), property)
 	}
-	else {
-		propertyFilters = filters.get(property as PropertyFilter)
-		if (!propertyFilters) {
-			filters.set(property as Type, propertyFilters = {})
-		}
+	let formatFilters = propertyFilters[format] ?? (propertyFilters[format] = {})
+	formatFilters[direction] = filter
+	return filter
+}
+
+export function setPropertyFilters<T extends object>(type: T, property: KeyOf<T>, filters: Filters<T>)
+{
+	for (const filter of filters) {
+		setPropertyFilter(type, property, filter.format ?? '', filter.direction ?? '', filter.filter)
+	}
+}
+
+export function setPropertyTypeFilter<T extends object>(
+	type: PropertyType, format: Format, direction: Direction, filter: Filter<T>
+) {
+	let propertyFilters = filters.get(type) as unknown as FormatFilters<T>
+	if (!propertyFilters) {
+		filters.set(type, propertyFilters = {})
 	}
 	let formatFilters = propertyFilters[format] ?? (propertyFilters[format] = {})
 	formatFilters[direction] = filter
 }
 
-export function setFilters<T extends FilterType>(
-	type:     T,
-	property: T extends Type ? string : PropertyFilter,
-	filters:  Filters
-) {
+export function setPropertyTypeFilters<T extends object>(type: PropertyType, filters: Filters<T>)
+{
 	for (const filter of filters) {
-		setFilter(type, property, filter.format ?? '', filter.direction ?? '', filter.filter)
+		setPropertyTypeFilter(type, filter.format ?? '', filter.direction ?? '', filter.filter)
 	}
 }
