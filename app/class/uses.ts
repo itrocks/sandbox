@@ -3,7 +3,7 @@ import { ObjectOrType, Type }    from './type'
 
 export function Super<T extends object>(self: object): T
 {
-	return Object.getPrototypeOf(Object.getPrototypeOf(self)) as T
+	return Object.getPrototypeOf(Object.getPrototypeOf(self))
 }
 
 function uses<T extends Type>(target: T, mixins: Type[]): T
@@ -42,7 +42,7 @@ function uses<T extends Type>(target: T, mixins: Type[]): T
 
 const USES = Symbol('uses')
 
-export const Uses = (...mixins: Type[]) => <T extends Type>(target: T): T =>
+export const Uses = <T extends object>(...mixins: Type[]) => (target: Type<T>) =>
 {
 	decorate(USES, mixins.concat(usesOf(target)))(target)
 	return uses(target, mixins)

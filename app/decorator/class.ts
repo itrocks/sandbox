@@ -1,28 +1,28 @@
 import { objectOf, ObjectOrType, Type } from '../class/type'
 
-export function decorate<T>(name: Symbol, value: T)
+export function decorate<T extends object>(name: Symbol, value: any)
 {
-	return (target: Type) => Reflect.defineMetadata(name, value, target.prototype)
+	return (target: Type<T>) => Reflect.defineMetadata(name, value, target.prototype)
 }
 
-export function decorateCallback<T>(name: Symbol, callback: (target: Type) => T)
+export function decorateCallback<T extends object>(name: Symbol, callback: (target: Type<T>) => any)
 {
-	return (target: Type) => Reflect.defineMetadata(name, callback(target), target.prototype)
+	return (target: Type<T>) => Reflect.defineMetadata(name, callback(target), target.prototype)
 }
 
-export function decoratorOf<T>(target: ObjectOrType, name: Symbol, undefinedValue: T): T
+export function decoratorOf<V>(target: ObjectOrType, name: Symbol, undefinedValue: V): V
 {
 	target = objectOf(target)
 	const result = Reflect.getMetadata(name, target)
 	return (result === undefined) ? undefinedValue : result
 }
 
-export function decoratorOfCallback<T>(target: ObjectOrType, name: Symbol): T | undefined
-export function decoratorOfCallback<T>(target: ObjectOrType, name: Symbol, undefinedCallback: (target: object) => T): T
-export function decoratorOfCallback<T>(target: ObjectOrType, name: Symbol, undefinedCallback?: (target: object) => T): T | undefined
+export function decoratorOfCallback<V>(target: ObjectOrType, name: Symbol): V
+export function decoratorOfCallback<V, T extends object>(target: ObjectOrType<T>, name: Symbol, undefinedCallback: (target: T) => V): V
+export function decoratorOfCallback<V, T extends object>(target: ObjectOrType<T>, name: Symbol, undefinedCallback?: (target: T) => V): V | undefined
 {
 	target = objectOf(target)
 	return Reflect.getMetadata(name, target) ?? undefinedCallback?.(target)
 }
 
-export type DecoratorOfType<T = any> = (target: ObjectOrType, name: Symbol, undefinedValue: T) => T
+export type DecoratorOfType<V = any> = (target: ObjectOrType, name: Symbol, undefinedValue: V) => V

@@ -10,7 +10,7 @@ export const Display = (name = '') => decorateCallback(
 )
 export default Display
 
-export const displayOf = (target: ObjectOrType) => decoratorOfCallback<string>(target, DISPLAY, target =>
+export const displayOf = (target: ObjectOrType) => decoratorOfCallback(target, DISPLAY, target =>
 {
 	let constr = target.constructor
 	while (!constr.name.length || (constr.name === 'BuiltClass')) {

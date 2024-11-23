@@ -1,10 +1,10 @@
-import { ObjectOrType }          from '../../class/type'
+import { KeyOf, ObjectOrType }   from '../../class/type'
 import { decorate, decoratorOf } from '../../decorator/property'
 
 const REQUIRED = Symbol('required')
 
-export const Required = (value: boolean = true) => decorate(REQUIRED, value)
+export const Required = <T extends object>(value = true) => decorate<T>(REQUIRED, value)
 export default Required
 
-export const requiredOf = (target: ObjectOrType, property: string) =>
-	decoratorOf<boolean>(target, property, REQUIRED, false)
+export const requiredOf = <T extends object>(target: ObjectOrType<T>, property: KeyOf<T>) =>
+	decoratorOf(target, property, REQUIRED, false)
