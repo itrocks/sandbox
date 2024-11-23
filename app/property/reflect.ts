@@ -1,15 +1,15 @@
-import { ReflectClass }    from '../class/reflect'
-import { AnyObject, Type } from '../class/type'
-import { applyFilter }     from './filter/filter'
-import { EDIT, OUTPUT }    from './filter/filter'
-import { HTML }            from './filter/filter'
+import { ReflectClass } from '../class/reflect'
+import { KeyOf, Type }  from '../class/type'
+import { applyFilter }  from './filter/filter'
+import { EDIT, OUTPUT } from './filter/filter'
+import { HTML }         from './filter/filter'
 
 export class ReflectProperty<T extends object>
 {
 	readonly #class: T | ReflectClass<T> | Type<T>
-	readonly name:   string
+	readonly name:   KeyOf<T>
 
-	constructor(object: T | ReflectClass<T> | Type<T>, name: string)
+	constructor(object: T | ReflectClass<T> | Type<T>, name: KeyOf<T>)
 	{
 		this.#class = object
 		this.name   = name
@@ -27,8 +27,8 @@ export class ReflectProperty<T extends object>
 	async edit(format: string = HTML)
 	{
 		if (!this.object) return
-		let value = (this.object as AnyObject)[this.name]
-		return applyFilter((value instanceof Promise) ? await value : value, this.object, this.name, format, EDIT)
+		let value = this.object[this.name]
+		return await applyFilter(await value, this.object, this.name, format, EDIT)
 	}
 
 	get object()
@@ -41,8 +41,8 @@ export class ReflectProperty<T extends object>
 	async output(format: string = HTML)
 	{
 		if (!this.object) return
-		const value = (this.object as AnyObject)[this.name]
-		return applyFilter((value instanceof Promise) ? await value : value, this.object, this.name, format, OUTPUT)
+		const value = this.object[this.name]
+		return await applyFilter(await value, this.object, this.name, format, OUTPUT)
 	}
 
 	get type()
@@ -52,7 +52,7 @@ export class ReflectProperty<T extends object>
 
 	get value()
 	{
-		return this.object ? (this.object as AnyObject)[this.name] : undefined
+		return this.object ? this.object[this.name] : undefined
 	}
 
 }
