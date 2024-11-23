@@ -1,31 +1,35 @@
-import { AnyObject, ObjectOrType, typeOf }       from '../../class/type'
+import { KeyOf, ObjectOrType, typeOf }           from '../../class/type'
+import ReflectClass                              from '../../class/reflect'
 import { decorateCallback, decoratorOfCallback } from '../../decorator/class'
 import { requiredOf }                            from '../../property/validate/required'
 
 const REPRESENTATIVE = Symbol('representative')
 
-export const Representative = (...properties: string[]) => decorateCallback(REPRESENTATIVE, function(target)
+export const Representative = <T extends object>(...properties: KeyOf<T>[]) => decorateCallback<T>(REPRESENTATIVE, target =>
 {
-	if (!target.prototype.hasOwnProperty('toString')) {
-		target.prototype.toString = function() {
-			return representativeValueOf(this)
-		}
+	if (target.prototype.toString === Object.prototype.toString) {
+		Object.defineProperty(target.prototype, 'toString', {
+			configurable: true,
+			enumerable:   false,
+			value:        function() { return representativeValueOf<T>(this) },
+			writable:     true
+		})
 	}
 	return properties.length
 		? properties
-		: Object.getOwnPropertyNames(new target).filter(name => requiredOf(target, name))
+		: new ReflectClass(target).propertyNames.filter(name => requiredOf(target, name))
 })
 export default Representative
 
-export const representativeOf = (target: ObjectOrType): string[] => {
-	const result = decoratorOfCallback<string[]>(target, REPRESENTATIVE)
+export const representativeOf = <T extends object>(target: ObjectOrType<T>): KeyOf<T>[] => {
+	const result = decoratorOfCallback<KeyOf<T>[]>(target, REPRESENTATIVE)
 	if (result) return result
 	Representative()(typeOf(target))
-	return representativeOf(target)
+	return representativeOf<T>(target)
 }
 
-export const representativeValueOf = (target: object) =>
-	representativeOf(target)
-		.map(property => (target as AnyObject)[property])
+export const representativeValueOf = <T extends object>(target: T) =>
+	representativeOf<T>(target)
+		.map(property => target[property])
 		.filter(value => value?.toString().length)
 		.join(' ')
