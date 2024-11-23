@@ -2,8 +2,8 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"command": "node_modules/.bin/tsc -w",
-			"group": "none",
+			"command": "npm run build:watch",
+			"group": "build",
 			"label": "build",
 			"presentation": {
 				"close": true,
@@ -19,7 +19,7 @@
 			}
 		},
 		{
-			"command": "node_modules/.bin/nodemon",
+			"command": "npm run start:watch",
 			"label": "start",
 			"presentation": {
 				"close": true,
