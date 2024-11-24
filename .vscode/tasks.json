@@ -1,5 +1,4 @@
 {
-	"version": "2.0.0",
 	"tasks": [
 		{
 			"command": "npm run build:watch",
@@ -7,8 +6,8 @@
 			"label": "build",
 			"presentation": {
 				"close": true,
-				"reveal": "always",
-				"panel": "new"
+				"panel": "new",
+				"reveal": "always"
 			},
 			"runOptions": {
 				"runOn": "folderOpen"
@@ -34,5 +33,6 @@
 				"command": "node_modules/.bin/nodemon"
 			}
 		}
-	]
+	],
+	"version": "2.0.0"
 }
