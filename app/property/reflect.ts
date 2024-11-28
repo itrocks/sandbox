@@ -28,7 +28,7 @@ export class ReflectProperty<T extends object>
 	{
 		if (!this.object) return
 		let value = this.object[this.name]
-		return await applyFilter(await value, this.object, this.name, format, EDIT)
+		return await applyFilter(await value, this.object ?? this.class.type, this.name, format, EDIT)
 	}
 
 	get object()
@@ -42,12 +42,14 @@ export class ReflectProperty<T extends object>
 	{
 		if (!this.object) return
 		const value = this.object[this.name]
-		return await applyFilter(await value, this.object, this.name, format, OUTPUT)
+		return await applyFilter(await value, this.object ?? this.class.type, this.name, format, OUTPUT)
 	}
 
 	get type()
 	{
-		return this.class.propertyTypes[this.name]
+		const value = this.class.propertyTypes[this.name]
+		Object.defineProperty(this, 'type', { value })
+		return value
 	}
 
 	get value()

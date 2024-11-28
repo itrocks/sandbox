@@ -10,7 +10,7 @@ const PASSWORD = Symbol('password')
 
 const lfTab = '\n\t\t\t\t'
 
-function editPassword<T extends object>(value: string, target: T, property: KeyOf<T>)
+function editPassword<T extends object>(value: string, target: ObjectOrType<T>, property: KeyOf<T>)
 {
 	const inputValue = value.length ? ` value="${UNCHANGED}"` : ''
 	const label      = `<label for="${property}">${tr(displayOf(target, property))}</label>`
