@@ -4,7 +4,7 @@ import { DecoratorOfType } from '../../decorator/class'
 import { decorate }        from '../../decorator/property'
 import { decoratorOf }     from '../../decorator/property'
 import ReflectProperty     from '../reflect'
-import { PrimitiveType }   from '../types'
+import { PrimitiveType }   from '../type'
 
 const FILTERS = Symbol('filters')
 
