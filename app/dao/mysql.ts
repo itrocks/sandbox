@@ -1,7 +1,10 @@
 import mariadb                    from 'mariadb'
-import { AnyObject, KeyOf, Type } from '../class/type'
+import {AnyObject, KeyOf, Type}   from '../class/type'
+import { componentOf }            from '../orm/component'
 import { applyFilter, UNCHANGED } from '../property/filter/filter'
 import { READ, SAVE, SQL }        from '../property/filter/filter'
+import ReflectProperty            from '../property/reflect'
+import { CollectionType }         from '../property/type'
 import { Dao, Entity }            from './dao'
 import { Identifier, SearchType } from './dao'
 import Function                   from './functions'
@@ -90,6 +93,28 @@ export default class Mysql extends Dao
 		)
 
 		return this.valuesFromDb(rows[0], type)
+	}
+
+	async readCollection<T extends object, PT extends object>(
+		object:   T & Entity,
+		property: KeyOf<T>,
+		type = (new ReflectProperty(object, property).type as CollectionType).elementType as Type<PT>
+	) {
+		const connection = this.connection ?? await this.connect()
+		const objectTable = storeOf(object)
+		const table       = storeOf(type)
+		let query: string
+		if (componentOf(object, property)) {
+			query = 'SELECT * FROM `' + table + '` WHERE ' + objectTable + '_id = ?'
+		}
+		else {
+			const joinTable = [objectTable, table].sort().join('_')
+			query = 'SELECT `' + table + '`.* FROM `' + table + '`'
+				+ ' INNER JOIN `' + joinTable + '` ON `' + joinTable + '`.' + table + '_id = `' + table + '`.id'
+				+ ' WHERE `' + joinTable + '`.' + objectTable + '_id = ?'
+		}
+		const rows: (PT & Entity)[] = await connection.query(query, [object.id])
+		return await Promise.all(rows.map(async row => this.valuesFromDb(row, type)))
 	}
 
 	async save<T extends object>(object: T | (T & Entity))

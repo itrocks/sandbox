@@ -1,7 +1,7 @@
 import config          from '../../local/dao'
 import { KeyOf, Type } from '../class/type'
 
-export type SearchType<T extends object = object> = Partial<Record<KeyOf<T & Entity>, any>> & { [key: string]: any }
+export type SearchType<T extends object = object> = Partial<Record<KeyOf<T>, any>> & { [key: string]: any }
 
 export abstract class Dao
 {
@@ -26,6 +26,9 @@ export abstract class Dao
 	}
 
 	abstract read<T extends object>(type: Type<T>, id: Identifier): Promise<T & Entity>
+
+	abstract readCollection<T extends object, PT extends object>(object: T, property: KeyOf<T>, type?: Type<PT>):
+		Promise<(PT & Entity)[]>
 
 	abstract save<T extends object>(object: T): Promise<T & Entity>
 
