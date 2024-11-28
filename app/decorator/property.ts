@@ -7,20 +7,24 @@ export function decorate<T extends object>(name: Symbol, value: any)
 
 export function decorateCallback<T extends object>(name: Symbol, callback: (target: Type<T>, property: KeyOf<T>) => any)
 {
-	return (target: Type<T>, property: KeyOf<T>) => Reflect.defineMetadata(name, callback(target, property), target, property)
+	return (target: Type<T>, property: KeyOf<T>) =>
+		Reflect.defineMetadata(name, callback(target, property), target, property)
 }
 
-export function decoratorOf<V, T extends object>(target: ObjectOrType<T>, property: KeyOf<T>, name: Symbol, undefinedValue: V): V
+export function decoratorOf<V, T extends object>(
+	target: ObjectOrType<T>, property: KeyOf<T>, name: Symbol, undefinedValue?: V
+): V
 {
-	const result = Reflect.getMetadata(name, objectOf(target), property)
-	return (result === undefined) ? undefinedValue : result
+	return Reflect.getMetadata(name, objectOf(target), property)
+		?? undefinedValue
 }
 
 export function decoratorOfCallback<V, T extends object>(
-	target: ObjectOrType<T>, property: KeyOf<T>, name: Symbol, undefinedCallback: (target: ObjectOrType<T>, property: KeyOf<T>) => V
+	target: ObjectOrType<T>, property: KeyOf<T>, name: Symbol,
+	undefinedCallback: (target: ObjectOrType<T>, property: KeyOf<T>) => V
 ): V
 {
 	target = objectOf(target)
-	const result = Reflect.getMetadata(name, target, property)
-	return (result === undefined) ? undefinedCallback(target, property) : result
+	return Reflect.getMetadata(name, target, property)
+		?? undefinedCallback(target, property)
 }
