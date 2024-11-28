@@ -1,10 +1,10 @@
-import { objectOf }        from '../../class/type'
-import { KeyOf, Type }     from '../../class/type'
-import { DecoratorOfType } from '../../decorator/class'
-import { decorate }        from '../../decorator/property'
-import { decoratorOf }     from '../../decorator/property'
-import ReflectProperty     from '../reflect'
-import { PrimitiveType }   from '../type'
+import { isAnyObject, KeyOf }     from '../../class/type'
+import { objectOf, ObjectOrType } from '../../class/type'
+import { Type, typeOf }           from '../../class/type'
+import { DecoratorOfType }        from '../../decorator/class'
+import { decorate, decoratorOf }  from '../../decorator/property'
+import ReflectProperty            from '../reflect'
+import { PrimitiveType }          from '../type'
 
 const FILTERS = Symbol('filters')
 
@@ -25,7 +25,7 @@ type Direction = string | '' | 'edit' | 'input' | 'output' | 'read' | 'save'
 type Format    = string | '' | 'html' | 'json' | 'sql'
 
 export type Filter<T extends object = object>
-	= (value: any, target: T, property: KeyOf<T>, data: any, format: Format, direction: Direction) => any
+	= (value: any, target: ObjectOrType<T>, property: KeyOf<T>, data: any, format: Format, direction: Direction) => any
 
 type PropertyType<PT extends object = object> = DecoratorOfType<PT> | PrimitiveType | Type<PT> | null
 
@@ -45,7 +45,7 @@ export async function applyFilter<T extends object>(
 		filter = setPropertyFilter<T>(target, property, format, direction,
 			(
 				getPropertyTypeFilter(propertyType, format, direction)
-				|| getPropertyTypeFilter(null, format, direction)
+				|| getPropertyTypeFilter(ALL, format, direction)
 				|| ((value: any) => value)
 			) as unknown as Filter<T>
 		)
@@ -64,7 +64,7 @@ function getPropertyFilter<T extends object>(target: T, property: KeyOf<T>, form
 
 function getPropertyTypeFilter(type: PropertyType, format: Format, direction: Direction)
 {
-	const formatFilters = filters.get(type)
+	const formatFilters = filters.get(isAnyObject(type) ? typeOf(type) : type)
 	if (!formatFilters) return
 	const directionFilters = formatFilters[format] ?? formatFilters['']
 	if (!directionFilters) return
