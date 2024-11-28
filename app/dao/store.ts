@@ -59,7 +59,7 @@ export const Store = (name: string | false = '') => decorateCallback(STORE, targ
 		setPropertyTypeFilter(target, HTML, INPUT, storeInput)
 		setPropertyTypeFilter(target, SQL,  SAVE,  storeSave)
 	}
-	return (name === '') ? target.name.toLowerCase() : name
+	return (name === '') ? target.name.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase() : name
 })
 export default Store
 
