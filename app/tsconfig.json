@@ -1,11 +1,14 @@
 {
 	"compilerOptions": {
-		"allowSyntheticDefaultImports": true,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
-		"plugins": [{ "transform":  "./action/static-routes-plugin.ts", "type": "program" }],
+		"plugins": [
+			{ "transform": "./action/static-routes-plugin.ts" },
+			{ "transform": "./class/uses-interface-plugin.ts" },
+			{ "transform": "./class/uses-interface-plugin.ts", "afterDeclarations": true }
+		],
 		"target": "ESNext"
 	},
 	"extends": "../tsconfig.json",
