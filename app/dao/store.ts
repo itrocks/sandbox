@@ -1,15 +1,15 @@
-import { routeOf }                       from '../action/route'
-import { KeyOf, ObjectOrType }           from '../class/type'
-import { StringObject, Type }            from '../class/type'
-import { decorateCallback, decoratorOf } from '../decorator/class'
-import tr                                from '../locale/translate'
-import { Filter, setPropertyTypeFilter } from '../property/filter/filter'
-import { UNCHANGED }                     from '../property/filter/filter'
-import { EDIT, HTML, INPUT, SAVE, SQL }  from '../property/filter/filter'
-import ReflectProperty                   from '../property/reflect'
-import { representativeValueOf }         from '../view/class/representative'
-import { displayOf }                     from '../view/property/display'
-import { dao, Entity }                   from './dao'
+import { routeOf }                        from '../action/route'
+import { AnyObject, KeyOf, ObjectOrType } from '../class/type'
+import { StringObject, Type }             from '../class/type'
+import { decorateCallback, decoratorOf }  from '../decorator/class'
+import tr                                 from '../locale/translate'
+import { Filter, setPropertyTypeFilter }  from '../property/filter/filter'
+import { EDIT, HTML, INPUT, OUTPUT }      from '../property/filter/filter'
+import { SAVE, SQL, UNCHANGED }           from '../property/filter/filter'
+import ReflectProperty                    from '../property/reflect'
+import { representativeValueOf }          from '../view/class/representative'
+import { displayOf }                      from '../view/property/display'
+import { dao, Entity }                    from './dao'
 
 const lfTab = '\n\t\t\t\t'
 
@@ -28,14 +28,15 @@ function storeEdit<T extends object>(value: (object & Entity) | undefined, type:
 	return label + lfTab + input + input_id
 }
 
-const storeInput: Filter = <T extends object>(_value: string, object: T, property: KeyOf<T>, data: StringObject) =>
-{
+const storeInput: Filter = <T extends object>(
+	value: (object & Entity) | object | undefined, object: T, property: KeyOf<T>, data: StringObject
+) => {
 	const property_id = property + '_id'
 	if (
 		(property_id in data)
 		&& ((property_id in object)
-			? (data[property_id] !== String(object[property_id as KeyOf<T>]))
-			: (data[property_id] !== String((object[property] as Entity).id))
+			? (data[property_id] !== String((object as AnyObject)[property_id]))
+			: (data[property_id] !== String((value as Entity | undefined)?.id))
 		)
 	) {
 		delete object[property]
@@ -55,9 +56,10 @@ const storeSave: Filter = <T extends object>(value: T | (T & Entity) | undefined
 export const Store = (name: string | false = '') => decorateCallback(STORE, target =>
 {
 	if (name !== false) {
-		setPropertyTypeFilter(target, HTML, EDIT,  storeEdit)
-		setPropertyTypeFilter(target, HTML, INPUT, storeInput)
-		setPropertyTypeFilter(target, SQL,  SAVE,  storeSave)
+		setPropertyTypeFilter(target, HTML, EDIT,   storeEdit)
+		setPropertyTypeFilter(target, HTML, INPUT,  storeInput)
+		setPropertyTypeFilter(target, HTML, OUTPUT, representativeValueOf)
+		setPropertyTypeFilter(target, SQL,  SAVE,   storeSave)
 	}
 	return (name === '') ? target.name.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase() : name
 })
