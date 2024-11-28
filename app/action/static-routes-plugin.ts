@@ -7,7 +7,11 @@ import ts                from 'typescript'
 
 const staticRoutesFile = __dirname + '/static-routes.json'
 
-const routes  = JSON.parse(readFileSync(staticRoutesFile).toString()) as { [path: string]: string }
+let source: string
+try   { source = readFileSync(staticRoutesFile).toString() }
+catch { source = '{}' }
+const routes = JSON.parse(source) as { [path: string]: string }
+
 const modules = {} as { [module: string]: string[] }
 for (const [path, module] of Object.entries(routes)) {
 	(modules[module] ?? (modules[module] = [])).push(path)
@@ -15,7 +19,7 @@ for (const [path, module] of Object.entries(routes)) {
 
 const saveStaticRoutes = () => writeFileSync(staticRoutesFile, JSON.stringify(routes, null, '\t') + '\n')
 
-const transformer = (context: ts.TransformationContext) => (sourceFile: ts.SourceFile) =>
+export default () => (context: ts.TransformationContext) => (sourceFile: ts.SourceFile) =>
 {
 	let   hasRoute    = false
 	const validRoutes = {} as { [path: string]: string }
@@ -51,33 +55,31 @@ const transformer = (context: ts.TransformationContext) => (sourceFile: ts.Sourc
 
 	function routeDecoratorValues(node: ts.Node)
 	{
-		const values = []
+		const routes = new Array<string>
 		if (!ts.canHaveDecorators(node)) return []
 		for (const decorator of ts.getDecorators(node) ?? []) {
 			if (!ts.isCallExpression(decorator.expression)) continue
 			if (decorator.expression.expression.getText() !== 'Route') continue
 			const argument = decorator.expression.arguments[0]
 			if (!argument || !ts.isStringLiteral(argument)) continue
-			values.push(argument.text)
+			routes.push(argument.text)
 		}
-		return values
+		return routes
 	}
 
-	function visit(node: ts.Node): ts.Node
+	const visit: ts.Visitor = (node: ts.Node): ts.Node =>
 	{
 		if (hasRoute ||= isRoute(node)) {
 			for (const path of routeDecoratorValues(node)) {
-				if (path) {
-					validRoutes[path] = module
-					if (module !== routes[path]) {
-						if (routes[path]) {
-							const moduleRoutes = modules[routes[path]]
-							delete moduleRoutes[moduleRoutes.indexOf(path)]
-						}
-						(modules[module] ?? (modules[module] = [])).push(path)
-						routes[path] = module
-					}
+				if (!path) continue
+				validRoutes[path] = module
+				if (module === routes[path]) continue
+				if (routes[path]) {
+					const moduleRoutes = modules[routes[path]]
+					delete moduleRoutes[moduleRoutes.indexOf(path)]
 				}
+				(modules[module] ?? (modules[module] = [])).push(path)
+				routes[path] = module
 			}
 		}
 		return ts.visitEachChild(node, visit, context)
@@ -108,5 +110,3 @@ const transformer = (context: ts.TransformationContext) => (sourceFile: ts.Sourc
 
 	return resultNode
 }
-
-export default () => { return { before: [transformer] } }
