@@ -1,3 +1,4 @@
+import { isAnyFunction } from '../class/type'
 
 export default function dump(variable: any, indent: number = 0): string
 {
@@ -16,7 +17,7 @@ export default function dump(variable: any, indent: number = 0): string
 	indent ++
 	for (const property in variable) {
 		const value = variable[property]
-		if (((typeof value)[0] === 'f') && (value.toString()[0] !== 'c')) {
+		if (isAnyFunction(value)) {
 			continue
 		}
 		out += "\t".repeat(indent) + property + ': ' + dump(value, indent)
