@@ -9,18 +9,18 @@ import { SAVE, SQL, UNCHANGED }           from '../property/filter/filter'
 import ReflectProperty                    from '../property/reflect'
 import { representativeValueOf }          from '../view/class/representative'
 import { displayOf }                      from '../view/property/display'
-import { dao, Entity }                    from './dao'
+import { dao, HasEntity, MayEntity }      from './dao'
 
 const lfTab = '\n\t\t\t\t'
 
 const STORE = Symbol('store')
 
-function storeEdit<T extends object>(value: (object & Entity) | undefined, type: ObjectOrType<T>, property: KeyOf<T>)
+function storeEdit<T extends object>(value: HasEntity | undefined, object: T, property: KeyOf<T>)
 {
-	const propertyType   = new ReflectProperty(type, property).type as Type
+	const propertyType   = new ReflectProperty(object, property).type as Type
 	const representative = value ? representativeValueOf(value) : ''
 	const fetch          = routeOf(propertyType) + '/summary'
-	const label          = `<label for="${property}">${tr(displayOf(type, property))}</label>`
+	const label          = `<label for="${property}">${tr(displayOf(object, property))}</label>`
 	const name           = `id="${property}" name="${property}"`
 	const inputValue     = representative.length ? ` value="${representative}"` : ''
 	const input          = `<input data-fetch="${fetch}" data-type="object" ${name}${inputValue}>`
@@ -29,14 +29,14 @@ function storeEdit<T extends object>(value: (object & Entity) | undefined, type:
 }
 
 const storeInput: Filter = <T extends object>(
-	value: (object & Entity) | object | undefined, object: T, property: KeyOf<T>, data: StringObject
+	value: object | HasEntity | undefined, object: T, property: KeyOf<T>, data: StringObject
 ) => {
 	const property_id = property + '_id'
 	if (
 		(property_id in data)
 		&& ((property_id in object)
 			? (data[property_id] !== String((object as AnyObject)[property_id]))
-			: (data[property_id] !== String((value as Entity | undefined)?.id))
+			: (data[property_id] !== String((value as HasEntity | undefined)?.id))
 		)
 	) {
 		delete object[property]
@@ -45,7 +45,7 @@ const storeInput: Filter = <T extends object>(
 	return UNCHANGED
 }
 
-const storeSave: Filter = <T extends object>(value: T | (T & Entity) | undefined, object: T, property: KeyOf<T>) =>
+const storeSave: Filter = <T extends object>(value: MayEntity | undefined, object: T, property: KeyOf<T>) =>
 {
 	if (value && dao.isObjectConnected(value)) {
 		Object.assign(object, { [property + '_id']: value.id })
