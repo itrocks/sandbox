@@ -27,17 +27,21 @@ type Format    = string | '' | 'html' | 'json' | 'sql'
 export type Filter<T extends object = object>
 	= (value: any, target: ObjectOrType<T>, property: KeyOf<T>, data: any, format: Format, direction: Direction) => any
 
+export class HtmlContainer { constructor(public mandatoryContainer: boolean, public container: boolean = true) {} }
+
 type PropertyType<PT extends object = object> = DecoratorOfType<PT> | PrimitiveType | Type<PT> | null
 
 type DirectionFilters<T extends object = object> = { [direction: Direction]: Filter<T> }
 type FormatFilters<T extends object = object>     = { [format: Format]: DirectionFilters<T> }
-
 const filters = new Map<PropertyType, FormatFilters>()
+
+export type FormatFilter = (result: any, data: any) => any
+const formatFilters = new Map<string, FormatFilter>
 
 type Filters<T extends object = object> = Array<{ format?: Format, direction?: Direction, filter: Filter<T> }>
 
 export async function applyFilter<T extends object>(
-	value: any, target: T, property: KeyOf<T>, format: Format, direction: Direction, data?: any
+	value: any, target: ObjectOrType<T>, property: KeyOf<T>, format: Format, direction: Direction, data?: any
 ) {
 	let filter = getPropertyFilter<T>(target, property, format, direction)
 	if (!filter) {
@@ -50,11 +54,14 @@ export async function applyFilter<T extends object>(
 			) as unknown as Filter<T>
 		)
 	}
-	return filter(value, target, property, data, format, direction)
+	const formatFilter = formatFilters.get(format)
+	const result       = filter(value, target, property, data, format, direction)
+	return (data && formatFilter) ? formatFilter(result, data) : result
 }
 
-function getPropertyFilter<T extends object>(target: T, property: KeyOf<T>, format: Format, direction: Direction)
-{
+function getPropertyFilter<T extends object>(
+	target: ObjectOrType<T>, property: KeyOf<T>, format: Format, direction: Direction
+) {
 	const formatFilters = decoratorOf<FormatFilters<T> | null, T>(target, property, FILTERS, null)
 	if (!formatFilters) return
 	const directionFilters = formatFilters[format] ?? formatFilters['']
@@ -71,8 +78,13 @@ function getPropertyTypeFilter(type: PropertyType, format: Format, direction: Di
 	return directionFilters[direction] ?? directionFilters['']
 }
 
+export function setFormatFilter(format: string, filter: FormatFilter)
+{
+	formatFilters.set(format, filter)
+}
+
 export function setPropertyFilter<T extends object>(
-	type: T, property: KeyOf<T>, format: Format, direction: Direction, filter: Filter<T>
+	type: ObjectOrType<T>, property: KeyOf<T>, format: Format, direction: Direction, filter: Filter<T>
 ) {
 	let propertyFilters = decoratorOf<FormatFilters<T> | null, T>(type, property, FILTERS, null)
 	if (!propertyFilters) {

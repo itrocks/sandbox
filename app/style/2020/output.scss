@@ -31,6 +31,18 @@ ul.object.properties {
 			}
 		}
 
+		> ul {
+			display: block;
+
+			> li {
+				display: inline-block;
+
+				&:not(:first-child):before {
+					content: ', ';
+				}
+			}
+		}
+
 		> :not(input[type=checkbox]):not(label) {
 			border-radius: 4px;
 			padding: .5em;

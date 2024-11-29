@@ -29,6 +29,7 @@ import { fastifyResponse } from './server/fastify'
 import Request             from './server/request'
 import Response            from './server/response'
 import FileStore           from './session-file-store'
+import                          './view/html/filter'
 import { frontScripts }    from './view/html/template'
 
 frontScripts.push(

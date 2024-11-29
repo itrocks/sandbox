@@ -47,20 +47,40 @@ main > article[data-action="list"] {
 				}
 			}
 
-			> thead > tr > * {
-				background: #f8f8f8;
+			> thead {
+
+				> tr > * {
+					background: #f8f8f8;
+				}
+
+				> .properties > .select > input[name=select] {
+					display: none;
+				}
 			}
 
-			> thead > .properties > .select > input[name=select] {
-				display: none;
-			}
+			> tbody > tr {
 
-			> tbody > tr:nth-child(even) > * {
-				background: #f8f8f8;
-			}
+				&:nth-child(even) > * {
+					background: #f8f8f8;
+				}
 
-			> tbody > tr:nth-child(odd) > * {
-				background: white;
+				&:nth-child(odd) > * {
+					background: white;
+				}
+
+				> td > ul {
+					display: block;
+					margin: 0;
+					padding: 0;
+
+					> li {
+						display: inline-block;
+
+						&:not(:first-child):before {
+							content: ', ';
+						}
+					}
+				}
 			}
 		}
 

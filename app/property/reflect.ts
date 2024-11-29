@@ -1,8 +1,8 @@
-import { ReflectClass } from '../class/reflect'
-import { KeyOf, Type }  from '../class/type'
-import { applyFilter }  from './filter/filter'
-import { EDIT, OUTPUT } from './filter/filter'
-import { HTML }         from './filter/filter'
+import { ReflectClass }       from '../class/reflect'
+import { KeyOf, Type }        from '../class/type'
+import { applyFilter }        from './filter/filter'
+import { EDIT, HTML, OUTPUT } from './filter/filter'
+import { HtmlContainer }      from './filter/filter'
 
 export class ReflectProperty<T extends object>
 {
@@ -26,9 +26,9 @@ export class ReflectProperty<T extends object>
 
 	async edit(format: string = HTML)
 	{
-		if (!this.object) return
-		let value = this.object[this.name]
-		return await applyFilter(await value, this.object ?? this.class.type, this.name, format, EDIT)
+		const object = this.object ?? this.class.type
+		const value  = this.object ? this.object[this.name] : undefined
+		return await applyFilter<T>(await value, object, this.name, format, EDIT) as string
 	}
 
 	get object()
@@ -38,11 +38,21 @@ export class ReflectProperty<T extends object>
 		return value
 	}
 
-	async output(format: string = HTML)
+	async output(format: string = HTML, askFor?: HtmlContainer)
 	{
-		if (!this.object) return
-		const value = this.object[this.name]
-		return await applyFilter(await value, this.object ?? this.class.type, this.name, format, OUTPUT)
+		const object = this.object ?? this.class.type
+		const value  = this.object ? await this.object[this.name] : undefined
+		return await applyFilter<T>(value, object, this.name, format, OUTPUT, askFor) as string
+	}
+
+	async outputMandatoryContainer(format: string = HTML)
+	{
+		return this.output(format, new HtmlContainer(true))
+	}
+
+	async outputOptionalContainer(format: string = HTML)
+	{
+		return this.output(format, new HtmlContainer(false))
 	}
 
 	get type()
