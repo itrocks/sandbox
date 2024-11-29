@@ -1,10 +1,9 @@
-import { isAnyObject, KeyOf }     from '../../class/type'
-import { objectOf, ObjectOrType } from '../../class/type'
-import { Type, typeOf }           from '../../class/type'
-import { DecoratorOfType }        from '../../decorator/class'
-import { decorate, decoratorOf }  from '../../decorator/property'
-import ReflectProperty            from '../reflect'
-import { PrimitiveType }          from '../type'
+import { KeyOf }             from '../../class/type'
+import { ObjectOrType }      from '../../class/type'
+import { prototypeOf, Type } from '../../class/type'
+import { DecoratorOfType }   from '../../decorator/class'
+import ReflectProperty       from '../reflect'
+import { PrimitiveType }     from '../type'
 
 const FILTERS = Symbol('filters')
 
@@ -43,26 +42,28 @@ type Filters<T extends object = object> = Array<{ format?: Format, direction?: D
 export async function applyFilter<T extends object>(
 	value: any, target: ObjectOrType<T>, property: KeyOf<T>, format: Format, direction: Direction, data?: any
 ) {
-	let filter = getPropertyFilter<T>(target, property, format, direction)
-	if (!filter) {
+	const object = prototypeOf(target)
+	let   filter = getPropertyFilter<T>(object, property, format, direction)
+	if (filter === undefined) {
 		const propertyType = new ReflectProperty(target, property).type
-		filter = setPropertyFilter<T>(target, property, format, direction,
+		filter = setPropertyFilter(
+			object, property, format, direction,
 			(
 				getPropertyTypeFilter(propertyType, format, direction)
 				|| getPropertyTypeFilter(ALL, format, direction)
-				|| ((value: any) => value)
-			) as unknown as Filter<T>
+				|| false
+			) as unknown as (Filter<T> | false)
 		)
 	}
 	const formatFilter = formatFilters.get(format)
-	const result       = filter(value, target, property, data, format, direction)
+	const result       = filter ? filter(value, target, property, data, format, direction) : value
 	return (data && formatFilter) ? formatFilter(result, data) : result
 }
 
-function getPropertyFilter<T extends object>(
-	target: ObjectOrType<T>, property: KeyOf<T>, format: Format, direction: Direction
-) {
-	const formatFilters = decoratorOf<FormatFilters<T> | null, T>(target, property, FILTERS, null)
+function getPropertyFilter<T extends object>(object: T, property: KeyOf<T>, format: Format, direction: Direction)
+	: Filter<T> | false | undefined
+{
+	const formatFilters = Reflect.getMetadata(FILTERS, object, property)
 	if (!formatFilters) return
 	const directionFilters = formatFilters[format] ?? formatFilters['']
 	if (!directionFilters) return
@@ -71,7 +72,7 @@ function getPropertyFilter<T extends object>(
 
 function getPropertyTypeFilter(type: PropertyType, format: Format, direction: Direction)
 {
-	const formatFilters = filters.get(isAnyObject(type) ? typeOf(type) : type)
+	const formatFilters = filters.get(type)
 	if (!formatFilters) return
 	const directionFilters = formatFilters[format] ?? formatFilters['']
 	if (!directionFilters) return
@@ -84,21 +85,22 @@ export function setFormatFilter(format: string, filter: FormatFilter)
 }
 
 export function setPropertyFilter<T extends object>(
-	type: ObjectOrType<T>, property: KeyOf<T>, format: Format, direction: Direction, filter: Filter<T>
+	target: ObjectOrType<T>, property: KeyOf<T>, format: Format, direction: Direction, filter: Filter<T> | false
 ) {
-	let propertyFilters = decoratorOf<FormatFilters<T> | null, T>(type, property, FILTERS, null)
+	target = prototypeOf(target)
+	let propertyFilters = Reflect.getMetadata(FILTERS, target, property)
 	if (!propertyFilters) {
-		decorate<T>(FILTERS, propertyFilters = {})(objectOf(type), property)
+		Reflect.defineMetadata(FILTERS, propertyFilters = {}, target, property)
 	}
 	let formatFilters = propertyFilters[format] ?? (propertyFilters[format] = {})
 	formatFilters[direction] = filter
 	return filter
 }
 
-export function setPropertyFilters<T extends object>(type: T, property: KeyOf<T>, filters: Filters<T>)
+export function setPropertyFilters<T extends object>(target: ObjectOrType<T>, property: KeyOf<T>, filters: Filters<T>)
 {
 	for (const filter of filters) {
-		setPropertyFilter(type, property, filter.format ?? '', filter.direction ?? '', filter.filter)
+		setPropertyFilter(target, property, filter.format ?? '', filter.direction ?? '', filter.filter)
 	}
 }
 

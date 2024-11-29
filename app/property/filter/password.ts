@@ -1,10 +1,11 @@
-import { createHash }            from 'crypto'
+import { createHash       }      from 'crypto'
 import { KeyOf, ObjectOrType }   from '../../class/type'
 import { decorate, decoratorOf } from '../../decorator/property'
 import tr                        from '../../locale/translate'
 import { displayOf }             from '../../view/property/display'
 import { setPropertyFilters }    from './filter'
-import { EDIT, HTML, INPUT, JSON, UNCHANGED } from './filter'
+import { EDIT, HTML, INPUT }     from './filter'
+import { JSON, UNCHANGED }       from './filter'
 
 const PASSWORD = Symbol('password')
 

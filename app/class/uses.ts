@@ -45,7 +45,7 @@ const USES = Symbol('uses')
 export const Uses = <T extends object>(...mixins: Type[]) => (target: Type<T>) =>
 {
 	decorate<T>(USES, mixins.concat(usesOf(target)))(target)
-	return uses<Type<T>>(target, mixins)
+	return uses(target, mixins)
 }
 export default Uses
 
