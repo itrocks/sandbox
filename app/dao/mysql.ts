@@ -48,7 +48,7 @@ export default class Mysql extends Dao
 	{
 		const connection = this.connection ?? await this.connect()
 
-		const values = this.valuesToDb(object)
+		const values = await this.valuesToDb(object)
 		const sql    = this.propertiesToSql(object)
 		const query  = 'INSERT INTO `' + storeOf(object) + '` SET '  + sql
 		if (DEBUG) console.log(query, values)
@@ -131,9 +131,9 @@ export default class Mysql extends Dao
 		const searchValues = Object.values(search).filter(value => value instanceof Function)
 			? Object.assign({}, search)
 			: search
-			const sql    = this.propertiesToSearchSql(searchValues)
-			const values = this.valuesToDb(searchValues, type)
-		if (DEBUG) console.log('SELECT * FROM `' + storeOf(type) + '`' + sql, values)
+		const sql    = this.propertiesToSearchSql(searchValues)
+		const values = await this.valuesToDb(searchValues, type)
+		if (DEBUG) console.log('SELECT * FROM `' + storeOf(type) + '`' + sql, '[', values, ']')
 		const rows: HasEntity<T>[] = await connection.query(
 			'SELECT * FROM `' + storeOf(type) + '`' + sql,
 			values
