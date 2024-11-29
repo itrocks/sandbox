@@ -1,11 +1,11 @@
-import { SortedArray }                   from '@itrocks/sorted-array'
-import { ReflectProperty }               from '../property/reflect'
-import { PropertyTypes }                 from '../property/type'
-import { propertyTypesFromFile }         from '../property/type'
-import { fileOf }                        from './file'
-import { isObject, KeyOf, Type, typeOf } from './type'
-import { usesOf }                        from './uses'
-import {decorate, decoratorOf} from '../decorator/class'
+import { SortedArray }            from '@itrocks/sorted-array'
+import { ReflectProperty }        from '../property/reflect'
+import { PropertyTypes }          from '../property/type'
+import { propertyTypesFromFile }  from '../property/type'
+import { fileOf }                 from './file'
+import { isObject, KeyOf, Type }  from './type'
+import { typeIdentifier, typeOf } from './type'
+import { usesOf }                 from './uses'
 
 const TYPES = Symbol('types')
 
@@ -69,10 +69,11 @@ export class ReflectClass<T extends object>
 
 	get propertyTypes()
 	{
-		let value: PropertyTypes<T> | undefined = decoratorOf(this.type, TYPES, undefined)
+		const identifier = typeIdentifier(this.type)
+		let value: PropertyTypes<T> | undefined = Reflect.getMetadata(TYPES, this.type, identifier)
 		if (!value) {
 			value = {}
-			decorate(TYPES, value)(this.type)
+			Reflect.defineMetadata(TYPES, value, this.type, identifier)
 			const parent = this.parent
 			if (parent.name) {
 				Object.assign(value, parent.propertyTypes)

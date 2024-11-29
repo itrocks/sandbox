@@ -28,6 +28,8 @@ export type ObjectOrType<T extends object = object> = T | Type<T>
 export default Type
 export type Type<T extends object = object> = new (...args: any[]) => T
 
+export const typeIdentifier = (type: Type) => Symbol.for(type.prototype.constructor.name)
+
 export const typeOf = <T extends object>(target: ObjectOrType<T>): Type<T> => isObject(target)
 	? Object.getPrototypeOf(target).constructor
 	: target
