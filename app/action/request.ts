@@ -1,16 +1,16 @@
-import Type            from '../class/type'
-import { dao, Entity } from '../dao/dao'
-import ServerRequest   from '../server/request'
-import Exception       from './exception'
-import formats         from './formats'
-import { getModule }   from './routes'
+import Type               from '../class/type'
+import { dao, HasEntity } from '../dao/dao'
+import ServerRequest      from '../server/request'
+import Exception          from './exception'
+import formats            from './formats'
+import { getModule }      from './routes'
 
 export default class Request
 {
 	action  = ''
 	format  = ''
 	ids     = [] as string[]
-	objects = [] as (object & Entity)[]
+	objects = [] as HasEntity[]
 	route   = ''
 
 	constructor(public request: ServerRequest)

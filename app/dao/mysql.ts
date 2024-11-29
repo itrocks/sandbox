@@ -1,14 +1,14 @@
-import mariadb                    from 'mariadb'
-import {AnyObject, KeyOf, Type}   from '../class/type'
-import { componentOf }            from '../orm/component'
-import { applyFilter, UNCHANGED } from '../property/filter/filter'
-import { READ, SAVE, SQL }        from '../property/filter/filter'
-import ReflectProperty            from '../property/reflect'
-import { CollectionType }         from '../property/type'
-import { Dao, Entity }            from './dao'
-import { Identifier, SearchType } from './dao'
-import Function                   from './functions'
-import { storeOf }                from './store'
+import mariadb                       from 'mariadb'
+import { AnyObject, KeyOf, Type }    from '../class/type'
+import { componentOf }               from '../orm/component'
+import { applyFilter, UNCHANGED }    from '../property/filter/filter'
+import { READ, SAVE, SQL }           from '../property/filter/filter'
+import ReflectProperty               from '../property/reflect'
+import { CollectionType }            from '../property/type'
+import { Dao, HasEntity, MayEntity } from './dao'
+import { Identifier, SearchType }    from './dao'
+import Function                      from './functions'
+import { storeOf }                   from './store'
 
 const DEBUG = false
 
@@ -31,7 +31,7 @@ export default class Mysql extends Dao
 		return this.connection = await mariadb.createConnection(mariaDbConfig)
 	}
 
-	async delete<T extends object>(object: T & Entity, property: KeyOf<T & Entity> = 'id')
+	async delete<T extends object>(object: HasEntity<T>, property: KeyOf<HasEntity<T>> = 'id')
 	{
 		const connection = this.connection ?? await this.connect()
 
@@ -87,7 +87,7 @@ export default class Mysql extends Dao
 		const connection = this.connection ?? await this.connect()
 
 		if (DEBUG) console.log('SELECT * FROM `' + storeOf(type) + '` WHERE id = ?', [id])
-		const rows: (T & Entity)[] = await connection.query(
+		const rows: HasEntity<T>[] = await connection.query(
 			'SELECT * FROM `' + storeOf(type) + '` WHERE id = ?',
 			[id]
 		)
@@ -96,7 +96,7 @@ export default class Mysql extends Dao
 	}
 
 	async readCollection<T extends object, PT extends object>(
-		object:   T & Entity,
+		object:   HasEntity<T>,
 		property: KeyOf<T>,
 		type = (new ReflectProperty(object, property).type as CollectionType).elementType as Type<PT>
 	) {
@@ -113,11 +113,11 @@ export default class Mysql extends Dao
 				+ ' INNER JOIN `' + joinTable + '` ON `' + joinTable + '`.' + table + '_id = `' + table + '`.id'
 				+ ' WHERE `' + joinTable + '`.' + objectTable + '_id = ?'
 		}
-		const rows: (PT & Entity)[] = await connection.query(query, [object.id])
+		const rows: HasEntity<PT>[] = await connection.query(query, [object.id])
 		return await Promise.all(rows.map(async row => this.valuesFromDb(row, type)))
 	}
 
-	async save<T extends object>(object: T | (T & Entity))
+	async save<T extends object>(object: MayEntity<T>)
 	{
 		return this.isObjectConnected(object)
 			? this.update(object)
@@ -134,7 +134,7 @@ export default class Mysql extends Dao
 			const sql    = this.propertiesToSearchSql(searchValues)
 			const values = this.valuesToDb(searchValues, type)
 		if (DEBUG) console.log('SELECT * FROM `' + storeOf(type) + '`' + sql, values)
-		const rows: (T & Entity)[] = await connection.query(
+		const rows: HasEntity<T>[] = await connection.query(
 			'SELECT * FROM `' + storeOf(type) + '`' + sql,
 			values
 		)
@@ -142,7 +142,7 @@ export default class Mysql extends Dao
 		return await Promise.all(rows.map(async row => this.valuesFromDb(row, type)))
 	}
 
-	async update<T extends (object & Entity)>(object: T)
+	async update<T extends HasEntity>(object: T)
 	{
 		const connection = this.connection ?? await this.connect()
 
@@ -157,10 +157,10 @@ export default class Mysql extends Dao
 		return this.connectObject(object, id)
 	}
 
-	async valuesFromDb<T extends object>(row: T & Entity, type: Type<T>)
+	async valuesFromDb<T extends object>(row: HasEntity<T>, type: Type<T>)
 	{
-		const object = (new type) as T & Entity
-		let property: KeyOf<T & Entity>
+		const object = (new type) as HasEntity<T>
+		let property: KeyOf<HasEntity<T>>
 		for (property in row) {
 			const value = await applyFilter(row[property], object, property, SQL, READ, this)
 			if (value === UNCHANGED) continue
