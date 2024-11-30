@@ -42,5 +42,5 @@ const collectionOutput: Filter = (value: MayEntity[], _object, _property, askFor
 	return value.map(object => representativeValueOf(object)).join(', ')
 }
 
-setPropertyTypeFilter(CollectionType, HTML, EDIT, collectionEdit)
+setPropertyTypeFilter(CollectionType, HTML, EDIT,   collectionEdit)
 setPropertyTypeFilter(CollectionType, HTML, OUTPUT, collectionOutput)

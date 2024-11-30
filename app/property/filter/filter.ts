@@ -1,9 +1,10 @@
-import { KeyOf }             from '../../class/type'
-import { ObjectOrType }      from '../../class/type'
-import { prototypeOf, Type } from '../../class/type'
-import { DecoratorOfType }   from '../../decorator/class'
-import ReflectProperty       from '../reflect'
-import { PrimitiveType }     from '../type'
+import { isAnyObject, KeyOf } from '../../class/type'
+import { ObjectOrType }       from '../../class/type'
+import { prototypeOf }        from '../../class/type'
+import { typeOf, Type }       from '../../class/type'
+import { DecoratorOfType }    from '../../decorator/class'
+import ReflectProperty        from '../reflect'
+import { PrimitiveType }      from '../type'
 
 const FILTERS = Symbol('filters')
 
@@ -49,9 +50,13 @@ export async function applyFilter<T extends object>(
 		filter = setPropertyFilter(
 			object, property, format, direction,
 			(
-				getPropertyTypeFilter(propertyType, format, direction)
-				|| getPropertyTypeFilter(ALL, format, direction)
-				|| false
+				propertyType
+					? (
+						getPropertyTypeFilter(propertyType, format, direction)
+						|| getPropertyTypeFilter(ALL, format, direction)
+						|| false
+					)
+					: false
 			) as unknown as (Filter<T> | false)
 		)
 	}
@@ -72,7 +77,7 @@ function getPropertyFilter<T extends object>(object: T, property: KeyOf<T>, form
 
 function getPropertyTypeFilter(type: PropertyType, format: Format, direction: Direction)
 {
-	const formatFilters = filters.get(type)
+	const formatFilters = filters.get(isAnyObject(type) ? typeOf(type) : type)
 	if (!formatFilters) return
 	const directionFilters = formatFilters[format] ?? formatFilters['']
 	if (!directionFilters) return
