@@ -1,4 +1,27 @@
 
-form[data-action=edit] h2 {
-	background: red !important;
+form[data-action=edit] {
+	ul.object.properties > li {
+
+		> input {
+			border: 1px solid #ddd;
+
+			&[type=checkbox] {
+				margin: 8px 0;
+			}
+		}
+
+		> ul {
+			background: #f4f4f4;
+			border: 1px solid #f8f8f8;
+			border-radius: 4px;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 4px;
+			padding: 4px;
+
+			> li > input {
+				padding: 3px 7px;
+			}
+		}
+	}
 }

@@ -8,11 +8,14 @@ import { XTargetDefaultOptions } from '../node_modules/@itrocks/xtarget/xtarget.
 import autoFocus                 from './auto-focus.js'
 import breadcrumb                from './breadcrumb.js'
 import collapse                  from './collapse.js'
+import containedAutoWidth        from './contained-auto-width.js'
 import notification              from './notifications.js'
 import { notifications }         from './notifications.js'
 import                                './real-viewport-height.js'
 
 build<HTMLAnchorElement>('a.auto-redirect', async anchor => (await import('./auto-redirect.js')).default(anchor))
+
+build<HTMLInputElement>('input[data-type=object]', async input => (await import('./autocompleter.js')).default(input))
 
 build<HTMLHeadingElement>('main > * > h2, main > * > header > h2', breadcrumb)
 
@@ -22,12 +25,12 @@ build<HTMLInputElement>('input[data-type=date]', async input => (await import('.
 
 build<HTMLFormElement>('form', autoFocus)
 
-XTargetDefaultOptions({ plugins: [ XTargetBeginEnd, XTargetHead, XTargetHeadersSize, XTargetHistory ] })
-buildXTarget()
+build<HTMLElement>('[data-contained-auto-width]', async container => containedAutoWidth(container))
 
 build<HTMLFormElement>('#modal form', async form => (await import('./modal.js')).default(form))
 
 build<HTMLElement>('#notification', notification)
 build<HTMLOListElement>('ol#notifications', notifications)
 
-build<HTMLInputElement>('input[data-type=object]', async input => (await import('./autocompleter.js')).default(input))
+XTargetDefaultOptions({ plugins: [ XTargetBeginEnd, XTargetHead, XTargetHeadersSize, XTargetHistory ] })
+buildXTarget()

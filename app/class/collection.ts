@@ -25,12 +25,16 @@ const collectionEdit: Filter = <T extends object>(
 	const label  = `<label for="${property}">${tr(displayOf(object, property))}</label>`
 	const inputs = []
 	for (const object of value) {
-		inputs.push(dao.isObjectConnected(object)
+		inputs.push('<li>' + (
+			dao.isObjectConnected(object)
 			? `<input id="${property}.${object.id}" name="${property}.${object.id}" value="${representativeValueOf(object)}">`
 			: `<input id="${property}." name="${property}." value="${representativeValueOf(object)}">`
-		)
+		) + '</li>')
 	}
-	return label + `<div>${inputs.join('')}<input id="${property}" name="${property}"></div>`
+	return label + '<ul data-contained-auto-width>'
+		+ inputs.join('')
+		+ `<li><input id="${property}" name="${property}" placeholder="+"></li>`
+		+ '</ul>'
 }
 
 const collectionOutput: Filter = (value: MayEntity[], _object, _property, askFor: HtmlContainer) =>

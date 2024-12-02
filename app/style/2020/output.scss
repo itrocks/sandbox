@@ -1,7 +1,7 @@
 
 ul.object.properties {
 	border-collapse: separate;
-	border-spacing: .5em;
+	border-spacing: 7px;
 	display: table;
 	margin: 0;
 	padding: 0;
@@ -10,25 +10,15 @@ ul.object.properties {
 		display: table-row;
 
 		> * {
-			border: 1px solid;
-			display: table-cell;
 			line-height: 16px;
 		}
 
 		> label {
-			border-color: transparent;
+			display: table-cell;
 			font-weight: 500;
-			padding: .5em 0;
+			padding: 7px 0;
 			text-align: right;
 			vertical-align: top;
-		}
-
-		> input {
-			border-color: #ddd;
-
-			&[type=checkbox] {
-				margin: 8px 0;
-			}
 		}
 
 		> ul {
@@ -36,22 +26,21 @@ ul.object.properties {
 
 			> li {
 				display: inline-block;
-
-				&:not(:first-child):before {
-					content: ', ';
-				}
 			}
 		}
+	}
+}
 
-		> :not(input[type=checkbox]):not(label) {
-			border-radius: 4px;
-			padding: .5em;
-			white-space: pre-line;
+article:not([data-action=edit]) ul.object.properties > li {
 
-			&:not(input) {
-				background: #f4f4f4;
-				border-color: #f8f8f8;
-			}
-		}
+	> :not(label) {
+		background: #f4f4f4;
+		border: 1px solid #f8f8f8;
+		border-radius: 4px;
+		padding: 6px;
+	}
+
+	> ul > li:not(:first-child):before {
+		content: ', ';
 	}
 }
