@@ -1,9 +1,12 @@
 import build                     from '../node_modules/@itrocks/build/build.js'
 import buildXTarget              from '../node_modules/@itrocks/xtarget/build.js'
 import XTargetBeginEnd           from '../node_modules/@itrocks/xtarget/begin-end.js'
+import XTargetComposite          from '../node_modules/@itrocks/xtarget/composite.js'
+import XTargetDefaultTarget      from '../node_modules/@itrocks/xtarget/default-target.js'
 import XTargetHead               from '../node_modules/@itrocks/xtarget/head.js'
 import XTargetHeadersSize        from '../node_modules/@itrocks/xtarget/headers-size.js'
 import XTargetHistory            from '../node_modules/@itrocks/xtarget/history.js'
+import XTargetModifier           from '../node_modules/@itrocks/xtarget/modifier.js'
 import { XTargetDefaultOptions } from '../node_modules/@itrocks/xtarget/xtarget.js'
 import autoFocus                 from './auto-focus.js'
 import breadcrumb                from './breadcrumb.js'
@@ -32,5 +35,8 @@ build<HTMLFormElement>('#modal form', async form => (await import('./modal.js'))
 build<HTMLElement>('#notifications > li', notification)
 build<HTMLOListElement>('#notifications', notifications)
 
-XTargetDefaultOptions({ plugins: [ XTargetBeginEnd, XTargetHead, XTargetHeadersSize, XTargetHistory ] })
+XTargetDefaultOptions({ plugins: [
+	XTargetBeginEnd, XTargetComposite, XTargetDefaultTarget, XTargetHead, XTargetHeadersSize, XTargetHistory,
+	XTargetModifier
+] })
 buildXTarget()
