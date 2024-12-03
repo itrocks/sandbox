@@ -1,2 +1,5 @@
 
-export default (element: HTMLAnchorElement) => setTimeout(() => element.click())
+export default (element: HTMLAnchorElement) => {
+	element.addEventListener('click', event => event.stopPropagation())
+	setTimeout(() => element.click())
+}

@@ -8,11 +8,15 @@
 	<title>Delete {objects.0.@display}</title>
 </head>
 <body>
+<ol id="notifications">
 <!--BEGIN-->
 
-	<p class="notification">{objects.0.@display} deleted</p>
-	<a class="auto-redirect" href="app://(type.@route)/list" target="main">Back</a>
+	<li>
+		{objects.0.@display} deleted.
+		<a class="auto-redirect" href="app://(type.@route)/list" target="main">Back</a>
+	</li>
 
 <!--END-->
+</ol>
 </body>
 </html>

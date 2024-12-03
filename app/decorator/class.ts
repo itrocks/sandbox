@@ -16,12 +16,9 @@ export function decoratorOf<V>(target: ObjectOrType, name: Symbol, undefinedValu
 	return (result === undefined) ? undefinedValue : result
 }
 
-export function decoratorOfCallback<V>(target: ObjectOrType, name: Symbol): V
-export function decoratorOfCallback<V, T extends object>(
-	target: ObjectOrType<T>, name: Symbol, undefinedCallback: (target: Type<T>) => V): V
-export function decoratorOfCallback<V, T extends object>(
+export function decoratorOfCallback<T extends object, V>(
 	target: ObjectOrType<T>, name: Symbol, undefinedCallback?: (target: Type<T>) => V
-): V | undefined
+): V
 {
 	target = typeOf(target)
 	return Reflect.getMetadata(name, target) ?? undefinedCallback?.(target)

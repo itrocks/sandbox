@@ -10,11 +10,12 @@ export const Display = (name = '') => decorateCallback(
 )
 export default Display
 
-export const displayOf = (target: ObjectOrType) => decoratorOfCallback(target, DISPLAY, target =>
-{
-	let constr = target.constructor
-	while (!constr.name.length || (constr.name === 'BuiltClass')) {
-		constr = Object.getPrototypeOf(constr)
+export const displayOf = <T extends object>(target: ObjectOrType<T>) => decoratorOfCallback<T, string>(
+	target, DISPLAY, target => {
+		let constr = target.constructor
+		while (!constr.name.length || (constr.name === 'BuiltClass')) {
+			constr = Object.getPrototypeOf(constr)
+		}
+		return toDisplay(constr.name)
 	}
-	return toDisplay(constr.name)
-})
+)

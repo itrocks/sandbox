@@ -29,8 +29,8 @@ build<HTMLElement>('[data-contained-auto-width]', async container => containedAu
 
 build<HTMLFormElement>('#modal form', async form => (await import('./modal.js')).default(form))
 
-build<HTMLElement>('#notification', notification)
-build<HTMLOListElement>('ol#notifications', notifications)
+build<HTMLElement>('#notifications > li', notification)
+build<HTMLOListElement>('#notifications', notifications)
 
 XTargetDefaultOptions({ plugins: [ XTargetBeginEnd, XTargetHead, XTargetHeadersSize, XTargetHistory ] })
 buildXTarget()

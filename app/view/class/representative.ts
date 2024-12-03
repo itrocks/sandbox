@@ -22,7 +22,7 @@ export const Representative = <T extends object>(...properties: KeyOf<T>[]) => d
 export default Representative
 
 export const representativeOf = <T extends object>(target: ObjectOrType<T>): KeyOf<T>[] => {
-	const result = decoratorOfCallback<KeyOf<T>[]>(target, REPRESENTATIVE)
+	const result = decoratorOfCallback<T, KeyOf<T>[]>(target, REPRESENTATIVE)
 	if (result) return result
 	Representative()(typeOf(target))
 	return representativeOf<T>(target)

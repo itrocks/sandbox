@@ -18,7 +18,7 @@
 	<form
 		action="app://(@route)/forgot" autocomplete="off"
 		data-action="forgot" data-class="{%name}" data-route="{@route}"
-		method="post" target="#notification"
+		method="post" target="#notifications:prepend"
 	>
 		<input type="hidden" name="token" value="{-.token}">
 		<header>

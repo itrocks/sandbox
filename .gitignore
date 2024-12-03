@@ -1,5 +1,6 @@
 .idea
 .sass-cache
+.yalc
 node_modules
 
 /coverage
@@ -7,6 +8,7 @@ node_modules
 	!/local/*-example.*
 	!/local/session/contains-session-data
 /package-lock.json
+/yalc.lock
 
 *.css
 *.css.map
