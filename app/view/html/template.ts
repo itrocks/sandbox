@@ -123,8 +123,8 @@ export default class Template
 	getCleanContext()
 	{
 		const doneLinks = new SortedArray<string>
-		doneLinks.distinct = true
 		const headLinks = new SortedArray<string>
+		doneLinks.distinct = true
 		headLinks.distinct = true
 		return {
 			doHeadLinks:        false,
@@ -836,9 +836,11 @@ export default class Template
 		let left       = text.length
 		text           = text.trimStart()
 		left          -= text.length
-		text           = (parts && /^(\$[1-9][0-9]*)+$/.test(text))
-			? parts.join('')
-			: (text.length ? tr(text, parts?.map(part => ((typeof part)[0] === 's') ? tr(part) : part)) : text)
+		if (text !== '') {
+			text = (parts && /^(\$[1-9][0-9]*)+$/.test(text))
+				? parts.join('')
+				: tr(text, parts?.map(part => ((typeof part)[0] === 's') ? tr(part) : part))
+		}
 		return original.substring(0, left) + text + original.substring(right)
 	}
 
