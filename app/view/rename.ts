@@ -12,6 +12,14 @@ export function toClass(string: string)
 	)
 }
 
+export function toFunction(string: string)
+{
+	return string[0].toLowerCase() + string.slice(1).replace(
+		/([a-zA-Z0-9_])[ -]([a-zA-Z0-9_])/g,
+		(_match, low: string, high: string) => low + high.toUpperCase()
+	)
+}
+
 export function toVar(string: string)
 {
 	return string[0].toLowerCase() + string.slice(1).replace(
