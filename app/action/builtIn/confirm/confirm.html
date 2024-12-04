@@ -18,7 +18,7 @@
 	<form
 		action="app://(path)"
 		data-action="confirm" data-class="{type.%name}" data-id="{?type.id}" data-route="{type.@route}"
-		method="post" target="{target}"
+		method="post" target="{?target}"
 	>
 		<input type="hidden" name="confirm" value="{hash}">
 		<header><h2>Please confirm {action}</h2></header>

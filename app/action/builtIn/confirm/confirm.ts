@@ -40,7 +40,7 @@ export default class Confirm extends Action
 				hash:    this.generateConfirmHash(request),
 				message: message.replace("\n", "<br>\n\t\t\t"),
 				path:    request.request.path,
-				target:  request.request.headers['xhr-info'] ? JSON.parse(request.request.headers['xhr-info']).target : '',
+				target:  JSON.parse(request.request.headers['xhr-info'] ?? '{}').target,
 				type:    request.type
 			},
 			request,
