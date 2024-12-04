@@ -29,7 +29,7 @@ function storeEdit<T extends object>(value: HasEntity | undefined, object: T, pr
 }
 
 const storeInput: Filter = <T extends object>(
-	value: object | HasEntity | undefined, object: T, property: KeyOf<T>, data: StringObject
+	value: MayEntity | undefined, object: T, property: KeyOf<T>, data: StringObject
 ) => {
 	const property_id = property + '_id'
 	if (
@@ -45,6 +45,8 @@ const storeInput: Filter = <T extends object>(
 	return UNCHANGED
 }
 
+const storeOutput: Filter = (value: MayEntity | undefined) => value ? representativeValueOf(value) : ''
+
 const storeSave: Filter = <T extends object>(value: MayEntity | undefined, object: T, property: KeyOf<T>) =>
 {
 	if (value && dao.isObjectConnected(value)) {
@@ -58,7 +60,7 @@ export const Store = (name: string | false = '') => decorateCallback(STORE, targ
 	if (name !== false) {
 		setPropertyTypeFilter(target, HTML, EDIT,   storeEdit)
 		setPropertyTypeFilter(target, HTML, INPUT,  storeInput)
-		setPropertyTypeFilter(target, HTML, OUTPUT, representativeValueOf)
+		setPropertyTypeFilter(target, HTML, OUTPUT, storeOutput)
 		setPropertyTypeFilter(target, SQL,  SAVE,   storeSave)
 	}
 	return (name === '') ? target.name.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase() : name
