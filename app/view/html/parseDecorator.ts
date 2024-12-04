@@ -4,6 +4,7 @@ import ReflectProperty                    from '../../property/reflect'
 import { displayOf as classDisplayOf }    from '../class/display'
 import { trOutputOf }                     from '../class/output'
 import { displayOf as propertyDisplayOf } from '../property/display'
+import Str                                from '../str'
 
 export default function parseDecorator(variable: string, data: any)
 {
@@ -18,7 +19,7 @@ export default function parseDecorator(variable: string, data: any)
 		case '@objectRoute':
 			return objectRouteOf(data)
 		case '@output':
-			return trOutputOf(data)
+			return new Str(trOutputOf(data))
 		case '@route':
 			return routeOf(data)
 	}
