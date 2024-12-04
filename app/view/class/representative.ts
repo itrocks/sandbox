@@ -5,23 +5,25 @@ import { requiredOf }                            from '../../property/validate/r
 
 const REPRESENTATIVE = Symbol('representative')
 
-export const Representative = <T extends object>(...properties: KeyOf<T>[]) => decorateCallback<T>(REPRESENTATIVE, target =>
-{
-	if (target.prototype.toString === Object.prototype.toString) {
-		Object.defineProperty(target.prototype, 'toString', {
-			configurable: true,
-			enumerable:   false,
-			value:        function() { return representativeValueOf<T>(this) },
-			writable:     true
-		})
+export const Representative = <T extends object>(...properties: KeyOf<T>[]) => decorateCallback<T>(
+	REPRESENTATIVE, target => {
+		if (target.prototype.toString === Object.prototype.toString) {
+			Object.defineProperty(target.prototype, 'toString', {
+				configurable: true,
+				enumerable:   false,
+				value:        function() { return representativeValueOf<T>(this) },
+				writable:     true
+			})
+		}
+		return properties.length
+			? properties
+			: new ReflectClass(target).propertyNames.filter(name => requiredOf(target, name))
 	}
-	return properties.length
-		? properties
-		: new ReflectClass(target).propertyNames.filter(name => requiredOf(target, name))
-})
+)
 export default Representative
 
-export const representativeOf = <T extends object>(target: ObjectOrType<T>): KeyOf<T>[] => {
+export const representativeOf = <T extends object>(target: ObjectOrType<T>): KeyOf<T>[] =>
+{
 	const result = decoratorOfCallback<T, KeyOf<T>[]>(target, REPRESENTATIVE)
 	if (result) return result
 	Representative()(typeOf(target))
