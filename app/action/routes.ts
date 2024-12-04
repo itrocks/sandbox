@@ -76,19 +76,19 @@ export function getModule(ofRoute: string)
 
 export function getRoute(ofModule: string)
 {
-	let getRoute = ''
-	let route    = routes as Routes | string
+	const getRoute = ['']
+	let   route    = routes as Routes | string
 	for (const name of ofModule.slice((ofModule[1] === ':') ? 3 : 1).split(sep).reverse()) {
-		if (typeof route === 'string') return getRoute
+		if (typeof route === 'string') return getRoute.join('/')
 		const routeStep = route[name] as Routes | string | undefined
 		if (!routeStep) break
-		getRoute += '/' + name
+		getRoute.push(name)
 		route = routeStep
 	}
 	if ((typeof route === 'object') && route[':']) {
 		route = route[':']
 	}
-	return (typeof route === 'string') ? getRoute : undefined
+	return (typeof route === 'string') ? getRoute.join('/') : undefined
 }
 
 type Routes = { [name: string]: Routes | string }
