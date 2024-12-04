@@ -33,7 +33,7 @@ export default function tr(text: string, parts?: string[] | Options, options?: O
 		options = parts
 		parts   = []
 	}
-	const [firstSpaces, lastSpaces] = (text.match(/^(\s*).*(\s*)$/) ?? []).slice(1)
+	const [firstSpaces, lastSpaces] = (text.match(/^(\s*).*(\s*)$/) ?? ['', '', '']).slice(1)
 	text = text.trim()
 	let   partsCount = parts.length
 	const firstChar  = text[0]
