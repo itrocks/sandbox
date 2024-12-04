@@ -21,6 +21,11 @@ ul.object.properties {
 			vertical-align: top;
 		}
 
+		> :empty:before {
+			content: ' ';
+			white-space: pre;
+		}
+
 		> ul {
 			display: block;
 
