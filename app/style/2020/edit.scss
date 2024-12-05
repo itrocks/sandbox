@@ -11,16 +11,16 @@ form[data-action=edit] {
 		}
 
 		> ul {
-			background: #f4f4f4;
-			border: 1px solid #f8f8f8;
+			background: #f8f8f8;
+			border: 1px solid #ddd;
 			border-radius: 4px;
 			display: flex;
 			flex-wrap: wrap;
-			gap: 4px;
-			padding: 4px;
+			gap: 3px;
+			padding: 3px;
 
 			> li > input {
-				padding: 3px 7px;
+				padding: 2px 7px;
 			}
 		}
 	}
