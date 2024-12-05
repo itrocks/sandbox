@@ -14,7 +14,7 @@ export default function breadcrumb(heading: HTMLHeadingElement)
 	anchor.setAttribute('target', 'main')
 	anchor.textContent = heading.textContent
 
-	const action = (article.getAttribute('data-action') === 'list') ? 'list' : 'view'
+	const action = (article.dataset.action === 'list') ? 'list' : 'view'
 
 	if (action === 'list') {
 		ol.querySelector<HTMLLIElement>(`li[data-action=view]`)?.remove()

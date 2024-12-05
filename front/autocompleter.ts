@@ -18,7 +18,7 @@ export default function autoCompleter(input: HTMLInputElement)
 		fetch: (text, update) =>
 		{
 			const requestInit: RequestInit = { headers: { Accept: 'application/json' } }
-			const summaryRoute = input.getAttribute('data-fetch') + '?startsWith=' + text
+			const summaryRoute = input.dataset.fetch + '?startsWith=' + text
 			fetch(summaryRoute, requestInit).then(response => response.text()).then((json) => {
 				const summary     = JSON.parse(json) as [string, string][]
 				const startsWith  = input.value.toLowerCase()
