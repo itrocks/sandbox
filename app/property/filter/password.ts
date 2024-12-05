@@ -4,8 +4,8 @@ import { decorate, decoratorOf } from '../../decorator/property'
 import tr                        from '../../locale/translate'
 import { displayOf }             from '../../view/property/display'
 import { setPropertyFilters }    from './filter'
-import { EDIT, HTML, INPUT }     from './filter'
-import { JSON, UNCHANGED }       from './filter'
+import { EDIT, HTML, IGNORE }    from './filter'
+import { INPUT, JSON }           from './filter'
 
 const PASSWORD = Symbol('password')
 
@@ -13,7 +13,7 @@ const lfTab = '\n\t\t\t\t'
 
 function editPassword<T extends object>(value: string, target: ObjectOrType<T>, property: KeyOf<T>)
 {
-	const inputValue = value.length ? ` value="${UNCHANGED}"` : ''
+	const inputValue = value.length ? ` value="${IGNORE}"` : ''
 	const label      = `<label for="${property}">${tr(displayOf(target, property))}</label>`
 	const input      = `<input id="${property}" name="${property}" type="password"${inputValue}>`
 	return label + lfTab + input
@@ -21,7 +21,7 @@ function editPassword<T extends object>(value: string, target: ObjectOrType<T>, 
 
 function inputPassword(value: string)
 {
-	return ['', UNCHANGED].includes(value)
+	return ['', IGNORE].includes(value)
 		? value
 		: createHash('sha512').update(value, 'utf8').digest('hex')
 }

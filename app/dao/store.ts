@@ -4,8 +4,8 @@ import { StringObject, Type }             from '../class/type'
 import { decorateCallback, decoratorOf }  from '../decorator/class'
 import tr                                 from '../locale/translate'
 import { Filter, setPropertyTypeFilter }  from '../property/filter/filter'
-import { EDIT, HTML, INPUT, OUTPUT }      from '../property/filter/filter'
-import { SAVE, SQL, UNCHANGED }           from '../property/filter/filter'
+import { EDIT, HTML, IGNORE }             from '../property/filter/filter'
+import { INPUT, OUTPUT, SAVE, SQL }       from '../property/filter/filter'
 import ReflectProperty                    from '../property/reflect'
 import { representativeValueOf }          from '../view/class/representative'
 import { displayOf }                      from '../view/property/display'
@@ -42,17 +42,24 @@ const storeInput: Filter = <T extends object>(
 		delete object[property]
 		Object.assign(object, { [property_id]: Number(data[property_id]) })
 	}
-	return UNCHANGED
+	return IGNORE
 }
 
 const storeOutput: Filter = (value: MayEntity | undefined) => value ? representativeValueOf(value) : ''
 
-const storeSave: Filter = <T extends object>(value: MayEntity | undefined, object: T, property: KeyOf<T>) =>
-{
-	if (value && dao.isObjectConnected(value)) {
-		Object.assign(object, { [property + '_id']: value.id })
+const storeSave: Filter = async <T extends object>(
+	_value: undefined, object: T, property: KeyOf<T>, values: AnyObject
+) => {
+	let value = Object.getOwnPropertyDescriptor(object, property)?.get
+			? undefined
+			: object[property] as MayEntity
+	if (value && !dao.isObjectConnected(value)) {
+		await dao.save(value)
 	}
-	return UNCHANGED
+	const property_id   = property + '_id'
+	const id            = (value && dao.isObjectConnected(value)) ? value.id : values[property_id]
+	values[property_id] = id ?? null
+	return IGNORE
 }
 
 export const Store = (name: string | false = '') => decorateCallback(STORE, target =>

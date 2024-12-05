@@ -4,8 +4,8 @@ import ReflectClass     from '../../../class/reflect'
 import { StringObject } from '../../../class/type'
 import dao              from '../../../dao/dao'
 import { applyFilter }  from '../../../property/filter/filter'
-import { HTML, INPUT }  from '../../../property/filter/filter'
-import { UNCHANGED }    from '../../../property/filter/filter'
+import { HTML, IGNORE } from '../../../property/filter/filter'
+import { INPUT }        from '../../../property/filter/filter'
 
 export default class Save extends Action
 {
@@ -16,7 +16,7 @@ export default class Save extends Action
 		for (const property in data) {
 			if (!properties.includes(property)) continue
 			const value = await applyFilter(data[property], object, property, HTML, INPUT, data)
-			if (value === UNCHANGED) continue
+			if (value === IGNORE) continue
 			object[property] = value
 		}
 	}

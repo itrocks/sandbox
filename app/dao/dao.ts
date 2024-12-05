@@ -30,7 +30,7 @@ export abstract class Dao
 	abstract readCollection<T extends object, PT extends object>(object: T, property: KeyOf<T>, type?: Type<PT>):
 		Promise<HasEntity<PT>[]>
 
-	abstract save<T extends object>(object: T): Promise<HasEntity<T>>
+	abstract save<T extends object>(object: MayEntity<T>): Promise<HasEntity<T>>
 
 	abstract search<T extends object>(type: Type<T>, search?: SearchType<T>): Promise<HasEntity<T>[]>
 

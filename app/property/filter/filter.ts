@@ -19,7 +19,7 @@ export const HTML = 'html'
 export const JSON = 'json'
 export const SQL  = 'sql'
 
-export const UNCHANGED = '¤~!~!~!~!~¤'
+export const IGNORE = '¤~!~!~!~!~¤'
 
 type Direction = string | '' | 'edit' | 'input' | 'output' | 'read' | 'save'
 type Format    = string | '' | 'html' | 'json' | 'sql'

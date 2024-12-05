@@ -6,11 +6,16 @@ import { storeOf }        from '../dao/store'
 import ReflectProperty    from '../property/reflect'
 import { CollectionType } from '../property/type'
 
+export const PROTECT_GET = Symbol('protectGet')
+
+export type PropertyDescriptorWithProtectGet = PropertyDescriptor & ThisType<any> & { [PROTECT_GET]?: true }
+
 function defineCollectionProperty<T extends object>(type: CollectionType<T>, property: KeyOf<T>, builtClass: Type<T>)
 {
-	Object.defineProperty(builtClass.prototype, property, {
-		configurable: true,
-		enumerable:   true,
+	const descriptor: PropertyDescriptorWithProtectGet = {
+		configurable:  true,
+		enumerable:    true,
+		[PROTECT_GET]: true,
 
 		async get() {
 			return this[property] = await Dao.readCollection(this, property, type.elementType as Type)
@@ -20,7 +25,8 @@ function defineCollectionProperty<T extends object>(type: CollectionType<T>, pro
 			Object.defineProperty(this, property, { configurable: true, enumerable: true, value, writable: true })
 		}
 
-	})
+	}
+	Object.defineProperty(builtClass.prototype, property, descriptor)
 	return property
 }
 
