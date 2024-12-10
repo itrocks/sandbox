@@ -73,7 +73,7 @@ export default class Mysql extends Dao
 		const id     = result.insertId
 		const entity = this.connectObject(
 			object,
-			((id <= Number.MAX_SAFE_INTEGER) && (id >= Number.MIN_SAFE_INTEGER)) ? +id : id
+			((id >= Number.MIN_SAFE_INTEGER) && (id <= Number.MAX_SAFE_INTEGER)) ? Number(id) : id
 		)
 		for (const callback of deferred) {
 			callback(object)
