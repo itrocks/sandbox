@@ -14,13 +14,13 @@ export default class Demo
 
 	// TODO Fix infinite recursion
 	//@Component()
-	//lines = new Array<DemoLine>
+	//lines: DemoLine[] = []
 
 	@Required()
 	name = ''
 
 	user?: User
 
-	users = new Array<User>
+	users: User[] = []
 
 }

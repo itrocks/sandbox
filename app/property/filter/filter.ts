@@ -38,7 +38,7 @@ const filters = new Map<PropertyType, FormatFilters>()
 export type FormatFilter = (result: any, data: any) => any
 const formatFilters = new Map<string, FormatFilter>
 
-type Filters<T extends object = object> = Array<{ format?: Format, direction?: Direction, filter: Filter<T> }>
+type Filters<T extends object = object> = { format?: Format, direction?: Direction, filter: Filter<T> }[]
 
 export async function applyFilter<T extends object>(
 	value: any, target: ObjectOrType<T>, property: KeyOf<T>, format: Format, direction: Direction, data?: any

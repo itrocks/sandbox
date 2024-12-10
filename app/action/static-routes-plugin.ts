@@ -8,7 +8,7 @@ import ts                from 'typescript'
 const staticRoutesFile = __dirname + '/static-routes.json'
 
 let source: string
-try   { source = readFileSync(staticRoutesFile).toString() }
+try   { source = readFileSync(staticRoutesFile) + '' }
 catch { source = '{}' }
 const routes = JSON.parse(source) as { [path: string]: string }
 
@@ -55,7 +55,7 @@ export default () => (context: ts.TransformationContext) => (sourceFile: ts.Sour
 
 	function routeDecoratorValues(node: ts.Node)
 	{
-		const routes = new Array<string>
+		const routes: string[] = []
 		if (!ts.canHaveDecorators(node)) return []
 		for (const decorator of ts.getDecorators(node) ?? []) {
 			if (!ts.isCallExpression(decorator.expression)) continue

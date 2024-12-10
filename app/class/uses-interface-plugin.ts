@@ -158,7 +158,7 @@ export default () => function transformer(context: ts.TransformationContext)
 				return node
 			}
 
-			const nodes   = new Array<ts.Statement>
+			const nodes: ts.Statement[] = []
 			const options = updateOptions as UpdateOptions
 
 			if (!doneImports) {

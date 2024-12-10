@@ -7,7 +7,7 @@ import Str             from '../str'
 import parseDecorator  from './parseDecorator'
 import parseReflect    from './parseReflect'
 
-type BlockStack = Array<{ blockStart: number, collection: any[], data: any, iteration: number, iterations: number }>
+type BlockStack = { blockStart: number, collection: any[], data: any, iteration: number, iterations: number }[]
 
 let blockBack:  number
 let blockStack: BlockStack
