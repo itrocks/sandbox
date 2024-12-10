@@ -1,7 +1,7 @@
 
 export default (fileName: string, onLoad?: (link: HTMLScriptElement) => void) =>
 {
-	const exists = document.head.querySelector('script[src="' + fileName + '"]') as HTMLScriptElement
+	const exists = document.head.querySelector<HTMLScriptElement>('script[src="' + fileName + '"]')
 	if (exists) return onLoad?.(exists)
 
 	const script  = document.createElement('script')

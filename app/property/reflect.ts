@@ -24,11 +24,11 @@ export class ReflectProperty<T extends object>
 		return value
 	}
 
-	async edit(format: string = HTML)
+	async edit(format: string = HTML): Promise<string>
 	{
 		const object = this.object ?? this.class.type
 		const value  = this.object ? this.object[this.name] : undefined
-		return await applyFilter<T>(await value, object, this.name, format, EDIT) as string
+		return applyFilter<T>(await value, object, this.name, format, EDIT)
 	}
 
 	get object()
@@ -38,11 +38,11 @@ export class ReflectProperty<T extends object>
 		return value
 	}
 
-	async output(format: string = HTML, askFor?: HtmlContainer)
+	async output(format: string = HTML, askFor?: HtmlContainer): Promise<string>
 	{
 		const object = this.object ?? this.class.type
 		const value  = this.object ? await this.object[this.name] : undefined
-		return await applyFilter<T>(value, object, this.name, format, OUTPUT, askFor) as string
+		return applyFilter<T>(value, object, this.name, format, OUTPUT, askFor)
 	}
 
 	async outputMandatoryContainer(format: string = HTML)

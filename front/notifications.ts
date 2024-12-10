@@ -40,7 +40,8 @@ export function notifications(list: HTMLOListElement | HTMLUListElement)
 			return
 		}
 		// mark notification as read/unread
-		const li      = item.closest('ol > li, ul > li') as HTMLLIElement
+		const li = item.closest<HTMLLIElement>('ol > li, ul > li')
+		if (!li) return
 		const liClass = li.classList
 		if (liClass.contains('read')) {
 			removeClass(li, 'read')
