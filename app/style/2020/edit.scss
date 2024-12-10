@@ -20,7 +20,23 @@ form[data-action=edit] {
 			padding: 3px;
 
 			> li > input {
-				padding: 2px 7px;
+				padding-bottom: 2px;
+				padding-top: 2px;
+			}
+
+			&[data-multiple-contained-auto-width] > li {
+				box-sizing: border-box;
+				padding: 3px 8px;
+				position: relative;
+				white-space: pre;
+
+				> input {
+					box-sizing: border-box;
+					left: 0;
+					position: absolute;
+					top: 0;
+					width: 100%;
+				}
 			}
 		}
 	}

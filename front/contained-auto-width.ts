@@ -11,32 +11,12 @@ export default function containedAutoWidth(container: HTMLElement)
 		return
 	}
 
-	const containerStyle = getComputedStyle(container) as CSSStyleDeclaration & { [p: string]: string }
+	container.childNodes.forEach(element => {
+		if (element.nodeType !== Node.TEXT_NODE) return
+		element.remove()
+	})
 
-	const input      = container.firstElementChild as HTMLInputElement
-	const inputStyle = getComputedStyle(input) as CSSStyleDeclaration & { [p: string]: string }
-
-	const setInputStyle = input.style
-	setInputStyle.boxSizing = 'border-box'
-	setInputStyle.left      = '0'
-	setInputStyle.position  = 'absolute'
-	setInputStyle.top       = '0'
-	setInputStyle.width     = '100%'
-
-	const setContainerStyle = container.style as CSSStyleDeclaration & { [p: string]: string }
-
-	setContainerStyle.boxSizing = inputStyle.boxSizing
-	for (const side of ['Bottom', 'Left', 'Right', 'Top']) {
-		const paddingSide     = 'padding' + side
-		const borderSideWidth = 'border' + side + 'Width'
-		setContainerStyle[paddingSide] = (
-			parseFloat(containerStyle[paddingSide])
-			+ parseFloat(inputStyle[paddingSide])
-			+ parseFloat(inputStyle[borderSideWidth])
-		) + 'px'
-	}
-	setContainerStyle.position   = 'relative'
-	setContainerStyle.whiteSpace = 'pre';
+	const input = container.firstElementChild as HTMLInputElement
 
 	const textContent = () => (input.value === '') ? ((input.placeholder === '') ? ' ' : input.placeholder) : input.value
 	const copyTextContent = () => { textNode.textContent = textContent() }

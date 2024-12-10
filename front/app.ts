@@ -16,11 +16,12 @@ import notification              from './notifications.js'
 import { notifications }         from './notifications.js'
 import                                './real-viewport-height.js'
 
+let selector: string
+
 build<HTMLAnchorElement>('a.auto-redirect', async anchor => (await import('./auto-redirect.js')).default(anchor))
 
-build<HTMLInputElement>('input[data-type=object]', async input => (await import('./autocompleter.js')).default(input))
-
-build<HTMLUListElement>('ul[data-type=objects]', async input => (await import('./autocompleter.js')).multiple(input))
+selector = 'input[data-type=object], ul[data-type=objects] > li > input'
+build<HTMLInputElement>(selector, async input => (await import('./autocompleter.js')).default(input))
 
 build<HTMLHeadingElement>('main > * > h2, main > * > header > h2', breadcrumb)
 
@@ -30,7 +31,8 @@ build<HTMLInputElement>('input[data-type=date]', async input => (await import('.
 
 build<HTMLFormElement>('form', autoFocus)
 
-build<HTMLElement>('[data-contained-auto-width]', async container => containedAutoWidth(container))
+selector = '[data-contained-auto-width], [data-multiple-contained-auto-width] > li'
+build<HTMLLIElement>(selector, async container => containedAutoWidth(container))
 
 build<HTMLFormElement>('#modal form', async form => (await import('./modal.js')).default(form))
 

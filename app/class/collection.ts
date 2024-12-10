@@ -41,7 +41,7 @@ const collectionEdit: Filter = <T extends object>(values: MayEntity[], object: T
 			: `<input id="${property}." name="${property}." ${attrValue}>`
 		) + '</li>')
 	}
-	return label + `<ul data-contained-auto-width data-fetch="${fetch}" data-type="objects">`
+	return label + `<ul data-multiple-contained-auto-width data-fetch="${fetch}" data-type="objects">`
 		+ inputs.join('')
 		+ `<li><input id="${property}" name="${property}" placeholder="+"></li>`
 		+ '</ul>'

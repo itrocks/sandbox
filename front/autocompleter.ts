@@ -45,12 +45,45 @@ export default function autoCompleter(input: HTMLInputElement)
 			}
 			if (item.label) {
 				input.value = item.label
-				input.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }))
+				input.dispatchEvent(new Event('input', { cancelable: true }))
 			}
 		},
 
 		preventSubmit: PreventSubmit.OnSelect
 	})
+
+	input.addEventListener('change', () => {
+		if (input.value.length) return
+
+		if (input.nextElementSibling instanceof HTMLInputElement) {
+			input.nextElementSibling.value = ''
+			return
+		}
+
+		let dotPosition = input.id.lastIndexOf('.')
+		const name = (dotPosition < 0) ? input.id : input.id.slice(0, dotPosition)
+		input.id = input.name = name
+
+		const parent = input.parentElement
+		const item   = (parent instanceof HTMLLIElement) ? parent : input
+		if (!item.parentElement || (item === item.parentElement.lastElementChild)) return
+		item.remove()
+	})
+
+	if (!input.dataset.fetch) {
+		const parent = input.parentElement
+		const item   = (parent instanceof HTMLLIElement) ? parent : input
+
+		input.addEventListener('input', () => {
+			if (item.nextElementSibling || !input.value.length || !item.parentElement) return
+
+			const newItem  = item.cloneNode(true) as HTMLInputElement | HTMLLIElement
+			const newInput = (newItem instanceof HTMLLIElement) ? newItem.getElementsByTagName('input')[0] : newItem
+			newInput.value = ''
+			item.parentElement.append(newItem)
+			setTimeout(() => { newInput.dispatchEvent(new Event('input', { cancelable: true })) })
+		})
+	}
 }
 
 export function multiple(list: HTMLUListElement)
