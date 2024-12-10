@@ -33,7 +33,7 @@ export default function containedAutoWidth(container: HTMLElement)
 			parseFloat(containerStyle[paddingSide])
 			+ parseFloat(inputStyle[paddingSide])
 			+ parseFloat(inputStyle[borderSideWidth])
-		).toString() + 'px'
+		) + 'px'
 	}
 	setContainerStyle.position   = 'relative'
 	setContainerStyle.whiteSpace = 'pre';

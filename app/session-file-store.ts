@@ -37,7 +37,7 @@ export default class FileStore implements SessionStore
 				if (!data) {
 					return callback(null)
 				}
-				const stringData = data.toString()
+				const stringData = data + ''
 				if (stringData === '') {
 					return callback(null)
 				}

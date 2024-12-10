@@ -32,8 +32,8 @@ setPropertyTypeFilters(Boolean, [
 	{ format: HTML, direction: EDIT,   filter: booleanEdit },
 	{ format: HTML, direction: INPUT,  filter: booleanInput },
 	{ format: HTML, direction: OUTPUT, filter: (value: boolean) => value ? tr('yes') : tr('no') },
-	{ format: SQL,  direction: READ,   filter: (value: string)  => Boolean(value)},
-	{ format: SQL,  direction: SAVE,   filter: (value: boolean) => Number(value)}
+	{ format: SQL,  direction: READ,   filter: (value: string)  => !!value },
+	{ format: SQL,  direction: SAVE,   filter: (value: boolean) => +value }
 ])
 
 // Date
@@ -69,7 +69,7 @@ function numberEdit<T extends object>(value: number | undefined, type: ObjectOrT
 
 setPropertyTypeFilters(Number, [
 	{ format: HTML, direction: EDIT,  filter: numberEdit },
-	{ format: HTML, direction: INPUT,	filter: (value: string) => Number(value) }
+	{ format: HTML, direction: INPUT,	filter: (value: string) => +value }
 ])
 
 // default

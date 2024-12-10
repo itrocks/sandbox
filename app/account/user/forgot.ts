@@ -57,8 +57,8 @@ export default class Forgot extends Action
 					port:   config.port,
 					secure: config.secure,
 				})
-				const content = (await fs.readFile(__dirname + '/forgot-email-' + lang + '.html')).toString()
-				const link    = request.request.url.toString() + '?token=' + token.token
+				const content = (await fs.readFile(__dirname + '/forgot-email-' + lang + '.html')) + ''
+				const link    = request.request.url + '?token=' + token.token
 				const from    = (smtp.from.name ? ('"' + smtp.from.name + '" ') : '') + '<' + smtp.from.email + '>'
 				const html    = content.replaceAll('app://(resetLink)', link)
 				try {

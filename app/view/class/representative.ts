@@ -33,5 +33,5 @@ export const representativeOf = <T extends object>(target: ObjectOrType<T>): Key
 export const representativeValueOf = <T extends object>(target: T) =>
 	representativeOf<T>(target)
 		.map(property => target[property])
-		.filter(value => value?.toString().length)
+		.filter(value => (value + '').length)
 		.join(' ')

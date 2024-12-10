@@ -9,7 +9,7 @@ export default class Summary extends Action
 
 	async json(request: Request)
 	{
-		const summary = (await dao.search(request.type)).map(object => [object.id, object.toString()])
+		const summary = (await dao.search(request.type)).map(object => [object.id, object + ''])
 		return this.jsonResponse(summary)
 	}
 

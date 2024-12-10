@@ -21,7 +21,7 @@ export default class Confirm extends Action
 	generateConfirmHash(request: Request)
 	{
 		const hash = createHash('sha512')
-			.update(new URLSearchParams(request.request.data).toString(), 'utf8')
+			.update(new URLSearchParams(request.request.data) + '', 'utf8')
 			.digest('hex')
 		const session = request.request.session
 		if (!session.confirm) {
