@@ -15,38 +15,46 @@ function defineCollectionProperty<T extends object>(type: CollectionType<T>, pro
 	const descriptor: PropertyDescriptorWithProtectGet = {
 		configurable:  true,
 		enumerable:    true,
-		[PROTECT_GET]: true,
 
 		async get() {
-			return this[property] = await Dao.readCollection(this, property, type.elementType as Type)
+			const ids = this[property + '_ids']
+			return this[property] = ids
+				? await Dao.readMultiple(type.elementType as Type, ids)
+				: await Dao.readCollection(this, property, type.elementType as Type)
 		},
 
 		set(value) {
+			delete this[property + '_ids']
 			Object.defineProperty(this, property, { configurable: true, enumerable: true, value, writable: true })
+			Reflect.deleteMetadata(PROTECT_GET, builtClass.prototype, property)
 		}
 
 	}
 	Object.defineProperty(builtClass.prototype, property, descriptor)
+	Reflect.defineMetadata(PROTECT_GET, true, builtClass.prototype, property)
 	return property
 }
 
 function defineObjectProperty<T extends object>(type: Type, property: KeyOf<T>, builtClass: Type<T>)
 {
-	Object.defineProperty(builtClass.prototype, property, {
+	const descriptor: PropertyDescriptorWithProtectGet = {
 		configurable: true,
 		enumerable:   true,
 
 		async get() {
-			const property_id = property + '_id'
-			return this[property] = this[property_id] ? await Dao.read(type, this[property_id]) : undefined
+			const id = this[property + '_id']
+			return this[property] = id ? await Dao.read(type, id) : undefined
 		},
 
 		set(value) {
 			delete this[property + '_id']
 			Object.defineProperty(this, property, { configurable: true, enumerable: true, value, writable: true })
+			Reflect.deleteMetadata(PROTECT_GET, builtClass.prototype, property)
 		}
 
-	})
+	}
+	Object.defineProperty(builtClass.prototype, property, descriptor)
+	Reflect.defineMetadata(PROTECT_GET, true, builtClass.prototype, property)
 	return property
 }
 
@@ -55,7 +63,7 @@ export function initClass<T extends object>(classType: Type<T>): Type<T> | undef
 	try { if (!storeOf(classType)) return }
 	catch { return }
 
-	const properties = new Array<KeyOf<T>>
+	const properties: KeyOf<T>[] = []
 
 	// @ts-ignore TS2415 classType is always a heritable class, not a function.
 	const BuiltClass = class extends classType {

@@ -14,21 +14,34 @@ export abstract class Dao
 
 	abstract delete<T extends object>(object: HasEntity<T>, property?: KeyOf<HasEntity<T>>): Promise<T>
 
+	abstract deleteId<T extends object>(type: Type<T>, id: Identifier): void
+
+	abstract deleteLink<T extends HasEntity>(object: T, property: KeyOf<T>, id: Identifier): void
+
 	disconnectObject<T extends object>(object: HasEntity<T>)
 	{
 		delete (object as Partial<Entity>).id
 		return object as T
 	}
 
+	abstract insertLink<T extends HasEntity>(object: T, property: KeyOf<T>, id: Identifier): void
+
 	isObjectConnected<T extends object>(object: MayEntity<T>): object is HasEntity<T>
 	{
-		return Boolean(('id' in object) && object.id)
+		return ('id' in object) && !!object.id
 	}
 
 	abstract read<T extends object>(type: Type<T>, id: Identifier): Promise<HasEntity<T>>
 
-	abstract readCollection<T extends object, PT extends object>(object: T, property: KeyOf<T>, type?: Type<PT>):
-		Promise<HasEntity<PT>[]>
+	abstract readCollection<T extends object, PT extends object>(
+		object: HasEntity<T>, property: KeyOf<T>, type?: Type<PT>
+	): Promise<HasEntity<PT>[]>
+
+	abstract readCollectionIds<T extends object, PT extends object>(
+		object: HasEntity<T>, property: KeyOf<T>, type?: Type<PT>
+	): Promise<Identifier[]>
+
+	abstract readMultiple<T extends object>(type: Type<T>, ids: Identifier[]): Promise<HasEntity<T>[]>
 
 	abstract save<T extends object>(object: MayEntity<T>): Promise<HasEntity<T>>
 

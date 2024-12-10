@@ -28,37 +28,35 @@ function storeEdit<T extends object>(value: HasEntity | undefined, object: T, pr
 	return label + lfTab + input + input_id
 }
 
-const storeInput: Filter = <T extends object>(
+const storeInput: Filter = <T extends AnyObject>(
 	value: MayEntity | undefined, object: T, property: KeyOf<T>, data: StringObject
 ) => {
 	const property_id = property + '_id'
 	if (
 		(property_id in data)
-		&& ((property_id in object)
-			? (data[property_id] !== String((object as AnyObject)[property_id]))
-			: (data[property_id] !== String((value as HasEntity | undefined)?.id))
+		&& (
+			(property_id in object)
+				? (data[property_id] !== object[property_id] + '')
+				: (data[property_id] !== (value as HasEntity | undefined)?.id + '')
 		)
 	) {
 		delete object[property]
-		Object.assign(object, { [property_id]: Number(data[property_id]) })
+		Object.assign(object, { [property_id]: +data[property_id] })
 	}
 	return IGNORE
 }
 
 const storeOutput: Filter = (value: MayEntity | undefined) => value ? representativeValueOf(value) : ''
 
-const storeSave: Filter = async <T extends object>(
-	_value: undefined, object: T, property: KeyOf<T>, values: AnyObject
+const storeSave: Filter = async <T extends AnyObject>(
+	value: MayEntity | undefined, _object: T, property: KeyOf<T>, saveValues: AnyObject
 ) => {
-	let value = Object.getOwnPropertyDescriptor(object, property)?.get
-			? undefined
-			: object[property] as MayEntity
 	if (value && !dao.isObjectConnected(value)) {
 		await dao.save(value)
 	}
-	const property_id   = property + '_id'
-	const id            = (value && dao.isObjectConnected(value)) ? value.id : values[property_id]
-	values[property_id] = id ?? null
+	const property_id       = property + '_id'
+	const id                = (value && dao.isObjectConnected(value)) ? value.id : saveValues[property_id]
+	saveValues[property_id] = id ?? null
 	return IGNORE
 }
 

@@ -9,6 +9,7 @@ import fastify             from 'fastify'
 import { FastifyReply }    from 'fastify'
 import { FastifyRequest }  from 'fastify'
 import { readFile, stat }  from 'node:fs/promises'
+import qs                  from 'qs'
 import secret              from '../local/secret'
 import sessionConfig       from '../local/session'
 import Action              from './action/action'
@@ -154,7 +155,7 @@ async function httpAsset(request: Request, filePath: string, mimeType: string)
 const server = fastify({ trustProxy: true })
 
 server.register(fastifyCookie)
-server.register(fastifyFormbody)
+server.register(fastifyFormbody, { parser: str => qs.parse(str, { allowDots: true }) })
 server.register(fastifyMultipart)
 server.register(fastifySession, {
 	cookie:            { maxAge: 30 * 24 * 60 * 60 * 1000, sameSite: 'strict', secure: false },

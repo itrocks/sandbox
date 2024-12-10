@@ -17,12 +17,13 @@ export default function autoCompleter(input: HTMLInputElement)
 
 		fetch: (text, update) =>
 		{
+			const dataFetch = input.dataset.fetch ?? input.closest<HTMLElement>('[data-fetch]')?.dataset.fetch
 			const requestInit: RequestInit = { headers: { Accept: 'application/json' } }
-			const summaryRoute = input.dataset.fetch + '?startsWith=' + text
+			const summaryRoute = dataFetch + '?startsWith=' + text
 			fetch(summaryRoute, requestInit).then(response => response.text()).then((json) => {
 				const summary     = JSON.parse(json) as [string, string][]
 				const startsWith  = input.value.toLowerCase()
-				const suggestions = summary.map(([id, summary]) => ({ label: summary, value: Number(id) }))
+				const suggestions = summary.map(([id, summary]) => ({ label: summary, value: +id }))
 					.filter(item => item.label.toLowerCase().startsWith(startsWith))
 				update(suggestions)
 			})
@@ -32,10 +33,27 @@ export default function autoCompleter(input: HTMLInputElement)
 
 		onSelect: (item: Item, input: HTMLInputElement | HTMLTextAreaElement) =>
 		{
-			if (item.value) (input.nextElementSibling as HTMLInputElement).value = item.value.toString()
-			if (item.label) input.value = item.label
+			if (item.value) {
+				if (input.nextElementSibling instanceof HTMLInputElement) {
+					input.nextElementSibling.value = item.value + ''
+				}
+				else {
+					let dotPosition = input.id.lastIndexOf('.')
+					const name = (dotPosition < 0) ? input.id : input.id.slice(0, dotPosition)
+					input.id = input.name = name + '.' + item.value
+				}
+			}
+			if (item.label) {
+				input.value = item.label
+				input.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }))
+			}
 		},
 
 		preventSubmit: PreventSubmit.OnSelect
 	})
+}
+
+export function multiple(list: HTMLUListElement)
+{
+	list.querySelectorAll<HTMLInputElement>('input').forEach(autoCompleter)
 }

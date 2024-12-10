@@ -20,6 +20,8 @@ build<HTMLAnchorElement>('a.auto-redirect', async anchor => (await import('./aut
 
 build<HTMLInputElement>('input[data-type=object]', async input => (await import('./autocompleter.js')).default(input))
 
+build<HTMLUListElement>('ul[data-type=objects]', async input => (await import('./autocompleter.js')).multiple(input))
+
 build<HTMLHeadingElement>('main > * > h2, main > * > header > h2', breadcrumb)
 
 build<HTMLButtonElement>('button.collapse', button => collapse(button, 'body'))
