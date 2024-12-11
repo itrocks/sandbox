@@ -23,13 +23,13 @@ build<HTMLTableElement>(
 				input.focus()
 				return
 			}
-			select = tr.querySelector<HTMLInputElement>(':scope > th.select > input[name^="id."]')
-			if (!select) return
-			const id = select.getAttribute('name')?.slice(3)
+			const checkBox = tr.querySelector<HTMLInputElement>(':scope > th.select > input[name=id]')
+			if (!checkBox) return
+			const id = checkBox.value
 			if (!id) return
 			const form = tr.closest('form')
 			if (!form) return
-			await xTargetCall(form.getAttribute('action') + '/' + id, 'main')
+			return xTargetCall(form.getAttribute('action') + '/' + id, 'main')
 		})
 	}
 )

@@ -1,17 +1,17 @@
-import Type               from '../class/type'
-import { dao, HasEntity } from '../dao/dao'
-import ServerRequest      from '../server/request'
-import Exception          from './exception'
-import formats            from './formats'
-import { getModule }      from './routes'
+import { StringObject, Type } from '../class/type'
+import { dao, HasEntity }     from '../dao/dao'
+import ServerRequest          from '../server/request'
+import Exception              from './exception'
+import formats                from './formats'
+import { getModule }          from './routes'
 
-export default class Request
+export default class Request<T extends object = object>
 {
-	action  = ''
-	format  = ''
-	ids     = [] as string[]
-	objects = [] as HasEntity[]
-	route   = ''
+	action                     = ''
+	format                     = ''
+	ids:     string[]          = []
+	objects: (HasEntity & T)[] = []
+	route                      = ''
 
 	constructor(public request: ServerRequest)
 	{
@@ -23,18 +23,17 @@ export default class Request
 		return this.objects.length ? this.objects[0] : undefined
 	}
 
-	get type()
+	get type(): Type<T>
 	{
 		const module = getModule(this.route)
-		if (!module) {
-			return {} as Type
-		}
+		if (!module) return class {} as Type<T>
+
 		const type = require('..' + module).default
 		if ((typeof type)[0] !== 'f') {
 			throw new Exception('Module ' + this.route.substring(1) + ' default is not a class')
 		}
 		Object.defineProperty(this, 'type', { value: type })
-		return type as Type
+		return type
 	}
 
 	async getObjects()
@@ -48,7 +47,7 @@ export default class Request
 		}))
 	}
 
-	parsePath(): Partial<Request>
+	parsePath(): Partial<Request<T>>
 	{
 		const route  = '(?<route>(?:/[A-Za-z][A-Za-z0-9]*)+)'
 		const id     = '(?:/(?<id>(?!,)(?:,?[0-9]+)+))'
@@ -63,7 +62,7 @@ export default class Request
 			return {}
 		}
 		type Groups = { action?: string, format?: string, id?: string, route: string }
-		const path: Partial<Request> & Groups = match.groups as Groups
+		const path: Partial<Request<T>> & Groups = match.groups as Groups
 
 		// ids <- id
 		path.ids = path.id?.split(',') ?? []
@@ -132,10 +131,20 @@ export default class Request
 			}
 		}
 
-		if (!path.ids.length) {
-			for (const name in request.data) if (name.startsWith('id[') && request.data[name]) {
-				path.ids.push(name.slice(3, -1))
-				delete request.data[name]
+		const dataId = request.data.id
+		if (dataId) {
+			delete request.data.id
+			if (typeof dataId === 'string') {
+				path.ids.push(dataId)
+			}
+			else if (Array.isArray(dataId)) {
+				path.ids.push(...(dataId as string[]))
+			}
+			else if (typeof dataId === 'object') {
+				path.ids.push(...Object.values(dataId as StringObject))
+			}
+			else {
+				request.data.id = dataId
 			}
 		}
 
