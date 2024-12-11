@@ -1,10 +1,10 @@
+import Str                                from '@itrocks/rename'
 import { objectRouteOf, routeOf }         from '../../action/route'
 import tr                                 from '../../locale/translate'
 import ReflectProperty                    from '../../property/reflect'
 import { displayOf as classDisplayOf }    from '../class/display'
 import { trOutputOf }                     from '../class/output'
 import { displayOf as propertyDisplayOf } from '../property/display'
-import Str                                from '../str'
 
 export default function parseDecorator(variable: string, data: any)
 {

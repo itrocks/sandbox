@@ -1,9 +1,9 @@
+import Str             from '@itrocks/rename'
 import appDir          from '@itrocks/app-dir'
 import { SortedArray } from '@itrocks/sorted-array'
 import { readFile }    from 'node:fs/promises'
 import path, { sep }   from 'path'
 import tr              from '../../locale/translate'
-import Str             from '../str'
 import parseDecorator  from './parseDecorator'
 import parseReflect    from './parseReflect'
 

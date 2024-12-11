@@ -8,6 +8,7 @@
 		"@itrocks/app-dir": "latest",
 		"@itrocks/build": "latest",
 		"@itrocks/contenteditable": "latest",
+		"@itrocks/rename": "latest",
 		"@itrocks/table": "latest",
 		"@itrocks/xtarget": "latest",
 		"air-datepicker": "^3.5",

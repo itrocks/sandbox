@@ -1,6 +1,6 @@
+import { toDisplay }                             from '@itrocks/rename'
 import { KeyOf, ObjectOrType }                   from '../../class/type'
 import { decorateCallback, decoratorOfCallback } from '../../decorator/property'
-import { toDisplay }                             from '../rename'
 
 const DISPLAY = Symbol('display')
 
