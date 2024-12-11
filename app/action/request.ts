@@ -135,7 +135,7 @@ export default class Request<T extends object = object>
 		if (dataId) {
 			delete request.data.id
 			if (typeof dataId === 'string') {
-				path.ids.push(dataId)
+				path.ids.push(...dataId.split(','))
 			}
 			else if (Array.isArray(dataId)) {
 				path.ids.push(...(dataId as string[]))
