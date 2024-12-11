@@ -1,7 +1,7 @@
+import appDir          from '@itrocks/app-dir'
 import { SortedArray } from '@itrocks/sorted-array'
 import { readFile }    from 'node:fs/promises'
 import path, { sep }   from 'path'
-import { appPath }     from '../../app'
 import tr              from '../../locale/translate'
 import Str             from '../str'
 import parseDecorator  from './parseDecorator'
@@ -667,7 +667,7 @@ export default class Template
 							if (inLinkHRef && attributeValue.endsWith('.css')) {
 								let frontStyle = path
 									.normalize(this.filePath + sep + source.substring(start, index))
-									.substring(appPath.length)
+									.substring(appDir.length)
 								if (sep !== '/') {
 									frontStyle = frontStyle.replaceAll(sep, '/')
 								}
@@ -677,7 +677,7 @@ export default class Template
 							if (inScriptSrc && attributeValue.endsWith('.js')) {
 								let frontScript = path
 									.normalize(this.filePath + sep + source.substring(start, index))
-									.substring(appPath.length)
+									.substring(appDir.length)
 								if (sep !== '/') {
 									frontScript = frontScript.replaceAll(sep, '/')
 								}

@@ -5,6 +5,7 @@ import fastifyCookie       from '@fastify/cookie'
 import fastifyFormbody     from '@fastify/formbody'
 import fastifyMultipart    from '@fastify/multipart'
 import fastifySession      from '@fastify/session'
+import appDir              from '@itrocks/app-dir'
 import fastify             from 'fastify'
 import { FastifyReply }    from 'fastify'
 import { FastifyRequest }  from 'fastify'
@@ -18,7 +19,6 @@ import { needOf }          from './action/need'
 import ActionRequest       from './action/request'
 import { getActionModule } from './action/routes'
 import staticRoutes        from './action/static-routes'
-import { appPath }         from './app'
 import                          './class/collection'
 import access              from './config/access'
 import { storeOf }         from './dao/store'
@@ -118,7 +118,7 @@ async function httpCall(
 			const filePath = (request.path === '/favicon.ico') ? '/app/style/2020/logo/favicon.ico' : request.path
 			const mimeType = mimeTypes.get(fileExtension)
 			if (mimeType) {
-				return fastifyResponse(finalResponse, await httpAsset(request, appPath + filePath, mimeType))
+				return fastifyResponse(finalResponse, await httpAsset(request, appDir + filePath, mimeType))
 			}
 		}
 	}

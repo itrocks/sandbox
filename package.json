@@ -5,6 +5,7 @@
 		"@fastify/formbody": "^8.0",
 		"@fastify/multipart": "^9.0",
 		"@fastify/session": "^11.0",
+		"@itrocks/app-dir": "latest",
 		"@itrocks/build": "latest",
 		"@itrocks/contenteditable": "latest",
 		"@itrocks/table": "latest",
