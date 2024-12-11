@@ -25,14 +25,14 @@ export class ReflectProperty<T extends object>
 		return value
 	}
 
-	get collectionType()
+	get collectionType(): CollectionType<T>
 	{
 		const value = this.class.propertyTypes[this.name]
 		if (!(value instanceof CollectionType)) {
 			throw 'ReflectProperty.collectionType is meant to be used exclusively on collection properties'
 		}
 		Object.defineProperty(this, 'collectionType', { value })
-		return value as CollectionType<T>
+		return value
 	}
 
 	async edit(format: string = HTML): Promise<string>

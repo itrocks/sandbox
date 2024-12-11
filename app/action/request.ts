@@ -138,7 +138,7 @@ export default class Request<T extends object = object>
 				path.ids.push(...dataId.split(','))
 			}
 			else if (Array.isArray(dataId)) {
-				path.ids.push(...(dataId as string[]))
+				path.ids.push(...(dataId satisfies string[]))
 			}
 			else if (typeof dataId === 'object') {
 				path.ids.push(...Object.values(dataId as StringObject))

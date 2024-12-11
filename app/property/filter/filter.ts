@@ -57,7 +57,7 @@ export async function applyFilter<T extends object>(
 						|| false
 					)
 					: false
-			) as unknown as (Filter<T> | false)
+			) satisfies unknown as (Filter<T> | false)
 		)
 	}
 	const formatFilter = formatFilters.get(format)

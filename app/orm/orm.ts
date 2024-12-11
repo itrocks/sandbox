@@ -77,7 +77,7 @@ export function initClass<T extends object>(classType: Type<T>): Type<T> | undef
 		}
 	}
 
-	for (const property of Object.values(new ReflectClass(classType).properties) as ReflectProperty<T>[]) {
+	for (const property of Object.values(new ReflectClass(classType).properties) satisfies ReflectProperty<T>[]) {
 		const type = property.type
 		if (!type) continue
 
