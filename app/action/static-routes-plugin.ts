@@ -10,9 +10,9 @@ const staticRoutesFile = __dirname + '/static-routes.json'
 let source: string
 try   { source = readFileSync(staticRoutesFile) + '' }
 catch { source = '{}' }
-const routes = JSON.parse(source) as { [path: string]: string }
+const routes: Record<string, string> = JSON.parse(source)
 
-const modules = {} as { [module: string]: string[] }
+const modules: Record<string, string[]> = {}
 for (const [path, module] of Object.entries(routes)) {
 	(modules[module] ?? (modules[module] = [])).push(path)
 }
@@ -21,8 +21,8 @@ const saveStaticRoutes = () => writeFileSync(staticRoutesFile, JSON.stringify(ro
 
 export default () => (context: ts.TransformationContext) => (sourceFile: ts.SourceFile) =>
 {
-	let   hasRoute    = false
-	const validRoutes = {} as { [path: string]: string }
+	let   hasRoute = false
+	const validRoutes: Record<string, string> = {}
 
 	const rootLength = path.normalize(__dirname + '/..').length
 	const module     = sourceFile.fileName.slice(rootLength, -3)
@@ -31,11 +31,12 @@ export default () => (context: ts.TransformationContext) => (sourceFile: ts.Sour
 	{
 		if (!ts.isImportDeclaration(node)) return false
 		if (!node.importClause) return false
-		if (!(node.moduleSpecifier as ts.StringLiteral).text.endsWith('/route')) return false
+		const moduleSpecifier = node.moduleSpecifier as ts.StringLiteral
+		if (!moduleSpecifier.text.endsWith('/route')) return false
 
 		const fileName   = sourceFile.fileName
 		const filePath   = fileName.slice(0, fileName.lastIndexOf('/'))
-		const modulePath = path.normalize(filePath + '/' + (node.moduleSpecifier as ts.StringLiteral).text)
+		const modulePath = path.normalize(filePath + '/' + moduleSpecifier.text)
 		if (modulePath !== __dirname + '/route') return false
 
 		if (node.importClause.name?.getText() === 'Route') {

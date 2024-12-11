@@ -8,7 +8,7 @@ export default class Token
 
 	date  = new Date()
 	token = randomBytes(32).toString('hex')
-	user: User | undefined
+	user?: User
 
 	constructor(user?: User)
 	{

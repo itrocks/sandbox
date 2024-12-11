@@ -4,15 +4,15 @@ export default function dump(variable: any, indent: number = 0): string
 {
 	const typeOfVariable = typeof variable
 	if (typeOfVariable === 'string') {
-		return '"' + variable.replace('"', '\\"') + '"' + "\n"
+		return '"' + variable.replace('"', '\\"') + '"\n'
 	}
 	if (typeOfVariable[0] !== 'o') {
-		return variable + "\n"
+		return variable + '\n'
 	}
 
 	const isArray       = Array.isArray(variable)
 	const [open, close] = isArray ? ['[', ']'] : ['{', '}']
-	let   out           = open + "\n"
+	let   out           = open + '\n'
 
 	indent ++
 	for (const property in variable) {
@@ -20,9 +20,9 @@ export default function dump(variable: any, indent: number = 0): string
 		if (isAnyFunction(value)) {
 			continue
 		}
-		out += "\t".repeat(indent) + property + ': ' + dump(value, indent)
+		out += '\t'.repeat(indent) + property + ': ' + dump(value, indent)
 	}
 	indent --
 
-	return out + "\t".repeat(indent) + close + "\n"
+	return out + '\t'.repeat(indent) + close + '\n'
 }

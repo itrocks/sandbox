@@ -16,9 +16,9 @@ export type PrimitiveType = typeof BigInt | Boolean | Number | Object | String |
 export type PropertyType<T extends object = object, PT extends object = object>
 	= CollectionType<T, PT> | PrimitiveType | Type<PT>
 
-export type PropertyTypes<T extends object = object> = { [property: string]: PropertyType<T> }
+export type PropertyTypes<T extends object = object> = Record<string, PropertyType<T>>
 
-type TypeImports = { [name: string]: { import: string, name: string } }
+type TypeImports = Record<string, { import: string, name: string }>
 
 export function primitiveType(type: string): PrimitiveType | Type
 {
@@ -33,11 +33,12 @@ export function primitiveType(type: string): PrimitiveType | Type
 
 export function propertyTypesFromFile<T extends object = object>(file: string)
 {
-	const content       = fs.readFileSync(file.substring(0, file.lastIndexOf('.')) + '.d.ts', 'utf8')
-	const filePath      = file.slice(0, file.lastIndexOf('/'))
-	const propertyTypes = {} as PropertyTypes<T>
-	const sourceFile    = ts.createSourceFile(file, content, ts.ScriptTarget.Latest, true)
-	const typeImports   = {} as TypeImports
+	const content    = fs.readFileSync(file.substring(0, file.lastIndexOf('.')) + '.d.ts', 'utf8')
+	const filePath   = file.slice(0, file.lastIndexOf('/'))
+	const sourceFile = ts.createSourceFile(file, content, ts.ScriptTarget.Latest, true)
+
+	const propertyTypes: PropertyTypes<T> = {}
+	const typeImports:   TypeImports      = {}
 
 	const parseNode = (node: ts.Node) => {
 
@@ -46,8 +47,9 @@ export function propertyTypesFromFile<T extends object = object>(file: string)
 			if (node.importClause.name) {
 				typeImports[node.importClause.name.getText()] = { import: importFile, name: 'default' }
 			}
-			if (node.importClause.namedBindings && ts.isNamedImports(node.importClause.namedBindings)) {
-				for (const importSpecifier of node.importClause.namedBindings.elements) {
+			const namedBindings = node.importClause.namedBindings
+			if (namedBindings && ts.isNamedImports(namedBindings)) {
+				for (const importSpecifier of namedBindings.elements) {
 					const name  = importSpecifier.name.getText()
 					const alias = importSpecifier.propertyName?.getText() ?? name
 					typeImports[alias] = { import: importFile, name }
@@ -97,6 +99,6 @@ export function stringToType(type: string, typeImports: TypeImports): PrimitiveT
 {
 	const typeImport = typeImports[type]
 	return typeImport
-		? require(typeImport.import)[typeImport.name] as Type
+		? require(typeImport.import)[typeImport.name]
 		: primitiveType(type)
 }

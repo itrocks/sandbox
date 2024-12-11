@@ -1,5 +1,5 @@
 
-export type Headers = { [index: string]: string }
+export type Headers = Record<string, string>
 
 export class Response
 {

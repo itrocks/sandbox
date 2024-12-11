@@ -17,10 +17,11 @@ function defineCollectionProperty<T extends object>(type: CollectionType<T>, pro
 		enumerable:    true,
 
 		async get() {
-			const ids = this[property + '_ids']
+			const elementType = type.elementType as Type
+			const ids         = this[property + '_ids']
 			return this[property] = ids
-				? await Dao.readMultiple(type.elementType as Type, ids)
-				: await Dao.readCollection(this, property, type.elementType as Type)
+				? await Dao.readMultiple(elementType, ids)
+				: await Dao.readCollection(this, property, elementType)
 		},
 
 		set(value) {
@@ -66,7 +67,7 @@ export function initClass<T extends object>(classType: Type<T>): Type<T> | undef
 	const properties: KeyOf<T>[] = []
 
 	// @ts-ignore TS2415 classType is always a heritable class, not a function.
-	const BuiltClass = class extends classType {
+	const BuiltClass: Type<T> = class extends classType {
 		[property: string]: any
 		constructor(...args: any) {
 			super(...args)
@@ -74,7 +75,7 @@ export function initClass<T extends object>(classType: Type<T>): Type<T> | undef
 				delete this[property]
 			}
 		}
-	} as Type<T>
+	}
 
 	for (const property of Object.values(new ReflectClass(classType).properties) as ReflectProperty<T>[]) {
 		const type = property.type

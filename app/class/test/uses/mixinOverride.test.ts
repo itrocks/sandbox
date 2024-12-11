@@ -27,6 +27,7 @@ class Parent {
 	}
 }
 
+interface Class extends Parent {}
 @Uses(Mixin)
 class Class extends Parent {
 	a = 4
@@ -37,7 +38,7 @@ class Class extends Parent {
 
 describe('mixinOverride', () => {
 	it('mixinOverrideIt', () => {
-		const object = new Class as Class & Mixin
+		const object = new Class
 		expect(object.method()).toEqual('parentMethod2-method2-mixinParentMethod2-mixinMethod2')
 	})
 })

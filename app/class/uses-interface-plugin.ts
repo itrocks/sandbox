@@ -185,7 +185,7 @@ export default () => function transformer(context: ts.TransformationContext)
 					nodes.push(options.updateClasses.has(className) ? updateClass(node) : node )
 					const mixins = options.createInterfaces.get(className)
 					if (mixins?.length) {
-						nodes.push(createInterface(node as ts.ClassDeclaration, className, mixins))
+						nodes.push(createInterface(node, className, mixins))
 					}
 					if (options.createExport) {
 						nodes.push(createExport(className))

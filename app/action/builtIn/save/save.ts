@@ -1,16 +1,16 @@
-import Action           from '../../../action/action'
-import Request          from '../../../action/request'
-import ReflectClass     from '../../../class/reflect'
-import { StringObject } from '../../../class/type'
-import dao              from '../../../dao/dao'
-import { applyFilter }  from '../../../property/filter/filter'
-import { HTML, IGNORE } from '../../../property/filter/filter'
-import { INPUT }        from '../../../property/filter/filter'
+import Action                    from '../../../action/action'
+import Request                   from '../../../action/request'
+import ReflectClass              from '../../../class/reflect'
+import dao                       from '../../../dao/dao'
+import { applyFilter }           from '../../../property/filter/filter'
+import { HTML, IGNORE }          from '../../../property/filter/filter'
+import { INPUT }                 from '../../../property/filter/filter'
+import { RecursiveStringObject } from '../../../server/request'
 
 export default class Save extends Action
 {
 
-	async dataToObject<T extends object>(object: T, data: StringObject)
+	async dataToObject<T extends object>(object: T, data: RecursiveStringObject)
 	{
 		const properties = new ReflectClass(object).propertyNames
 		for (const property in data) {
@@ -23,7 +23,7 @@ export default class Save extends Action
 
 	async html(request: Request)
 	{
-		const object = request.object ?? new (request.type)
+		const object = request.object ?? new request.type
 		await this.dataToObject(object, request.request.data)
 		await dao.save(object)
 
@@ -32,7 +32,7 @@ export default class Save extends Action
 
 	async json(request: Request)
 	{
-		const object = request.object ?? new (request.type)
+		const object = request.object ?? new request.type
 		await this.dataToObject(object, request.request.data)
 		await dao.save(object)
 		return this.jsonResponse(object)

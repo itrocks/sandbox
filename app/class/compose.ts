@@ -42,9 +42,9 @@ const replacements = Object.fromEntries(
 	])
 )
 
-const cache        = {} as { [type: string]: SubstitutionModule }
-const Module       = require('module')
-const superRequire = Module.prototype.require as (...args: any) => typeof Module
+const cache: Record<string, SubstitutionModule> = {}
+const Module = require('module')
+const superRequire: (...args: any) => typeof Module = Module.prototype.require
 
 Module.prototype.require = function(file: string)
 {
@@ -60,17 +60,17 @@ Module.prototype.require = function(file: string)
 	// no replacement
 	let replacementFiles = replacements[file]
 	if (!replacementFiles) {
-		return cache[file] = applyFileToType(superRequire.apply(this, arguments as unknown as any[]), file)
+		return cache[file] = applyFileToType(superRequire.call(this, ...arguments), file)
 	}
 	// require parent
-	const module       = { __esModule: true } as SubstitutionModule
+	const module: SubstitutionModule = { __esModule: true }
 	cache[file]        = module
-	const parentModule = applyFileToType(superRequire.apply(this, arguments as unknown as any[]), file)
+	const parentModule = applyFileToType(superRequire.call(this, ...arguments), file)
 	// compose
 	if (typeof replacementFiles !== 'object') {
 		replacementFiles = [replacementFiles]
 	}
-	const replacementTypes = replacementFiles.map(file => this.require(file).default as Type)
+	const replacementTypes = replacementFiles.map((file): Type => this.require(file).default)
 	module.default = Uses(...replacementTypes)(parentModule.default)
 	return module
 }

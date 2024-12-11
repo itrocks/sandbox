@@ -1,6 +1,7 @@
 
-export const config: { [index: string]: string | string[] } =
-{
+export const config: Record<string, string | string[]> = {
+
 	'/account/account': '/account/active'
+
 }
 export default config

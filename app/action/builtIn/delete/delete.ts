@@ -14,7 +14,7 @@ export default class Delete extends Action
 		const confirm   = new Confirm()
 		const confirmed = confirm.confirmed(request)
 		if (!confirmed) {
-			return confirm.html(request, tr('Do you confirm deletion') + tr('?') + "\n" + tr('All data will be lost') + '.')
+			return confirm.html(request, tr('Do you confirm deletion') + tr('?') + '\n' + tr('All data will be lost') + '.')
 		}
 		request = confirmed
 

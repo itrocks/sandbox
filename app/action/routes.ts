@@ -61,10 +61,10 @@ export async function getActionModule(ofRoute: string, action: string)
 
 export function getModule(ofRoute: string)
 {
-	let route = routes as Routes | string
+	let route: Routes | string = routes
 	for (const name of ofRoute.slice(1).split('/').reverse()) {
 		if (typeof route === 'string') return route
-		const routeStep = route[name] as Routes | string | undefined
+		const routeStep: Routes | string | undefined = route[name]
 		if (!routeStep) break
 		route = routeStep
 	}
@@ -77,10 +77,10 @@ export function getModule(ofRoute: string)
 export function getRoute(ofModule: string)
 {
 	const getRoute = ['']
-	let   route    = routes as Routes | string
+	let route: Routes | string = routes
 	for (const name of ofModule.slice((ofModule[1] === ':') ? 3 : 1).split(sep).reverse()) {
 		if (typeof route === 'string') return getRoute.join('/')
-		const routeStep = route[name] as Routes | string | undefined
+		const routeStep: Routes | string | undefined = route[name]
 		if (!routeStep) break
 		getRoute.push(name)
 		route = routeStep
@@ -93,7 +93,7 @@ export function getRoute(ofModule: string)
 
 type Routes = { [name: string]: Routes | string }
 
-const routes = {} as Routes
+const routes: Routes = {}
 
 readDirRecursive(__dirname.slice(0, __dirname.lastIndexOf(sep))).then(entries => {
 	for (let entry of entries) {

@@ -59,7 +59,7 @@ frontScripts.push(
 
 async function execute(request: ActionRequest)
 {
-	let action: Action & { [index: string]: (request: ActionRequest) => Promise<Response> }
+	let action: Action & Record<string, (request: ActionRequest) => Promise<Response>>
 	let staticRoute = staticRoutes[request.request.path]
 	if (staticRoute) {
 		const position = staticRoute.lastIndexOf('/')
@@ -103,12 +103,11 @@ async function execute(request: ActionRequest)
 }
 
 async function httpCall(
-	originRequest: FastifyRequest<{ Params: { [index: string]: string } }>,
+	originRequest: FastifyRequest<{ Params: Record<string, string> }>,
 	finalResponse: FastifyReply
-)
-{
+) {
 	const request = await fastifyRequest(originRequest)
-	const dot = request.path.lastIndexOf('.') + 1
+	const dot     = request.path.lastIndexOf('.') + 1
 	if ((dot > request.path.length - 6) && !request.path.includes('./')) {
 		const fileExtension = request.path.substring(dot)
 		if (

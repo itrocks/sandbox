@@ -21,7 +21,7 @@ export default function autoCompleter(input: HTMLInputElement)
 			const requestInit: RequestInit = { headers: { Accept: 'application/json' } }
 			const summaryRoute = dataFetch + '?startsWith=' + text
 			fetch(summaryRoute, requestInit).then(response => response.text()).then((json) => {
-				const summary     = JSON.parse(json) as [string, string][]
+				const summary: [string, string][] = JSON.parse(json)
 				const startsWith  = input.value.toLowerCase()
 				const suggestions = summary.map(([id, summary]) => ({ label: summary, value: +id }))
 					.filter(item => item.label.toLowerCase().startsWith(startsWith))

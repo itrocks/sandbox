@@ -2,10 +2,10 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 import { Method, Request }              from './request'
 import Response                         from './response'
 
-export const fastifyRequest = async (request: FastifyRequest<{ Params: { [index: string]: string } }>) =>
+export const fastifyRequest = async (request: FastifyRequest<{ Params: Record<string, string> }>) =>
 {
-	const data = (request.body ?? request.query) as { [key: string]: string }
-	const files: { [key: string]: Buffer } = {}
+	const data = (request.body ?? request.query) as Record<string, string>
+	const files: Record<string, Buffer> = {}
 	const params = { ...request.params }
 	const path   = '/' + request.params['*']
 	delete params['*']
@@ -27,7 +27,7 @@ export const fastifyRequest = async (request: FastifyRequest<{ Params: { [index:
 		request.hostname,
 		request.port,
 		path,
-		request.headers as { [index: string]: string },
+		request.headers as Record<string, string>,
 		params,
 		data,
 		files,

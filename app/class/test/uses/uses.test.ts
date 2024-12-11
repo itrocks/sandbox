@@ -16,6 +16,7 @@ class ParentMixin2 extends ParentMixin2Extends {
 	parentMixin2Property = 'parentMixin2Property'
 }
 
+interface Parent extends ParentMixin1, ParentMixin2 {}
 @Uses(ParentMixin1, ParentMixin2)
 class Parent {
 	parentMethod() { return 'parentMethod' }
@@ -27,6 +28,7 @@ class Mixin1Mixin1 {
 	mixin1Mixin1Property = 'mixin1Mixin1Property'
 }
 
+interface Mixin1 extends Mixin1Mixin1 {}
 @Uses(Mixin1Mixin1)
 class Mixin1 {
 	mixin1Method() { return 'mixin1Method' }
@@ -38,6 +40,7 @@ class Mixin2 {
 	mixin2Property = 'mixin2Property'
 }
 
+interface Class extends Mixin1, Mixin2 {}
 @Uses(Mixin1)
 @Uses(Mixin2)
 class Class extends Parent {
@@ -50,7 +53,7 @@ describe('build', () =>
 
 	it('getAllMethods', () =>
 	{
-		const object = new Class as Class & Mixin1 & Mixin1Mixin1 & Mixin2 & ParentMixin1 & ParentMixin2
+		const object = new Class
 		expect(object.classMethod()).toEqual('classMethod')
 		expect(object.parentMethod()).toEqual('parentMethod')
 		expect(object.mixin1Method()).toEqual('mixin1Method')
@@ -63,7 +66,7 @@ describe('build', () =>
 
 	it('getAllProperties', () =>
 	{
-		const object = new Class as Class & Mixin1 & Mixin1Mixin1 & Mixin2 & ParentMixin1 & ParentMixin2
+		const object = new Class
 		expect(object.classProperty).toEqual('classProperty')
 		expect(object.parentProperty).toEqual('parentProperty')
 		expect(object.mixin1Property).toEqual('mixin1Property')

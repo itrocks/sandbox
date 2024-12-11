@@ -2,7 +2,7 @@ import { SessionStore }                from '@fastify/session'
 import { Session }                     from 'fastify'
 import { readFile, unlink, writeFile } from 'node:fs/promises'
 
-const cache = {} as { [sessionId: string]: Session }
+const cache: Record<string, Session> = {}
 
 export default class FileStore implements SessionStore
 {
@@ -43,7 +43,7 @@ export default class FileStore implements SessionStore
 				}
 				let session: Session
 				try {
-					session = JSON.parse(stringData) as Session
+					session = JSON.parse(stringData)
 				}
 				catch (exception) {
 					console.warn(sessionId, 'get:', exception)

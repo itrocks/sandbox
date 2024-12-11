@@ -1,7 +1,7 @@
 import loadCss    from './load-css.js'
 import loadScript from './load-script.js'
 
-const locales = {} as { [lang: string]: object }
+const locales: Record<string, object> = {}
 
 function init(input: HTMLInputElement)
 {

@@ -3,6 +3,7 @@ import { KeyOf, Type }        from '../class/type'
 import { applyFilter }        from './filter/filter'
 import { EDIT, HTML, OUTPUT } from './filter/filter'
 import { HtmlContainer }      from './filter/filter'
+import { CollectionType }     from './type'
 
 export class ReflectProperty<T extends object>
 {
@@ -22,6 +23,16 @@ export class ReflectProperty<T extends object>
 			: new ReflectClass(this.#class)
 		Object.defineProperty(this, 'class', { value })
 		return value
+	}
+
+	get collectionType()
+	{
+		const value = this.class.propertyTypes[this.name]
+		if (!(value instanceof CollectionType)) {
+			throw 'ReflectProperty.collectionType is meant to be used exclusively on collection properties'
+		}
+		Object.defineProperty(this, 'collectionType', { value })
+		return value as CollectionType<T>
 	}
 
 	async edit(format: string = HTML): Promise<string>

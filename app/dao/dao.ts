@@ -1,12 +1,12 @@
 import config          from '../../local/dao'
 import { KeyOf, Type } from '../class/type'
 
-export type SearchType<T extends object = object> = Partial<Record<KeyOf<T>, any>> & { [key: string]: any }
+export type SearchType<T extends object = object> = Partial<Record<KeyOf<T>, any>> & Record<string, any>
 
 export abstract class Dao
 {
 
-	connectObject<T extends object>(object: T, id: Identifier)
+	connectObject<T extends object>(object: MayEntity<T>, id: Identifier)
 	{
 		(object as HasEntity<T>).id = id
 		return object as HasEntity<T>
@@ -18,10 +18,10 @@ export abstract class Dao
 
 	abstract deleteLink<T extends HasEntity>(object: T, property: KeyOf<T>, id: Identifier): void
 
-	disconnectObject<T extends object>(object: HasEntity<T>)
+	disconnectObject<T extends object>(object: HasEntity<T>): T
 	{
 		delete (object as Partial<Entity>).id
-		return object as T
+		return object
 	}
 
 	abstract insertLink<T extends HasEntity>(object: T, property: KeyOf<T>, id: Identifier): void

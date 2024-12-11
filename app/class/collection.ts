@@ -29,8 +29,8 @@ const areMayEntityEntries = (entries: [string, MayEntity | string][]): entries i
 
 const collectionEdit: Filter = <T extends object>(values: MayEntity[], object: T, property: KeyOf<T>) =>
 {
-	const propertyType = new ReflectProperty(object, property).type as CollectionType
-	const fetch        = routeOf(propertyType.elementType as Type) + '/summary'
+	const propertyType = new ReflectProperty(object, property).collectionType
+	const fetch        = routeOf(propertyType?.elementType as Type) + '/summary'
 	const label        = `<label for="${property}">${tr(displayOf(object, property))}</label>`
 	const inputs       = []
 	for (const object of values) {
@@ -48,7 +48,7 @@ const collectionEdit: Filter = <T extends object>(values: MayEntity[], object: T
 }
 
 const collectionInput: Filter = <T extends AnyObject>(
-	values: { [id: string]: MayEntity | string }, object: T, property: KeyOf<T>
+	values: Record<string, MayEntity | string>, object: T, property: KeyOf<T>
 ) => {
 	const entries = Object.entries(values)
 	if (areMayEntityEntries(entries)) {
@@ -73,7 +73,7 @@ const collectionOutput: Filter = (values: MayEntity[], _object, _property, askFo
 const collectionSave: Filter = async <T extends AnyObject>(
 	values: MayEntity[] | undefined, object: T, property: KeyOf<T>
 ) => {
-	const newIdsPromise: Identifier[] = (object[property + '_ids'] as Identifier[])
+	const newIdsPromise: Identifier[] = object[property + '_ids']
 		?? values?.map(async value => (dao.isObjectConnected(value) ? value : await dao.save(value)).id).sort()
 		?? []
 	const previousIdsPromise = dao.isObjectConnected(object)

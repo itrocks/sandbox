@@ -7,9 +7,9 @@ import User    from '../user'
 export default class Auth extends Action
 {
 
-	async html(request: Request)
+	async html(request: Request<User>)
 	{
-		let search = new (request.type) as User
+		let search = new request.type
 		await ((new Save).dataToObject(search, request.request.data))
 
 		const { login, password } = search

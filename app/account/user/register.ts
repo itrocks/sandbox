@@ -7,10 +7,10 @@ import User    from '../user'
 export default class Register extends Action
 {
 
-	async html(request: Request)
+	async html(request: Request<User>)
 	{
 		let templateName = 'register'
-		let user         = new (request.type) as User
+		let user         = new request.type
 
 		if (Object.keys(request.request.data).length) {
 			await ((new Save).dataToObject(user, request.request.data))

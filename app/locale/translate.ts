@@ -14,7 +14,7 @@ export type Options = {
 }
 
 readFile(__dirname + '/fr-FR.csv', 'utf-8')
-	.then(data => parseCsv(data, { delimiter: ';' }).data as [string, string][])
+	.then((data): [string, string][] => parseCsv(data, { delimiter: ';' }).data)
 	.then(data => data.forEach(row => {
 		translations.set(row[0], row[1])
 		if (row[0].includes('$')) {

@@ -31,8 +31,8 @@ export class HtmlContainer { constructor(public mandatoryContainer: boolean, pub
 
 type PropertyType<PT extends object = object> = DecoratorOfType<PT> | PrimitiveType | Type<PT> | null
 
-type DirectionFilters<T extends object = object> = { [direction: Direction]: Filter<T> }
-type FormatFilters<T extends object = object>     = { [format: Format]: DirectionFilters<T> }
+type DirectionFilters<T extends object = object> = Record<Direction, Filter<T>>
+type FormatFilters<T extends object = object>    = Record<Format, DirectionFilters<T>>
 const filters = new Map<PropertyType, FormatFilters>()
 
 export type FormatFilter = (result: any, data: any) => any

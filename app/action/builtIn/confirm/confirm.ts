@@ -1,6 +1,6 @@
-import { createHash } from 'crypto'
-import Action         from '../../action'
-import Request        from '../../request'
+import { v4 }  from 'uuid'
+import Action  from '../../action'
+import Request from '../../request'
 
 export default class Confirm extends Action
 {
@@ -9,20 +9,18 @@ export default class Confirm extends Action
 	{
 		const data             = request.request.data
 		const session          = request.request.session
-		const confirmedRequest = data.confirm ? session.confirm[data.confirm] : undefined
-		if (!confirmedRequest) {
-			return
-		}
-		delete session.confirm[data.confirm]
+		const confirm          = data.confirm as string
+		const confirmedRequest = confirm ? session.confirm[confirm] : undefined
+		if (!confirmedRequest) return
+
+		delete session.confirm[confirm]
 		confirmedRequest.request.session = session
 		return confirmedRequest
 	}
 
 	generateConfirmHash(request: Request)
 	{
-		const hash = createHash('sha512')
-			.update(new URLSearchParams(request.request.data) + '', 'utf8')
-			.digest('hex')
+		const hash    = v4()
 		const session = request.request.session
 		if (!session.confirm) {
 			session.confirm = {}
@@ -38,7 +36,7 @@ export default class Confirm extends Action
 			{
 				action:  request.action,
 				hash:    this.generateConfirmHash(request),
-				message: message.replace("\n", "<br>\n\t\t\t"),
+				message: message.replace('\n', '<br>\n\t\t\t'),
 				path:    request.request.path,
 				target:  JSON.parse(request.request.headers['xhr-info'] ?? '{}').target,
 				type:    request.type

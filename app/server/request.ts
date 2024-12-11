@@ -1,6 +1,10 @@
 
 export type Method = 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT'
 
+export type RecursiveString       = RecursiveStringArray | RecursiveStringObject | string
+export type RecursiveStringArray  = RecursiveString[]
+export type RecursiveStringObject = { [index: string]: RecursiveString | unknown }
+
 export class Request
 {
 
@@ -10,11 +14,11 @@ export class Request
 		public readonly host:       string,
 		public readonly port:       number,
 		public readonly path:       string,
-		public readonly headers:    { [index: string]: string } = {},
-		public readonly parameters: { [index: string]: string } = {},
-		public readonly data:       { [index: string]: string } = {},
-		public readonly files:      { [index: string]: Buffer } = {},
-		public readonly session:    { [index: string]: any } = {}
+		public readonly headers:    Record<string, string> = {},
+		public readonly parameters: Record<string, string> = {},
+		public readonly data:       RecursiveStringObject  = {},
+		public readonly files:      Record<string, Buffer> = {},
+		public readonly session:    Record<string, any>    = {}
 	) {}
 
 	get url()

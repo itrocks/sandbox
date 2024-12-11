@@ -31,9 +31,9 @@ let translating:        boolean
 export const frontScripts = new SortedArray<string>()
 frontScripts.distinct = true
 
-let doneLinks      = new SortedArray<string>()
-let headLinks      = new SortedArray<string>()
-let headTitle      = undefined as string|undefined
+let doneLinks = new SortedArray<string>()
+let headLinks = new SortedArray<string>()
+let headTitle: string | undefined = undefined
 doneLinks.distinct = true
 headLinks.distinct = true
 
