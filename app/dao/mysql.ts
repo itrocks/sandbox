@@ -52,7 +52,7 @@ export default class Mysql extends Dao
 		const connection = this.connection ?? await this.connect()
 
 		const objectTable   = storeOf(object)
-		const propertyTable = storeOf(new ReflectProperty(object, property).collectionType?.elementType as Type)
+		const propertyTable = storeOf(new ReflectProperty(object, property).collectionType.elementType as Type)
 		const joinTable     = [objectTable, propertyTable].sort().join('_')
 
 		const query  = 'DELETE FROM `' + joinTable + '` WHERE ' + objectTable + '_id = ? AND ' + propertyTable + '_id = ?'
@@ -87,7 +87,7 @@ export default class Mysql extends Dao
 		const connection = this.connection ?? await this.connect()
 
 		const objectTable   = storeOf(object)
-		const propertyTable = storeOf(new ReflectProperty(object, property).collectionType?.elementType as Type)
+		const propertyTable = storeOf(new ReflectProperty(object, property).collectionType.elementType as Type)
 		const joinTable     = [objectTable, propertyTable].sort().join('_')
 
 		const query  = 'INSERT INTO `' + joinTable + '` SET ' + objectTable + '_id = ?, ' + propertyTable + '_id = ?'
@@ -137,7 +137,7 @@ export default class Mysql extends Dao
 	async readCollection<T extends object, PT extends object>(
 		object:   HasEntity<T>,
 		property: KeyOf<T>,
-		type = new ReflectProperty(object, property).collectionType?.elementType as Type<PT>
+		type = new ReflectProperty(object, property).collectionType.elementType as Type<PT>
 	) {
 		const connection = this.connection ?? await this.connect()
 
@@ -162,7 +162,7 @@ export default class Mysql extends Dao
 	async readCollectionIds<T extends object, PT extends object>(
 		object:   HasEntity<T>,
 		property: KeyOf<T>,
-		type = new ReflectProperty(object, property).collectionType?.elementType as Type<PT>
+		type = new ReflectProperty(object, property).collectionType.elementType as Type<PT>
 	) {
 		const connection = this.connection ?? await this.connect()
 
