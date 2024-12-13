@@ -15,19 +15,19 @@ class TemplateMockTranslate extends Template
 		return '?'
 	}
 
-	tr = (text: string, translateParts: string[] = []) =>
+	applyLiterals(text: string, parts: string[] = [])
 	{
 		if (!text.trim()) return ''
 		switch (text) {
-			case ' $1 ':        return ` ${translateParts[0]} `
-			case '$1':          return translateParts[0]
-			case '$1 is $2 me': return `${translateParts[0]} will ${translateParts[1]} you`
-			case 'a $1 here':   return `some ${translateParts[0]} there`
+			case ' $1 ':        return ` ${parts[0]} `
+			case '$1':          return parts[0]
+			case '$1 is $2 me': return `${parts[0]} will ${parts[1]} you`
+			case 'a $1 here':   return `some ${parts[0]} there`
 			case 'am':          return 'are'
 			case 'example':     return 'translated'
-			case 'I am $1-san': return `You are ${translateParts[0]}-sama`
-			case 'I AM $1-$2':  return `You ARE ${translateParts[0]}-${translateParts[1]}`
-			case 'I $1 a $2-san': return `You ${translateParts[0]} a ${translateParts[1]}-sama`
+			case 'I am $1-san': return `You are ${parts[0]}-sama`
+			case 'I AM $1-$2':  return `You ARE ${parts[0]}-${parts[1]}`
+			case 'I $1 a $2-san': return `You ${parts[0]} a ${parts[1]}-sama`
 			case 'send':        return 'do it!'
 			case 'Text 1':      return 'Phrase one'
 			case 'Text 2':      return 'Phrase two'
@@ -52,16 +52,16 @@ describe('tr', () => {
 	translations.set('example', 'translated')
 
 	it('simple', () => {
-		expect(template.tr('example')).toEqual('translated')
+		expect(template.combineLiterals('example')).toEqual('translated')
 	})
 	it('spacesAfter',() => {
-		expect(template.tr('example \n\t  ')).toEqual('translated \n\t  ')
+		expect(template.combineLiterals('example \n\t  ')).toEqual('translated \n\t  ')
 	})
 	it('spacesAround', () => {
-		expect(template.tr(' \n\t  example \n\t  ')).toEqual(' \n\t  translated \n\t  ')
+		expect(template.combineLiterals(' \n\t  example \n\t  ')).toEqual(' \n\t  translated \n\t  ')
 	})
 	it('spacesBefore', () => {
-		expect(template.tr(' \n\t  example')).toEqual(' \n\t  translated')
+		expect(template.combineLiterals(' \n\t  example')).toEqual(' \n\t  translated')
 	})
 })
 

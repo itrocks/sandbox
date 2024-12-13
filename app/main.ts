@@ -6,6 +6,7 @@ import fastifyFormbody     from '@fastify/formbody'
 import fastifyMultipart    from '@fastify/multipart'
 import fastifySession      from '@fastify/session'
 import appDir              from '@itrocks/app-dir'
+import { frontScripts }    from '@itrocks/template'
 import fastify             from 'fastify'
 import { FastifyReply }    from 'fastify'
 import { FastifyRequest }  from 'fastify'
@@ -31,7 +32,6 @@ import Request             from './server/request'
 import Response            from './server/response'
 import FileStore           from './session-file-store'
 import                          './view/html/filter'
-import { frontScripts }    from './view/html/template'
 
 frontScripts.push(
 	'/node_modules/@itrocks/build/build.js',
