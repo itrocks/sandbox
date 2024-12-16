@@ -5,10 +5,9 @@ import { AnyObject, isAnyFunction }  from '../class/type'
 import { KeyOf, ObjectOrType, Type } from '../class/type'
 import { componentOf }               from '../orm/component'
 import { PROTECT_GET }               from '../orm/orm'
-import { applyFilter, IGNORE }       from '../property/filter/filter'
-import { READ, SAVE, SQL }           from '../property/filter/filter'
+import { applyTransformer, IGNORE }  from '../property/transform/transform'
+import { READ, SAVE, SQL }           from '../property/transform/transform'
 import { ReflectProperty }           from '../property/reflect'
-import { CollectionType }            from '../property/type'
 import { Dao, HasEntity, MayEntity } from './dao'
 import { Identifier, SearchType }    from './dao'
 import DaoFunction                   from './functions'
@@ -242,7 +241,7 @@ export default class Mysql extends Dao
 		const object = (new type) as HasEntity<T>
 		let property: KeyOf<HasEntity<T>>
 		for (property in row) {
-			const value = await applyFilter(row[property], object, property, SQL, READ, row)
+			const value = await applyTransformer(row[property], object, property, SQL, READ, row)
 			if (value === IGNORE) continue
 			object[property] = value
 		}
@@ -256,7 +255,7 @@ export default class Mysql extends Dao
 		const values:   AnyObject  = {}
 		for (const property of type ? Object.keys(object) as KeyOf<T>[] : new ReflectClass(object).propertyNames) {
 			let value = Reflect.getMetadata(PROTECT_GET, typeObject, property) ? undefined : await object[property]
-			value     = await applyFilter(value, typeObject, property, SQL, SAVE, values)
+			value     = await applyTransformer(value, typeObject, property, SQL, SAVE, values)
 			if (value === IGNORE) continue
 			if (isAnyFunction(value)) {
 				deferred.push(value)

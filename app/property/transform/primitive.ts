@@ -1,17 +1,17 @@
-import { format, parse }             from 'date-fns'
-import { KeyOf, ObjectOrType }       from '../../class/type'
-import tr                            from '../../locale/translate'
-import { displayOf }                 from '../../view/property/display'
-import { setPropertyTypeFilters }    from './filter'
-import { EDIT, HTML, INPUT, OUTPUT } from './filter'
-import { READ, SAVE, SQL }           from './filter'
+import { format, parse }               from 'date-fns'
+import { KeyOf, ObjectOrType }         from '../../class/type'
+import tr                              from '../../locale/translate'
+import { displayOf }                   from '../../view/property/display'
+import { setPropertyTypeTransformers } from './transform'
+import { EDIT, HTML, INPUT, OUTPUT }   from './transform'
+import { READ, SAVE, SQL }             from './transform'
 
 const lfTab = '\n\t\t\t\t'
 
 // Bigint
 
-setPropertyTypeFilters(BigInt, [
-	{ format: HTML, direction: INPUT, filter: (value: string) => BigInt(value) }
+setPropertyTypeTransformers(BigInt, [
+	{ format: HTML, direction: INPUT, transformer: (value: string) => BigInt(value) }
 ])
 
 // Boolean
@@ -28,12 +28,12 @@ function booleanEdit<T extends object>(value: boolean, type: ObjectOrType<T>, pr
 
 const booleanInput = (value: string) => !['', '0', 'false', 'no', tr('false'), tr('no')].includes(value)
 
-setPropertyTypeFilters(Boolean, [
-	{ format: HTML, direction: EDIT,   filter: booleanEdit },
-	{ format: HTML, direction: INPUT,  filter: booleanInput },
-	{ format: HTML, direction: OUTPUT, filter: (value: boolean) => value ? tr('yes') : tr('no') },
-	{ format: SQL,  direction: READ,   filter: (value: string)  => !!value },
-	{ format: SQL,  direction: SAVE,   filter: (value: boolean) => +value }
+setPropertyTypeTransformers(Boolean, [
+	{ format: HTML, direction: EDIT,   transformer: booleanEdit },
+	{ format: HTML, direction: INPUT,  transformer: booleanInput },
+	{ format: HTML, direction: OUTPUT, transformer: (value: boolean) => value ? tr('yes') : tr('no') },
+	{ format: SQL,  direction: READ,   transformer: (value: string)  => !!value },
+	{ format: SQL,  direction: SAVE,   transformer: (value: boolean) => +value }
 ])
 
 // Date
@@ -50,10 +50,10 @@ function dateEdit<T extends object>(value: Date, type: ObjectOrType<T>, property
 const dateInput  = (value: string) => parse(value, tr('dd/MM/yyyy', { ucFirst: false }), new Date)
 const dateOutput = (value: Date)   => value ? format(value, tr('dd/MM/yyyy', { ucFirst: false })) : ''
 
-setPropertyTypeFilters(Date, [
-	{ format: HTML, direction: EDIT,   filter: dateEdit },
-	{ format: HTML, direction: INPUT,  filter: dateInput },
-	{ format: HTML, direction: OUTPUT, filter: dateOutput }
+setPropertyTypeTransformers(Date, [
+	{ format: HTML, direction: EDIT,   transformer: dateEdit },
+	{ format: HTML, direction: INPUT,  transformer: dateInput },
+	{ format: HTML, direction: OUTPUT, transformer: dateOutput }
 ])
 
 // Number
@@ -67,9 +67,9 @@ function numberEdit<T extends object>(value: number | undefined, type: ObjectOrT
 	return label + lfTab + input
 }
 
-setPropertyTypeFilters(Number, [
-	{ format: HTML, direction: EDIT,  filter: numberEdit },
-	{ format: HTML, direction: INPUT,	filter: (value: string) => +value }
+setPropertyTypeTransformers(Number, [
+	{ format: HTML, direction: EDIT,  transformer: numberEdit },
+	{ format: HTML, direction: INPUT,	transformer: (value: string) => +value }
 ])
 
 // default
@@ -83,6 +83,6 @@ function defaultEdit<T extends object>(value: any, type: ObjectOrType<T>, proper
 	return label + lfTab + input
 }
 
-setPropertyTypeFilters(null, [
-	{ format: HTML, direction: EDIT, filter: defaultEdit }
+setPropertyTypeTransformers(null, [
+	{ format: HTML, direction: EDIT, transformer: defaultEdit }
 ])

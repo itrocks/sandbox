@@ -5,9 +5,10 @@ import { ObjectOrType, StringObject }    from '../class/type'
 import Type                              from '../class/type'
 import { decorateCallback, decoratorOf } from '../decorator/class'
 import tr                                from '../locale/translate'
-import { Filter, setPropertyTypeFilter } from '../property/filter/filter'
-import { EDIT, HTML, IGNORE }            from '../property/filter/filter'
-import { INPUT, OUTPUT, SAVE, SQL }      from '../property/filter/filter'
+import { setPropertyTypeTransformer }    from '../property/transform/transform'
+import { Transformer }                   from '../property/transform/transform'
+import { EDIT, HTML, IGNORE }            from '../property/transform/transform'
+import { INPUT, OUTPUT, SAVE, SQL }      from '../property/transform/transform'
 import ReflectProperty                   from '../property/reflect'
 import { representativeValueOf }         from '../view/class/representative'
 import { displayOf }                     from '../view/property/display'
@@ -30,7 +31,7 @@ function storeEdit<T extends object>(value: HasEntity | undefined, object: T, pr
 	return label + lfTab + input + input_id
 }
 
-const storeInput: Filter = <T extends AnyObject>(
+const storeInput: Transformer = <T extends AnyObject>(
 	value: MayEntity | undefined, object: T, property: KeyOf<T>, data: StringObject
 ) => {
 	const property_id = property + '_id'
@@ -48,9 +49,9 @@ const storeInput: Filter = <T extends AnyObject>(
 	return IGNORE
 }
 
-const storeOutput: Filter = (value: MayEntity | undefined) => value ? representativeValueOf(value) : ''
+const storeOutput: Transformer = (value: MayEntity | undefined) => value ? representativeValueOf(value) : ''
 
-const storeSave: Filter = async <T extends AnyObject>(
+const storeSave: Transformer = async <T extends AnyObject>(
 	value: MayEntity | undefined, _object: T, property: KeyOf<T>, saveValues: AnyObject
 ) => {
 	if (value && !dao.isObjectConnected(value)) {
@@ -65,10 +66,10 @@ const storeSave: Filter = async <T extends AnyObject>(
 export const Store = (name: string | false = '') => decorateCallback(STORE, target =>
 {
 	if (name !== false) {
-		setPropertyTypeFilter(target, HTML, EDIT,   storeEdit)
-		setPropertyTypeFilter(target, HTML, INPUT,  storeInput)
-		setPropertyTypeFilter(target, HTML, OUTPUT, storeOutput)
-		setPropertyTypeFilter(target, SQL,  SAVE,   storeSave)
+		setPropertyTypeTransformer(target, HTML, EDIT,   storeEdit)
+		setPropertyTypeTransformer(target, HTML, INPUT,  storeInput)
+		setPropertyTypeTransformer(target, HTML, OUTPUT, storeOutput)
+		setPropertyTypeTransformer(target, SQL,  SAVE,   storeSave)
 	}
 	if (name !== '') {
 		return name

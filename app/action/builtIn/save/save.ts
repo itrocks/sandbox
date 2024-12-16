@@ -2,9 +2,9 @@ import Action                    from '../../../action/action'
 import Request                   from '../../../action/request'
 import ReflectClass              from '../../../class/reflect'
 import dao                       from '../../../dao/dao'
-import { applyFilter }           from '../../../property/filter/filter'
-import { HTML, IGNORE }          from '../../../property/filter/filter'
-import { INPUT }                 from '../../../property/filter/filter'
+import { applyTransformer }      from '../../../property/transform/transform'
+import { HTML, IGNORE }          from '../../../property/transform/transform'
+import { INPUT }                 from '../../../property/transform/transform'
 import { RecursiveStringObject } from '../../../server/request'
 
 export default class Save extends Action
@@ -15,7 +15,7 @@ export default class Save extends Action
 		const properties = new ReflectClass(object).propertyNames
 		for (const property in data) {
 			if (!properties.includes(property)) continue
-			const value = await applyFilter(data[property], object, property, HTML, INPUT, data)
+			const value = await applyTransformer(data[property], object, property, HTML, INPUT, data)
 			if (value === IGNORE) continue
 			object[property] = value
 		}

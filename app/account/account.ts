@@ -1,5 +1,5 @@
 import Store    from '../dao/store'
-import Password from '../property/filter/password'
+import Password from '../property/transform/password'
 import Required from '../property/validate/required'
 
 @Store()

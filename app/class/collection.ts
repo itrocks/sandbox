@@ -1,21 +1,22 @@
-import { routeOf }                  from '../action/route'
-import { decorate, decoratorOf }    from '../decorator/class'
-import { dao, HasEntity }           from '../dao/dao'
-import { Identifier, MayEntity }    from '../dao/dao'
-import tr                           from '../locale/translate'
-import { componentOf }              from '../orm/component'
-import { compositeOf }              from '../orm/composite'
-import { EDIT, HTML, IGNORE }       from '../property/filter/filter'
-import { INPUT, OUTPUT, SAVE, SQL } from '../property/filter/filter'
-import { Filter, HtmlContainer }    from '../property/filter/filter'
-import { setPropertyTypeFilter }    from '../property/filter/filter'
-import ReflectProperty              from '../property/reflect'
-import { CollectionType }           from '../property/type'
-import { representativeValueOf }    from '../view/class/representative'
-import { displayOf }                from '../view/property/display'
-import ReflectClass                 from './reflect'
-import { AnyObject, KeyOf }         from './type'
-import { ObjectOrType, Type }       from './type'
+import { routeOf }                    from '../action/route'
+import { decorate, decoratorOf }      from '../decorator/class'
+import { dao, HasEntity }             from '../dao/dao'
+import { Identifier, MayEntity }      from '../dao/dao'
+import tr                             from '../locale/translate'
+import { componentOf }                from '../orm/component'
+import { compositeOf }                from '../orm/composite'
+import { EDIT, HTML, IGNORE }         from '../property/transform/transform'
+import { INPUT, OUTPUT, SAVE, SQL }   from '../property/transform/transform'
+import { HtmlContainer }              from '../property/transform/transform'
+import { setPropertyTypeTransformer } from '../property/transform/transform'
+import { Transformer }                from '../property/transform/transform'
+import ReflectProperty                from '../property/reflect'
+import { CollectionType }             from '../property/type'
+import { representativeValueOf }      from '../view/class/representative'
+import { displayOf }                  from '../view/property/display'
+import ReflectClass                   from './reflect'
+import { AnyObject, KeyOf }           from './type'
+import { ObjectOrType, Type }         from './type'
 
 const COLLECTION = Symbol('collection')
 
@@ -30,7 +31,7 @@ Collection(true)(Set)
 const areMayEntityEntries = (entries: [string, MayEntity | string][]): entries is [string, MayEntity][] =>
 	(typeof entries[0]?.[1])[0] === 'o'
 
-const collectionEdit: Filter = <T extends object>(values: MayEntity[], object: T, property: KeyOf<T>) =>
+const collectionEdit: Transformer = <T extends object>(values: MayEntity[], object: T, property: KeyOf<T>) =>
 {
 	const propertyType = new ReflectProperty(object, property).collectionType
 	const fetch        = routeOf(propertyType?.elementType as Type) + '/summary'
@@ -50,7 +51,7 @@ const collectionEdit: Filter = <T extends object>(values: MayEntity[], object: T
 		+ '</ul>'
 }
 
-const collectionInput: Filter = <T extends AnyObject>(
+const collectionInput: Transformer = <T extends AnyObject>(
 	values: Record<string, MayEntity | string>, object: T, property: KeyOf<T>
 ) => {
 	const entries = Object.entries(values)
@@ -64,7 +65,7 @@ const collectionInput: Filter = <T extends AnyObject>(
 	return IGNORE
 }
 
-const collectionOutput: Filter = async <T extends object, PT extends object>(
+const collectionOutput: Transformer = async <T extends object, PT extends object>(
 	values: MayEntity<PT>[], object: T, property: KeyOf<T>, askFor: HtmlContainer
 ) => {
 	if (!values.length) {
@@ -93,7 +94,7 @@ const collectionOutput: Filter = async <T extends object, PT extends object>(
 	return values.map(object => representativeValueOf(object)).join(', ')
 }
 
-const collectionSave: Filter = async <T extends AnyObject>(
+const collectionSave: Transformer = async <T extends AnyObject>(
 	values: MayEntity[] | undefined, object: T, property: KeyOf<T>
 ) => {
 	const newIdsPromise: Identifier[] = object[property + '_ids']
@@ -116,7 +117,7 @@ const collectionSave: Filter = async <T extends AnyObject>(
 	}
 }
 
-setPropertyTypeFilter(CollectionType, HTML, EDIT,   collectionEdit)
-setPropertyTypeFilter(CollectionType, HTML, INPUT,  collectionInput)
-setPropertyTypeFilter(CollectionType, HTML, OUTPUT, collectionOutput)
-setPropertyTypeFilter(CollectionType, SQL,  SAVE,   collectionSave)
+setPropertyTypeTransformer(CollectionType, HTML, EDIT,   collectionEdit)
+setPropertyTypeTransformer(CollectionType, HTML, INPUT,  collectionInput)
+setPropertyTypeTransformer(CollectionType, HTML, OUTPUT, collectionOutput)
+setPropertyTypeTransformer(CollectionType, SQL,  SAVE,   collectionSave)

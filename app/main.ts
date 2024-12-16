@@ -25,13 +25,13 @@ import access              from './config/access'
 import { storeOf }         from './dao/store'
 import { mimeTypes }       from './mime'
 import { utf8Types }       from './mime'
-import                          './property/filter/primitive'
+import                          './property/transform/primitive'
 import { fastifyRequest }  from './server/fastify'
 import { fastifyResponse } from './server/fastify'
 import Request             from './server/request'
 import Response            from './server/response'
 import FileStore           from './session-file-store'
-import                          './view/html/filter'
+import                          './view/html/transformer'
 
 frontScripts.push(
 	'/node_modules/@itrocks/build/build.js',

@@ -1,8 +1,8 @@
 import { ReflectClass }       from '../class/reflect'
 import { KeyOf, Type }        from '../class/type'
-import { applyFilter }        from './filter/filter'
-import { EDIT, HTML, OUTPUT } from './filter/filter'
-import { HtmlContainer }      from './filter/filter'
+import { applyTransformer }   from './transform/transform'
+import { EDIT, HTML, OUTPUT } from './transform/transform'
+import { HtmlContainer }      from './transform/transform'
 import { CollectionType }     from './type'
 
 export class ReflectProperty<T extends object>
@@ -39,7 +39,7 @@ export class ReflectProperty<T extends object>
 	{
 		const object = this.object ?? this.class.type
 		const value  = this.object ? this.object[this.name] : undefined
-		return applyFilter<T>(await value, object, this.name, format, EDIT)
+		return applyTransformer<T>(await value, object, this.name, format, EDIT)
 	}
 
 	get object()
@@ -53,7 +53,7 @@ export class ReflectProperty<T extends object>
 	{
 		const object = this.object ?? this.class.type
 		const value  = this.object ? await this.object[this.name] : undefined
-		return applyFilter<T>(value, object, this.name, format, OUTPUT, askFor)
+		return applyTransformer<T>(value, object, this.name, format, OUTPUT, askFor)
 	}
 
 	async outputMandatoryContainer(format: string = HTML)

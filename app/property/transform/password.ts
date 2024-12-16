@@ -1,11 +1,11 @@
-import { createHash       }      from 'crypto'
-import { KeyOf, ObjectOrType }   from '../../class/type'
-import { decorate, decoratorOf } from '../../decorator/property'
-import tr                        from '../../locale/translate'
-import { displayOf }             from '../../view/property/display'
-import { setPropertyFilters }    from './filter'
-import { EDIT, HTML, IGNORE }    from './filter'
-import { INPUT, JSON }           from './filter'
+import { createHash       }        from 'crypto'
+import { KeyOf, ObjectOrType }     from '../../class/type'
+import { decorate, decoratorOf }   from '../../decorator/property'
+import tr                          from '../../locale/translate'
+import { displayOf }               from '../../view/property/display'
+import { EDIT, HTML, IGNORE }      from './transform'
+import { INPUT, JSON }             from './transform'
+import { setPropertyTransformers } from './transform'
 
 const PASSWORD = Symbol('password')
 
@@ -33,11 +33,11 @@ export function Password<T extends object>(value = true)
 	return value
 		? (target: T, property: KeyOf<T>) => {
 			parent(target, property)
-			setPropertyFilters(target, property, [
-				{ format: HTML, direction: EDIT,  filter: editPassword<T> },
-				{ format: HTML, direction: INPUT, filter: inputPassword },
-				{ format: HTML,                   filter: (value: string) => value.length ? '***********' : '' },
-				{ format: JSON,                   filter: (value: string) => value.length ? '*PASSWORD*' : '*EMPTY*' }
+			setPropertyTransformers(target, property, [
+				{ format: HTML, direction: EDIT,  transformer: editPassword<T> },
+				{ format: HTML, direction: INPUT, transformer: inputPassword },
+				{ format: HTML,                   transformer: (value: string) => value.length ? '***********' : '' },
+				{ format: JSON,                   transformer: (value: string) => value.length ? '*PASSWORD*' : '*EMPTY*' }
 			])
 		}
 		: parent
