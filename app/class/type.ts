@@ -1,7 +1,7 @@
 
 export function baseType<T extends object>(target: Type<T>): Type<T>
 {
-	while ((target.name === '') || (target.name === 'BuiltClass')) {
+	while (!target.name.length || (target.name === 'BuiltClass')) {
 		target = Object.getPrototypeOf(target)
 	}
 	return target

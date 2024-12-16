@@ -18,7 +18,7 @@ export default function containedAutoWidth(container: HTMLElement)
 
 	const input = container.firstElementChild as HTMLInputElement
 
-	const textContent = () => (input.value === '') ? ((input.placeholder === '') ? ' ' : input.placeholder) : input.value
+	const textContent = () => input.value.length ? input.value : ((input.placeholder === '') ? ' ' : input.placeholder)
 	const copyTextContent = () => { textNode.textContent = textContent() }
 
 	const textNode = document.createTextNode(textContent())

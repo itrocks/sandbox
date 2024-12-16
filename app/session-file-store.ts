@@ -38,7 +38,7 @@ export default class FileStore implements SessionStore
 					return callback(null)
 				}
 				const stringData = data + ''
-				if (stringData === '') {
+				if (!stringData.length) {
 					return callback(null)
 				}
 				let session: Session
