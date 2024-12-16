@@ -1,5 +1,6 @@
 import Str                                from '@itrocks/rename'
 import { objectRouteOf, routeOf }         from '../../action/route'
+import ReflectClass                       from '../../class/reflect'
 import tr                                 from '../../locale/translate'
 import ReflectProperty                    from '../../property/reflect'
 import { displayOf as classDisplayOf }    from '../class/display'
@@ -13,9 +14,10 @@ export default function parseDecorator(variable: string, data: any)
 	}
 	switch (variable) {
 		case '@display':
-			return (data instanceof ReflectProperty)
-				? tr(propertyDisplayOf(data.class.object ?? data.class.type, data.name))
-				: tr(classDisplayOf(data))
+			if (data instanceof ReflectProperty) return tr(propertyDisplayOf(data.class.object ?? data.class.type, data.name))
+			if (data instanceof ReflectClass)    return tr(classDisplayOf(data.type))
+			if (typeof data === 'object')        return classDisplayOf(data)
+			return data
 		case '@objectRoute':
 			return objectRouteOf(data)
 		case '@output':
