@@ -3,6 +3,8 @@ import { decorate, decoratorOf }    from '../decorator/class'
 import { dao, HasEntity }           from '../dao/dao'
 import { Identifier, MayEntity }    from '../dao/dao'
 import tr                           from '../locale/translate'
+import { componentOf }              from '../orm/component'
+import { compositeOf }              from '../orm/composite'
 import { EDIT, HTML, IGNORE }       from '../property/filter/filter'
 import { INPUT, OUTPUT, SAVE, SQL } from '../property/filter/filter'
 import { Filter, HtmlContainer }    from '../property/filter/filter'
@@ -11,6 +13,7 @@ import ReflectProperty              from '../property/reflect'
 import { CollectionType }           from '../property/type'
 import { representativeValueOf }    from '../view/class/representative'
 import { displayOf }                from '../view/property/display'
+import ReflectClass                 from './reflect'
 import { AnyObject, KeyOf }         from './type'
 import { ObjectOrType, Type }       from './type'
 
@@ -61,8 +64,28 @@ const collectionInput: Filter = <T extends AnyObject>(
 	return IGNORE
 }
 
-const collectionOutput: Filter = (values: MayEntity[], _object, _property, askFor: HtmlContainer) =>
-{
+const collectionOutput: Filter = async <T extends object, PT extends object>(
+	values: MayEntity<PT>[], object: T, property: KeyOf<T>, askFor: HtmlContainer
+) => {
+	if (!values.length) {
+		return ''
+	}
+	if (componentOf(object, property)) {
+		const propertyType = new ReflectProperty(object, property).type
+		if (propertyType instanceof CollectionType) {
+			const type          = propertyType.elementType
+			const propertyClass = new ReflectClass(type)
+			const properties    = propertyClass.propertyNames.filter(property => !compositeOf(type, property)) as KeyOf<PT>[]
+			const html = []
+			html.push('<table>')
+			html.push('<tr>' + properties.map(property => '<th>' + tr(property) + '</th>').join('') + '</tr>')
+			html.push(...values.map(
+				value => '<tr>' + properties.map(property => '<td>' + value[property] + '</td>').join('') + '</tr>'
+			))
+			html.push('</table>')
+			return html.join('\n')
+		}
+	}
 	if (askFor?.container) {
 		askFor.container = false
 		return '<ul>' + values.map(object => '<li>' + representativeValueOf(object) + '</li>').join('') + '</ul>'
