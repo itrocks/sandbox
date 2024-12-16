@@ -1,3 +1,4 @@
+import { toColumn }                  from '@itrocks/rename'
 import mariadb                       from 'mariadb'
 import ReflectClass                  from '../class/reflect'
 import { AnyObject, isAnyFunction }  from '../class/type'
@@ -43,8 +44,8 @@ export default class Mysql extends Dao
 	async deleteId<T extends object>(type: ObjectOrType<T>, id: any, property: KeyOf<HasEntity<T>> = 'id')
 	{
 		const connection = this.connection ?? await this.connect()
-		if (DEBUG) console.log('DELETE FROM `' + storeOf(type) + '` WHERE ' + property + ' = ?', [id])
-		await connection.query('DELETE FROM `' + storeOf(type) + '` WHERE ' + property + ' = ?', [id])
+		if (DEBUG) console.log('DELETE FROM `' + storeOf(type) + '` WHERE ' + toColumn(property) + ' = ?', [id])
+		await connection.query('DELETE FROM `' + storeOf(type) + '` WHERE ' + toColumn(property) + ' = ?', [id])
 	}
 
 	async deleteLink<T extends HasEntity>(object: T, property: KeyOf<T>, id: Identifier)
@@ -108,7 +109,7 @@ export default class Mysql extends Dao
 				else {
 					sql = ' = ?'
 				}
-				return '`' + name + '`' + sql
+				return '`' + toColumn(name) + '`' + sql
 			})
 			.join(' AND ')
 		return sql.length
@@ -118,7 +119,7 @@ export default class Mysql extends Dao
 
 	propertiesToSql(object: object)
 	{
-		return Object.keys(object).map(name => '`' + name + '` = ?').join(', ')
+		return Object.keys(object).map(name => '`' + toColumn(name) + '` = ?').join(', ')
 	}
 
 	async read<T extends object>(type: Type<T>, id: Identifier)
