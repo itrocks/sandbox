@@ -1,4 +1,5 @@
 import { decorate, decoratorOf } from '../decorator/class'
+import { baseType }              from './type'
 import { ObjectOrType, Type }    from './type'
 
 export function Super<T extends object>(self: object): T
@@ -51,14 +52,7 @@ export default Uses
 
 export const usesOf = (target: ObjectOrType, resolveBuiltClass = false) => {
 	const usesOf = decoratorOf<Type[]>(target, USES, [])
-	if (!resolveBuiltClass) {
-		return usesOf
-	}
-	for (const x in usesOf) {
-		let type = usesOf[x]
-		while (type.name === 'BuiltClass') {
-			type = usesOf[x] = Object.getPrototypeOf(type)
-		}
-	}
-	return usesOf
+	return resolveBuiltClass
+		? usesOf.map(type => baseType(type))
+		: usesOf
 }

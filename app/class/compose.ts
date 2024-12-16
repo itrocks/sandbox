@@ -1,11 +1,13 @@
-import path                from 'path'
-import Route               from '../action/route'
-import { getRoute }        from '../action/routes'
-import File                from '../class/file'
-import config              from '../config/compose'
-import { initClass }       from '../orm/orm'
-import { isAnyType, Type } from './type'
-import Uses                from './uses'
+import path          from 'path'
+import Route         from '../action/route'
+import { getRoute }  from '../action/routes'
+import File          from '../class/file'
+import config        from '../config/compose'
+import { initClass } from '../orm/orm'
+import { baseType }  from './type'
+import { isAnyType } from './type'
+import Type          from './type'
+import Uses          from './uses'
 
 type SubstitutionModule = { __esModule: true, default?: Type }
 
@@ -14,10 +16,7 @@ function applyFileToType(module: any, file: string)
 	const type = module?.default
 	if (!isAnyType(type)) return module
 
-	let realType = type
-	while (!realType.name.length || (realType.name === 'BuiltClass')) {
-		realType = Object.getPrototypeOf(realType)
-	}
+	let realType = baseType(type)
 	File(file)(realType)
 
 	const route = getRoute(file.slice(0, -3))

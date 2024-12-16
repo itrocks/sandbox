@@ -1,4 +1,12 @@
 
+export function baseType<T extends object>(target: Type<T>): Type<T>
+{
+	while ((target.name === '') || (target.name === 'BuiltClass')) {
+		target = Object.getPrototypeOf(target)
+	}
+	return target
+}
+
 export const isAnyFunction = (value: any): value is Function =>
 	((typeof value)[0] === 'f') && ((value + '')[0] !== 'c')
 

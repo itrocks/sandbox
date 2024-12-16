@@ -1,15 +1,17 @@
-import { routeOf }                        from '../action/route'
-import { AnyObject, KeyOf, ObjectOrType } from '../class/type'
-import { StringObject, Type }             from '../class/type'
-import { decorateCallback, decoratorOf }  from '../decorator/class'
-import tr                                 from '../locale/translate'
-import { Filter, setPropertyTypeFilter }  from '../property/filter/filter'
-import { EDIT, HTML, IGNORE }             from '../property/filter/filter'
-import { INPUT, OUTPUT, SAVE, SQL }       from '../property/filter/filter'
-import ReflectProperty                    from '../property/reflect'
-import { representativeValueOf }          from '../view/class/representative'
-import { displayOf }                      from '../view/property/display'
-import { dao, HasEntity, MayEntity }      from './dao'
+import { toColumn }                      from '@itrocks/rename'
+import { routeOf }                       from '../action/route'
+import { AnyObject, baseType, KeyOf }    from '../class/type'
+import { ObjectOrType, StringObject }    from '../class/type'
+import Type                              from '../class/type'
+import { decorateCallback, decoratorOf } from '../decorator/class'
+import tr                                from '../locale/translate'
+import { Filter, setPropertyTypeFilter } from '../property/filter/filter'
+import { EDIT, HTML, IGNORE }            from '../property/filter/filter'
+import { INPUT, OUTPUT, SAVE, SQL }      from '../property/filter/filter'
+import ReflectProperty                   from '../property/reflect'
+import { representativeValueOf }         from '../view/class/representative'
+import { displayOf }                     from '../view/property/display'
+import { dao, HasEntity, MayEntity }     from './dao'
 
 const lfTab = '\n\t\t\t\t'
 
@@ -68,7 +70,10 @@ export const Store = (name: string | false = '') => decorateCallback(STORE, targ
 		setPropertyTypeFilter(target, HTML, OUTPUT, storeOutput)
 		setPropertyTypeFilter(target, SQL,  SAVE,   storeSave)
 	}
-	return (name === '') ? target.name.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase() : name
+	if (name !== '') {
+		return name
+	}
+	return toColumn(baseType(target).name)
 })
 export default Store
 
