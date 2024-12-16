@@ -14,6 +14,7 @@ export const INPUT  = 'input'
 export const OUTPUT = 'output'
 export const READ   = 'read'
 export const SAVE   = 'save'
+export const SHORT_OUTPUT = 'shortOutput'
 
 export const HTML = 'html'
 export const JSON = 'json'
@@ -21,11 +22,8 @@ export const SQL  = 'sql'
 
 export const IGNORE = '¤~!~!~!~!~¤'
 
-type Direction = string | '' | 'edit' | 'input' | 'output' | 'read' | 'save'
-type Format    = string | '' | 'html' | 'json' | 'sql'
-
-export type Transformer<T extends object = object>
-	= (value: any, target: ObjectOrType<T>, property: KeyOf<T>, data: any, format: Format, direction: Direction) => any
+export type Direction = string | '' | 'edit' | 'input' | 'output' | 'read' | 'save' | 'shortOutput'
+export type Format    = string | '' | 'html' | 'json' | 'sql'
 
 export class HtmlContainer { constructor(public mandatoryContainer: boolean, public container: boolean = true) {} }
 
@@ -38,7 +36,11 @@ const transformers = new Map<PropertyType, FormatTransformers>()
 export type FormatTransformer = (result: any, data: any) => any
 const formatTransformers = new Map<string, FormatTransformer>
 
-type Transformers<T extends object = object> = { format?: Format, direction?: Direction, transformer: Transformer<T> }[]
+export type Transformer<T extends object = object>
+	= (value: any, target: ObjectOrType<T>, property: KeyOf<T>, data: any, format: Format, direction: Direction) => any
+
+export type Transformers<T extends object = object>
+	= { format?: Format, direction?: Direction, transformer: Transformer<T> }[]
 
 export async function applyTransformer<T extends object>(
 	value: any, target: ObjectOrType<T>, property: KeyOf<T>, format: Format, direction: Direction, data?: any
@@ -102,10 +104,13 @@ export function setPropertyTransformer<T extends object>(
 	return transformer
 }
 
-export function setPropertyTransformers<T extends object>(target: ObjectOrType<T>, property: KeyOf<T>, transformers: Transformers<T>)
-{
+export function setPropertyTransformers<T extends object>(
+	target: ObjectOrType<T>, property: KeyOf<T>, transformers: Transformers<T>
+) {
 	for (const transformer of transformers) {
-		setPropertyTransformer(target, property, transformer.format ?? '', transformer.direction ?? '', transformer.transformer)
+		setPropertyTransformer(
+			target, property, transformer.format ?? '', transformer.direction ?? '', transformer.transformer
+		)
 	}
 }
 

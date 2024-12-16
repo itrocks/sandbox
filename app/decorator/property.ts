@@ -1,11 +1,15 @@
 import { KeyOf, ObjectOrType, prototypeOf } from '../class/type'
 
+export type DecorateCaller<T extends object> = (target: T, property: KeyOf<T>) => void
+
 export function decorate<T extends object>(name: Symbol, value: any)
+	: DecorateCaller<T>
 {
 	return (target: T, property: KeyOf<T>) => Reflect.defineMetadata(name, value, target, property)
 }
 
 export function decorateCallback<T extends object>(name: Symbol, callback: (target: T, property: KeyOf<T>) => any)
+	: DecorateCaller<T>
 {
 	return (target: T, property: KeyOf<T>) =>
 		Reflect.defineMetadata(name, callback(target, property), target, property)
