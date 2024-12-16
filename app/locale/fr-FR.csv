@@ -36,6 +36,7 @@ forgot password;mot de passe oublié
 global search;recherche globale
 home;accueil
 id;id
+lines;lignes
 login;identifiant
 main module;module principal
 dd/MM/yyyy;dd/MM/yyyy
@@ -61,6 +62,7 @@ this is the $1 I love;c'est le $1 que j'aime
 true;vrai
 unable to connect;impossible de se connecter
 unable to connect: unknown email, login or password;impossible de se connecter : mail, identifiant ou mot de passe inconnu
+unknown;inconnu
 unknown email, login or password;mail, identifiant ou mot de passe inconnu
 user;utilisateur
 user account created;compte utilisateur créé

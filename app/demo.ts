@@ -12,9 +12,8 @@ export default class Demo
 
 	birthday = new Date
 
-	// TODO Fix infinite recursion
-	//@Component()
-	//lines: DemoLine[] = []
+	@Component()
+	lines: DemoLine[] = []
 
 	@Required()
 	name = ''
