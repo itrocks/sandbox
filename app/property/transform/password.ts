@@ -3,9 +3,9 @@ import { KeyOf, ObjectOrType }     from '../../class/type'
 import { decorate, decoratorOf }   from '../../decorator/property'
 import tr                          from '../../locale/translate'
 import { displayOf }               from '../../view/property/display'
-import { EDIT, HTML, IGNORE }      from './transform'
-import { INPUT, JSON }             from './transform'
-import { setPropertyTransformers } from './transform'
+import { EDIT, HTML, IGNORE }      from './transformer'
+import { INPUT, JSON }             from './transformer'
+import { setPropertyTransformers } from './transformer'
 
 const PASSWORD = Symbol('password')
 

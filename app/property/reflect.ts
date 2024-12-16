@@ -1,8 +1,8 @@
 import { ReflectClass }       from '../class/reflect'
 import { KeyOf, Type }        from '../class/type'
-import { applyTransformer }   from './transform/transform'
-import { EDIT, HTML, OUTPUT } from './transform/transform'
-import { HtmlContainer }      from './transform/transform'
+import { applyTransformer }   from './transform/transformer'
+import { EDIT, HTML, OUTPUT } from './transform/transformer'
+import { HtmlContainer }      from './transform/transformer'
 import { CollectionType }     from './type'
 
 export class ReflectProperty<T extends object>

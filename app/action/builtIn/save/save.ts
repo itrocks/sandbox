@@ -2,9 +2,9 @@ import Action                    from '../../../action/action'
 import Request                   from '../../../action/request'
 import ReflectClass              from '../../../class/reflect'
 import dao                       from '../../../dao/dao'
-import { applyTransformer }      from '../../../property/transform/transform'
-import { HTML, IGNORE }          from '../../../property/transform/transform'
-import { INPUT }                 from '../../../property/transform/transform'
+import { applyTransformer }      from '../../../property/transform/transformer'
+import { HTML, IGNORE }          from '../../../property/transform/transformer'
+import { INPUT }                 from '../../../property/transform/transformer'
 import { RecursiveStringObject } from '../../../server/request'
 
 export default class Save extends Action
