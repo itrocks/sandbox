@@ -61,7 +61,7 @@ export async function applyFilter<T extends object>(
 		)
 	}
 	const formatFilter = formatFilters.get(format)
-	const result       = filter ? filter(value, target, property, data, format, direction) : value
+	const result       = filter ? await filter(value, target, property, data, format, direction) : value
 	return (data && formatFilter) ? formatFilter(result, data) : result
 }
 
