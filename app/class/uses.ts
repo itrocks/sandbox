@@ -1,6 +1,6 @@
+import { baseType }              from '@itrocks/class-type'
+import { ObjectOrType, Type }    from '@itrocks/class-type'
 import { decorate, decoratorOf } from '../decorator/class'
-import { baseType }              from './type'
-import { ObjectOrType, Type }    from './type'
 
 export function Super<T extends object>(self: object): T
 {
@@ -9,13 +9,13 @@ export function Super<T extends object>(self: object): T
 
 function uses<T extends Type>(target: T, mixins: Type[]): T
 {
-	const BuiltClass = class extends target {
+	const BuiltClass = (() => class extends target {
 		[index: string]: any
 		constructor(...args: any[]) {
 			super(...args)
 			for (const mixin of mixins) this[mixin.name]()
 		}
-	}
+	})()
 
 	for (const mixin of mixins) {
 		const already = ['constructor']

@@ -1,4 +1,4 @@
-import { KeyOf, ObjectOrType, prototypeOf } from '../class/type'
+import { KeyOf, ObjectOrType, prototypeOf } from '@itrocks/class-type'
 
 export type DecorateCaller<T extends object> = (target: T, property: KeyOf<T>) => void
 

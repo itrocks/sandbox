@@ -1,4 +1,4 @@
-import { isAnyFunction } from '../class/type'
+import { isAnyFunction } from '@itrocks/class-type'
 
 export default function dump(variable: any, indent: number = 0): string
 {

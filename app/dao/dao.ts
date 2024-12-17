@@ -1,5 +1,5 @@
+import { KeyOf, Type } from '@itrocks/class-type'
 import config          from '../../local/dao'
-import { KeyOf, Type } from '../class/type'
 
 export type SearchType<T extends object = object> = Partial<Record<KeyOf<T>, any>> & Record<string, any>
 

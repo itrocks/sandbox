@@ -1,4 +1,4 @@
-import { ObjectOrType }          from '../class/type'
+import { ObjectOrType }          from '@itrocks/class-type'
 import { decorate, decoratorOf } from '../decorator/class'
 
 const ROUTE = Symbol('route')

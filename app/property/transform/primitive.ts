@@ -1,5 +1,5 @@
+import { KeyOf, ObjectOrType }         from '@itrocks/class-type'
 import { format, parse }               from 'date-fns'
-import { KeyOf, ObjectOrType }         from '../../class/type'
 import tr                              from '../../locale/translate'
 import { displayOf }                   from '../../view/property/display'
 import { setPropertyTypeTransformers } from './transformer'

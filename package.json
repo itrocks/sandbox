@@ -7,6 +7,7 @@
 		"@fastify/session": "^11.0",
 		"@itrocks/app-dir": "latest",
 		"@itrocks/build": "latest",
+		"@itrocks/class-type": "latest",
 		"@itrocks/contenteditable": "latest",
 		"@itrocks/rename": "latest",
 		"@itrocks/table": "latest",

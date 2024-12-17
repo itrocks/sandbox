@@ -1,6 +1,6 @@
+import { isAnyType }      from '@itrocks/class-type'
+import { KeyOf, Type }    from '@itrocks/class-type'
 import ReflectClass       from '../class/reflect'
-import { isAnyType }      from '../class/type'
-import { KeyOf, Type }    from '../class/type'
 import Dao                from '../dao/dao'
 import { storeOf }        from '../dao/store'
 import ReflectProperty    from '../property/reflect'
@@ -67,7 +67,7 @@ export function initClass<T extends object>(classType: Type<T>): Type<T> | undef
 	const properties: KeyOf<T>[] = []
 
 	// @ts-ignore TS2415 classType is always a heritable class, not a function.
-	const BuiltClass: Type<T> = class extends classType {
+	const BuiltClass: Type<T> = (() => class extends classType {
 		[property: string]: any
 		constructor(...args: any) {
 			super(...args)
@@ -75,7 +75,7 @@ export function initClass<T extends object>(classType: Type<T>): Type<T> | undef
 				delete this[property]
 			}
 		}
-	}
+	})()
 
 	for (const property of Object.values(new ReflectClass(classType).properties) satisfies ReflectProperty<T>[]) {
 		const type = property.type

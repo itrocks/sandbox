@@ -1,5 +1,5 @@
+import Type                      from '@itrocks/class-type'
 import { decorate, decoratorOf } from '../decorator/class'
-import Type from '../class/type'
 
 const ACTIONS = Symbol('actions')
 

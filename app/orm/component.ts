@@ -1,4 +1,4 @@
-import { KeyOf, ObjectOrType }   from '../class/type'
+import { KeyOf, ObjectOrType }   from '@itrocks/class-type'
 import { decorate, decoratorOf } from '../decorator/property'
 
 const COMPONENT = Symbol('component')

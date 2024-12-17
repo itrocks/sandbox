@@ -124,7 +124,8 @@ async function httpCall(
 	}
 	try {
 		return fastifyResponse(finalResponse, await execute(new ActionRequest(request)))
-	} catch (exception) {
+	}
+	catch (exception) {
 		console.error(request.path)
 		console.error(exception)
 		if (exception instanceof Exception) {
@@ -138,13 +139,13 @@ async function httpCall(
 
 async function httpAsset(request: Request, filePath: string, mimeType: string)
 {
-	const ifModified = request.headers['if-modified-since']
+	const ifModified   = request.headers['if-modified-since']
 	const lastModified = new Date((await stat(filePath)).mtime)
 	if (ifModified && (new Date(ifModified) >= lastModified)) {
 		return new Response('', 304)
 	}
 	const utf8Type = utf8Types.has(mimeType)
-	const headers = {
+	const headers  = {
 		'Content-Type': mimeType + (utf8Type ? '; charset=utf-8' : ''),
 		'Last-Modified': lastModified.toUTCString()
 	}

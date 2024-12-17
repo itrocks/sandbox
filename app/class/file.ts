@@ -1,5 +1,5 @@
+import { ObjectOrType }          from '@itrocks/class-type'
 import { decorate, decoratorOf } from '../decorator/class'
-import { ObjectOrType }          from './type'
 
 const FILE = Symbol('file')
 

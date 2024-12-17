@@ -1,4 +1,4 @@
-import { ObjectOrType, Type, typeOf } from '../class/type'
+import { ObjectOrType, Type, typeOf } from '@itrocks/class-type'
 
 export function decorate<T extends object>(name: Symbol, value: any)
 {

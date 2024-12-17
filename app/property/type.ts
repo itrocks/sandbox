@@ -1,7 +1,7 @@
+import Type from '@itrocks/class-type'
 import fs   from 'node:fs'
 import path from 'node:path'
 import ts   from 'typescript'
-import Type from '../class/type'
 
 export class CollectionType<T extends object = object, PT extends object = object>
 {

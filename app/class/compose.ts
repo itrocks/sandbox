@@ -1,12 +1,12 @@
+import { baseType }  from '@itrocks/class-type'
+import { isAnyType } from '@itrocks/class-type'
+import Type          from '@itrocks/class-type'
 import path          from 'path'
 import Route         from '../action/route'
 import { getRoute }  from '../action/routes'
 import File          from '../class/file'
 import config        from '../config/compose'
 import { initClass } from '../orm/orm'
-import { baseType }  from './type'
-import { isAnyType } from './type'
-import Type          from './type'
 import Uses          from './uses'
 
 type SubstitutionModule = { __esModule: true, default?: Type }

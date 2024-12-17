@@ -1,4 +1,4 @@
-import { KeyOf }                     from '../../class/type'
+import { KeyOf }                     from '@itrocks/class-type'
 import { DecorateCaller }            from '../../decorator/property'
 import { Direction, Format }         from './transformer'
 import { Transformer, Transformers } from './transformer'

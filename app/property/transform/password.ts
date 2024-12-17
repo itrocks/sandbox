@@ -1,5 +1,5 @@
-import { createHash       }        from 'crypto'
-import { KeyOf, ObjectOrType }     from '../../class/type'
+import { KeyOf, ObjectOrType }     from '@itrocks/class-type'
+import { createHash }              from 'crypto'
 import { decorate, decoratorOf }   from '../../decorator/property'
 import tr                          from '../../locale/translate'
 import { displayOf }               from '../../view/property/display'

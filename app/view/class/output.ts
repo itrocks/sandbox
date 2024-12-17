@@ -1,4 +1,4 @@
-import { isObject, ObjectOrType } from '../../class/type'
+import { isObject, ObjectOrType } from '@itrocks/class-type'
 import tr                         from '../../locale/translate'
 import { displayOf }              from './display'
 import { representativeValueOf }  from './representative'

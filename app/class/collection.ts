@@ -1,3 +1,5 @@
+import { AnyObject, KeyOf }           from '@itrocks/class-type'
+import { ObjectOrType, Type }         from '@itrocks/class-type'
 import { routeOf }                    from '../action/route'
 import { decorate, decoratorOf }      from '../decorator/class'
 import { dao, HasEntity }             from '../dao/dao'
@@ -15,8 +17,6 @@ import { CollectionType }             from '../property/type'
 import { representativeValueOf }      from '../view/class/representative'
 import { displayOf }                  from '../view/property/display'
 import ReflectClass                   from './reflect'
-import { AnyObject, KeyOf }           from './type'
-import { ObjectOrType, Type }         from './type'
 
 const COLLECTION = Symbol('collection')
 

@@ -1,4 +1,4 @@
-import { KeyOf, ObjectOrType, typeOf }           from '../../class/type'
+import { KeyOf, ObjectOrType, typeOf }           from '@itrocks/class-type'
 import ReflectClass                              from '../../class/reflect'
 import { decorateCallback, decoratorOfCallback } from '../../decorator/class'
 import { requiredOf }                            from '../../property/validate/required'

@@ -1,4 +1,4 @@
-import { StringObject, Type } from '../class/type'
+import { StringObject, Type } from '@itrocks/class-type'
 import { dao, HasEntity }     from '../dao/dao'
 import ServerRequest          from '../server/request'
 import Exception              from './exception'
