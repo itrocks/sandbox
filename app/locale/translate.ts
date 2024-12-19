@@ -13,6 +13,7 @@ export type Options = {
 	ucFirst?: boolean
 }
 
+/*
 readFile(__dirname + '/fr-FR.csv', 'utf-8')
 	.then((data): [string, string][] => parseCsv(data, { delimiter: ';' }).data)
 	.then(data => data.forEach(row => {
@@ -23,6 +24,8 @@ readFile(__dirname + '/fr-FR.csv', 'utf-8')
 	}))
 
 const lang = 'fr-FR'
+*/
+const lang = 'en-US'
 
 export default function tr(text: string, parts?: string[] | Options, options?: Options): string
 {
