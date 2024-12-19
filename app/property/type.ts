@@ -95,7 +95,7 @@ export function propertyTypesFromFile<T extends object = object>(file: string)
 	return propertyTypes
 }
 
-export function stringToType(type: string, typeImports: TypeImports): PrimitiveType | Type
+function stringToType(type: string, typeImports: TypeImports): PrimitiveType | Type
 {
 	const typeImport = typeImports[type]
 	return typeImport

@@ -1,6 +1,6 @@
 import { baseType }              from '@itrocks/class-type'
 import { ObjectOrType, Type }    from '@itrocks/class-type'
-import { decorate, decoratorOf } from '../decorator/class'
+import { decorate, decoratorOf } from '@itrocks/decorator/class'
 
 export function Super<T extends object>(self: object): T
 {
@@ -43,14 +43,17 @@ function uses<T extends Type>(target: T, mixins: Type[]): T
 
 const USES = Symbol('uses')
 
-export const Uses = <T extends object>(...mixins: Type[]) => (target: Type<T>) =>
-{
-	decorate<T>(USES, mixins.concat(usesOf(target)))(target)
-	return uses(target, mixins)
-}
 export default Uses
+export function Uses<T extends object>(...mixins: Type[])
+{
+	return (target: Type<T>) => {
+		decorate<T>(USES, mixins.concat(usesOf(target)))(target)
+		return uses(target, mixins)
+	}
+}
 
-export const usesOf = (target: ObjectOrType, resolveBuiltClass = false) => {
+export function usesOf(target: ObjectOrType, resolveBuiltClass = false)
+{
 	const usesOf = decoratorOf<Type[]>(target, USES, [])
 	return resolveBuiltClass
 		? usesOf.map(type => baseType(type))

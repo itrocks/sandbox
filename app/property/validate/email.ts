@@ -1,10 +1,15 @@
 import { KeyOf, ObjectOrType }   from '@itrocks/class-type'
-import { decorate, decoratorOf } from '../../decorator/property'
+import { decorate, decoratorOf } from '@itrocks/decorator/property'
 
 const EMAIL = Symbol('email')
 
-export const Email = <T extends object>(value = true) => decorate<T>(EMAIL, value)
 export default Email
+export function Email<T extends object>(value = true)
+{
+	return decorate<T>(EMAIL, value)
+}
 
-export const emailOf = <T extends object>(target: ObjectOrType<T>, property: KeyOf<T>) =>
-	decoratorOf(target, property, EMAIL, false)
+export function emailOf<T extends object>(target: ObjectOrType<T>, property: KeyOf<T>)
+{
+	return decoratorOf(target, property, EMAIL, false)
+}

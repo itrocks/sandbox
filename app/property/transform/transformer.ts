@@ -2,7 +2,7 @@ import { isAnyObject, KeyOf } from '@itrocks/class-type'
 import { ObjectOrType }       from '@itrocks/class-type'
 import { prototypeOf }        from '@itrocks/class-type'
 import { typeOf, Type }       from '@itrocks/class-type'
-import { DecoratorOfType }    from '../../decorator/class'
+import { DecoratorOfType }    from '@itrocks/decorator/class'
 import ReflectProperty        from '../reflect'
 import { PrimitiveType }      from '../type'
 

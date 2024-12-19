@@ -1,5 +1,5 @@
 import { ObjectOrType }          from '@itrocks/class-type'
-import { decorate, decoratorOf } from '../decorator/class'
+import { decorate, decoratorOf } from '@itrocks/decorator/class'
 
 const NEED = Symbol('need')
 
@@ -9,7 +9,13 @@ type NOTHING = ''
 export type Needs = NOTHING | 'object' | 'Store'
 type Need = { alternative?: string, need: Needs }
 
-export const Need = (need: Needs, alternative?: string) => decorate(NEED, { alternative, need })
 export default Need
+export function Need(need: Needs, alternative?: string)
+{
+	return decorate(NEED, { alternative, need })
+}
 
-export const needOf = (target: ObjectOrType) => decoratorOf<Need>(target, NEED, { need: NOTHING })
+export function needOf(target: ObjectOrType)
+{
+	return decoratorOf<Need>(target, NEED, { need: NOTHING })
+}

@@ -1,11 +1,20 @@
 import { ObjectOrType }          from '@itrocks/class-type'
-import { decorate, decoratorOf } from '../decorator/class'
+import { decorate, decoratorOf } from '@itrocks/decorator/class'
 
 const ROUTE = Symbol('route')
 
-export const objectRouteOf = (target: object) => routeOf(target) + (('id' in target) ? ('/' + target.id) : '')
+export function objectRouteOf(target: object)
+{
+	return routeOf(target) + (('id' in target) ? ('/' + target.id) : '')
+}
 
-export const Route = (route: string) => decorate(ROUTE, route)
 export default Route
+export function Route(route: string)
+{
+	return decorate(ROUTE, route)
+}
 
-export const routeOf = (target: ObjectOrType) => decoratorOf(target, ROUTE, '')
+export function routeOf(target: ObjectOrType)
+{
+	return decoratorOf(target, ROUTE, '')
+}

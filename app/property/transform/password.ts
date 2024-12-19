@@ -1,6 +1,6 @@
 import { KeyOf, ObjectOrType }     from '@itrocks/class-type'
+import { decorate, decoratorOf }   from '@itrocks/decorator/property'
 import { createHash }              from 'crypto'
-import { decorate, decoratorOf }   from '../../decorator/property'
 import tr                          from '../../locale/translate'
 import { displayOf }               from '../../view/property/display'
 import { EDIT, HTML, IGNORE }      from './transformer'
@@ -43,5 +43,7 @@ export function Password<T extends object>(value = true)
 		: parent
 }
 
-export const passwordOf = <T extends object>(target: ObjectOrType<T>, property: KeyOf<T>) =>
-	decoratorOf(target, property, PASSWORD, false)
+export function passwordOf<T extends object>(target: ObjectOrType<T>, property: KeyOf<T>)
+{
+	return decoratorOf(target, property, PASSWORD, false)
+}

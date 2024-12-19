@@ -1,12 +1,16 @@
 import { KeyOf, ObjectOrType }                   from '@itrocks/class-type'
+import { decorateCallback, decoratorOfCallback } from '@itrocks/decorator/property'
 import { toDisplay }                             from '@itrocks/rename'
-import { decorateCallback, decoratorOfCallback } from '../../decorator/property'
 
 const DISPLAY = Symbol('display')
 
-export const Display = <T extends object>(name = '') =>
-	decorateCallback<T>(DISPLAY, (_, property) => name.length ? name : toDisplay(property))
 export default Display
+export function Display<T extends object>(name = '')
+{
+	return decorateCallback<T>(DISPLAY, (_, property) => name.length ? name : toDisplay(property))
+}
 
-export const displayOf = <T extends object>(target: ObjectOrType<T>, property: KeyOf<T>) =>
-	decoratorOfCallback<string, T>(target, property, DISPLAY, (_, property) => toDisplay(property))
+export function displayOf<T extends object>(target: ObjectOrType<T>, property: KeyOf<T>)
+{
+	return decoratorOfCallback<string, T>(target, property, DISPLAY, (_, property) => toDisplay(property))
+}

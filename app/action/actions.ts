@@ -1,13 +1,15 @@
-import Type                      from '@itrocks/class-type'
-import { decorate, decoratorOf } from '../decorator/class'
+import { ObjectOrType }          from '@itrocks/class-type'
+import { decorate, decoratorOf } from '@itrocks/decorator/class'
 
 const ACTIONS = Symbol('actions')
 
-export const Actions = (value: string[] = []) => decorate(ACTIONS, value)
 export default Actions
+export function Actions(value: string[] = [])
+{
+	return decorate(ACTIONS, value)
+}
 
-export const actionsOf = (target: Type) => decoratorOf(
-	target,
-	ACTIONS,
-	['add', 'delete', 'edit', 'json', 'list', 'output', 'save']
-)
+export function actionsOf(target: ObjectOrType)
+{
+	return decoratorOf(target, ACTIONS, ['add', 'delete', 'edit', 'json', 'list', 'output', 'save'])
+}

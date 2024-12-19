@@ -1,7 +1,7 @@
 import { AnyObject, KeyOf }           from '@itrocks/class-type'
 import { ObjectOrType, Type }         from '@itrocks/class-type'
+import { decorate, decoratorOf }      from '@itrocks/decorator/class'
 import { routeOf }                    from '../action/route'
-import { decorate, decoratorOf }      from '../decorator/class'
 import { dao, HasEntity }             from '../dao/dao'
 import { Identifier, MayEntity }      from '../dao/dao'
 import tr                             from '../locale/translate'
@@ -11,7 +11,6 @@ import { EDIT, HTML, IGNORE }         from '../property/transform/transformer'
 import { INPUT, OUTPUT, SAVE, SQL }   from '../property/transform/transformer'
 import { HtmlContainer }              from '../property/transform/transformer'
 import { setPropertyTypeTransformer } from '../property/transform/transformer'
-import { Transformer }                from '../property/transform/transformer'
 import ReflectProperty                from '../property/reflect'
 import { CollectionType }             from '../property/type'
 import { representativeValueOf }      from '../view/class/representative'
@@ -20,10 +19,16 @@ import ReflectClass                   from './reflect'
 
 const COLLECTION = Symbol('collection')
 
-export const Collection = (value = true) => decorate(COLLECTION, value)
 export default Collection
+export function Collection(value = true)
+{
+	return decorate(COLLECTION, value)
+}
 
-export const collectionOf = (target: ObjectOrType) => decoratorOf(target, COLLECTION, false)
+export function collectionOf(target: ObjectOrType)
+{
+	return decoratorOf(target, COLLECTION, false)
+}
 
 Collection(true)(Array)
 Collection(true)(Set)
@@ -31,7 +36,7 @@ Collection(true)(Set)
 const areMayEntityEntries = (entries: [string, MayEntity | string][]): entries is [string, MayEntity][] =>
 	(typeof entries[0]?.[1])[0] === 'o'
 
-const collectionEdit: Transformer = <T extends object>(values: MayEntity[], object: T, property: KeyOf<T>) =>
+function collectionEdit<T extends object>(values: MayEntity[], object: T, property: KeyOf<T>)
 {
 	const propertyType = new ReflectProperty(object, property).collectionType
 	const fetch        = routeOf(propertyType?.elementType as Type) + '/summary'
@@ -51,9 +56,8 @@ const collectionEdit: Transformer = <T extends object>(values: MayEntity[], obje
 		+ '</ul>'
 }
 
-const collectionInput: Transformer = <T extends AnyObject>(
-	values: Record<string, MayEntity | string>, object: T, property: KeyOf<T>
-) => {
+function collectionInput<T extends AnyObject>(values: Record<string, MayEntity | string>, object: T, property: KeyOf<T>)
+{
 	const entries = Object.entries(values)
 	if (areMayEntityEntries(entries)) {
 		Object.assign(object, { [property]: entries.map(([id, value]) => dao.connectObject(value, +id)) })
@@ -65,9 +69,9 @@ const collectionInput: Transformer = <T extends AnyObject>(
 	return IGNORE
 }
 
-const collectionOutput: Transformer = async <T extends object, PT extends object>(
+async function collectionOutput<T extends object, PT extends object>(
 	values: MayEntity<PT>[], object: T, property: KeyOf<T>, askFor: HtmlContainer
-) => {
+) {
 	if (!values.length) {
 		return ''
 	}
@@ -94,9 +98,8 @@ const collectionOutput: Transformer = async <T extends object, PT extends object
 	return values.map(object => representativeValueOf(object)).join(', ')
 }
 
-const collectionSave: Transformer = async <T extends AnyObject>(
-	values: MayEntity[] | undefined, object: T, property: KeyOf<T>
-) => {
+async function collectionSave<T extends AnyObject>(values: MayEntity[] | undefined, object: T, property: KeyOf<T>)
+{
 	const newIdsPromise: Identifier[] = object[property + '_ids']
 		?? values?.map(async value => (dao.isObjectConnected(value) ? value : await dao.save(value)).id).sort()
 		?? []

@@ -1,14 +1,16 @@
 import { baseType, ObjectOrType }                from '@itrocks/class-type'
+import { decorateCallback, decoratorOfCallback } from '@itrocks/decorator/class'
 import { toDisplay }                             from '@itrocks/rename'
-import { decorateCallback, decoratorOfCallback } from '../../decorator/class'
 
 const DISPLAY = Symbol('display')
 
-export const Display = (name = '') => decorateCallback(
-	DISPLAY,
-	target => toDisplay(name.length ? name : target.name)
-)
 export default Display
+export function Display(name = '')
+{
+	return decorateCallback(DISPLAY, target => toDisplay(name.length ? name : target.name))
+}
 
-export const displayOf = <T extends object>(target: ObjectOrType<T>) =>
-	decoratorOfCallback<T, string>(target, DISPLAY, target => toDisplay(baseType(target).name))
+export function displayOf<T extends object>(target: ObjectOrType<T>)
+{
+	return decoratorOfCallback<T, string>(target, DISPLAY, target => toDisplay(baseType(target).name))
+}
