@@ -1,5 +1,6 @@
-import './class/compose'
+import '@itrocks/class-file/automation'
 import 'reflect-metadata'
+import './class/compose'
 
 import fastifyCookie       from '@fastify/cookie'
 import fastifyFormbody     from '@fastify/formbody'

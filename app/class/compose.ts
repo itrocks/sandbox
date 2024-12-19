@@ -4,7 +4,6 @@ import Type          from '@itrocks/class-type'
 import path          from 'path'
 import Route         from '../action/route'
 import { getRoute }  from '../action/routes'
-import File          from '../class/file'
 import config        from '../config/compose'
 import { initClass } from '../orm/orm'
 import Uses          from './uses'
@@ -16,10 +15,8 @@ function applyFileToType(module: any, file: string)
 	const type = module?.default
 	if (!isAnyType(type)) return module
 
-	let realType = baseType(type)
-	File(file)(realType)
-
-	const route = getRoute(file.slice(0, -3))
+	const realType = baseType(type)
+	const route    = getRoute(file.slice(0, -3))
 	if (route) {
 		Route(route)(realType)
 	}
