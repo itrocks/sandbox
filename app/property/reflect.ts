@@ -1,9 +1,9 @@
 import { KeyOf, Type }        from '@itrocks/class-type'
+import { CollectionType }     from '@itrocks/property-type'
 import { ReflectClass }       from '../class/reflect'
 import { applyTransformer }   from './transform/transformer'
 import { EDIT, HTML, OUTPUT } from './transform/transformer'
 import { HtmlContainer }      from './transform/transformer'
-import { CollectionType }     from './type'
 
 export class ReflectProperty<T extends object>
 {

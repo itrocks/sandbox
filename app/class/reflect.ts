@@ -1,10 +1,10 @@
 import { fileOf }                 from '@itrocks/class-file'
 import { isObject, KeyOf, Type }  from '@itrocks/class-type'
 import { typeIdentifier, typeOf } from '@itrocks/class-type'
+import { PropertyTypes }          from '@itrocks/property-type'
+import propertyTypesFromFile      from '@itrocks/property-type'
 import { SortedArray }            from '@itrocks/sorted-array'
 import { ReflectProperty }        from '../property/reflect'
-import { PropertyTypes }          from '../property/type'
-import { propertyTypesFromFile }  from '../property/type'
 import { usesOf }                 from './uses'
 
 const TYPES = Symbol('types')

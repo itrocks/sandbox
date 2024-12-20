@@ -11,6 +11,7 @@
 		"@itrocks/class-type": "latest",
 		"@itrocks/contenteditable": "latest",
 		"@itrocks/decorator": "latest",
+		"@itrocks/property-type": "latest",
 		"@itrocks/rename": "latest",
 		"@itrocks/table": "latest",
 		"@itrocks/template": "latest",

@@ -51,7 +51,7 @@ export abstract class Dao
 
 export interface Entity { id: Identifier }
 
-export type Identifier = bigint | number | string
+export type Identifier = BigInt | Number | String
 
 export type MayEntity<T extends object = object> = T | HasEntity<T>
 export type HasEntity<T extends object = object> = T & Entity

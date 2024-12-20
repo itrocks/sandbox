@@ -3,8 +3,8 @@ import { ObjectOrType }       from '@itrocks/class-type'
 import { prototypeOf }        from '@itrocks/class-type'
 import { typeOf, Type }       from '@itrocks/class-type'
 import { DecoratorOfType }    from '@itrocks/decorator/class'
+import { PrimitiveType }      from '@itrocks/property-type'
 import ReflectProperty        from '../reflect'
-import { PrimitiveType }      from '../type'
 
 const TRANSFORMERS = Symbol('transformers')
 
