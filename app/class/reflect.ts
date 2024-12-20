@@ -1,5 +1,6 @@
 import { fileOf }                 from '@itrocks/class-file'
-import { isObject, KeyOf, Type }  from '@itrocks/class-type'
+import { baseType, isObject }     from '@itrocks/class-type'
+import { KeyOf, Type }            from '@itrocks/class-type'
 import { typeIdentifier, typeOf } from '@itrocks/class-type'
 import { PropertyTypes }          from '@itrocks/property-type'
 import propertyTypesFromFile      from '@itrocks/property-type'
@@ -21,7 +22,7 @@ interface SortedPropertyNames<T extends object> extends SortedArray<KeyOf<T>>
 	includes(property: string): property is KeyOf<T>
 }
 
-export class ReflectClass<T extends object>
+export class ReflectClass<T extends object = object>
 {
 	readonly name:   string
 	readonly object: T | undefined
@@ -34,9 +35,10 @@ export class ReflectClass<T extends object>
 		this.name   = this.type.name
 	}
 
-	get parent()
+	get parent(): ReflectClass | null
 	{
-		const value = new ReflectClass(Object.getPrototypeOf(this.type))
+		const parentType = Object.getPrototypeOf(this.type)
+		const value      = (parentType === Function.prototype) ? null : new ReflectClass(baseType(parentType))
 		Object.defineProperty(this, 'parent', { value })
 		return value
 	}
@@ -75,7 +77,7 @@ export class ReflectClass<T extends object>
 			value = {}
 			Reflect.defineMetadata(TYPES, value, this.type, identifier)
 			const parent = this.parent
-			if (parent.name) {
+			if (parent?.name) {
 				Object.assign(value, parent.propertyTypes)
 			}
 			for (const uses of this.uses) {
