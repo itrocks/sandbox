@@ -2,7 +2,7 @@ import { isAnyType }      from '@itrocks/class-type'
 import { KeyOf, Type }    from '@itrocks/class-type'
 import { CollectionType } from '@itrocks/property-type'
 import ReflectClass       from '../class/reflect'
-import Dao                from '../dao/dao'
+import { dao }            from '../dao/dao'
 import { storeOf }        from '../dao/store'
 import ReflectProperty    from '../property/reflect'
 
@@ -20,8 +20,8 @@ function defineCollectionProperty<T extends object>(type: CollectionType<T>, pro
 			const elementType = type.elementType as Type
 			const ids         = this[property + '_ids']
 			return this[property] = ids
-				? await Dao.readMultiple(elementType, ids)
-				: await Dao.readCollection(this, property, elementType)
+				? await dao.readMultiple(elementType, ids)
+				: await dao.readCollection(this, property, elementType)
 		},
 
 		set(value) {
@@ -44,7 +44,7 @@ function defineObjectProperty<T extends object>(type: Type, property: KeyOf<T>, 
 
 		async get() {
 			const id = this[property + '_id']
-			return this[property] = id ? await Dao.read(type, id) : undefined
+			return this[property] = id ? await dao.read(type, id) : undefined
 		},
 
 		set(value) {
@@ -77,15 +77,37 @@ export function initClass<T extends object>(classType: Type<T>): Type<T> | undef
 		}
 	})()
 
-	for (const property of Object.values(new ReflectClass(classType).properties) satisfies ReflectProperty<T>[]) {
+	for (const property of Object.values(new ReflectClass(classType).properties) as ReflectProperty<T>[]) {
 		const type = property.type
 		if (!type) continue
 
-		if ((type instanceof CollectionType) && isAnyType(type.elementType))
+		if ((type instanceof CollectionType) && isAnyType(type.elementType)) {
 			properties.push(defineCollectionProperty(type, property.name, BuiltClass))
-		else if (isAnyType(type))
+		}
+		else if (isAnyType(type)) {
 			properties.push(defineObjectProperty(type, property.name, BuiltClass))
+		}
 	}
 
 	return properties.length ? BuiltClass : undefined
+}
+
+const Module = require('module')
+const superRequire: (...args: any) => typeof Module = Module.prototype.require
+
+Module.prototype.require = function()
+{
+	const original = superRequire.call(this, ...arguments)
+	let module: Record<string, any> | undefined
+	for (const [name, type] of Object.entries(original)) {
+		if (!isAnyType(type)) continue
+		const withORM = initClass(type)
+		if (!withORM) continue
+		if (!module) {
+			module = { ...original }
+		}
+		// @ts-ignore TS18048 but module is always initialized
+		module[name] = withORM
+	}
+	return module ?? original
 }

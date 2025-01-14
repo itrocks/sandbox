@@ -1,7 +1,7 @@
-import { access, readdir } from 'node:fs/promises'
-import { sep }             from 'path'
-
-const DEBUG = false
+import { baseType, isAnyType } from '@itrocks/class-type'
+import { access, readdir }     from 'fs/promises'
+import { normalize, sep }      from 'path'
+import { Route }               from './route'
 
 const walk = async (directoryName: string): Promise<string[]> =>
 {
@@ -22,10 +22,8 @@ const readDirRecursive = async (directoryName: string) =>
 
 export async function accessModule(path: string)
 {
-	if (DEBUG) console.log('try', path)
 	try { await access('./app' + path + '.js') }
 	catch { return }
-	if (DEBUG) console.log('> OK')
 	return path
 }
 
@@ -114,3 +112,27 @@ readDirRecursive(__dirname.slice(0, __dirname.lastIndexOf(sep))).then(entries =>
 	}
 	for (const [name, route] of Object.entries(routes)) simplify(routes, name, route)
 })
+
+const Module = require('module')
+const superRequire: (...args: any) => typeof Module = Module.prototype.require
+
+Module.prototype.require = function(file: string)
+{
+	const module = superRequire.call(this, ...arguments)
+	const type   = module?.default
+	if (!type || !isAnyType(type)) return module
+
+	if (file[0] === '.') {
+		file = this.path + ((this.path[this.path.length - 1] === '/') ? '' : '/') + file
+	}
+	file = normalize(require.resolve(file))
+	if (file[0] !== '/') return module
+
+	const realType = baseType(type)
+	const route    = getRoute(file.slice(0, -3))
+	if (!route) return module
+
+	Route(route)(realType)
+
+	return module
+}
