@@ -1,4 +1,6 @@
-export default {
+
+export default
+{
 	free: [
 		'/user/auth',
 		'/user/forgot',
