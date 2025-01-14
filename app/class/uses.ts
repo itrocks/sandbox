@@ -1,6 +1,6 @@
 import { baseType }              from '@itrocks/class-type'
 import { ObjectOrType, Type }    from '@itrocks/class-type'
-import { decorate, decoratorOf } from '@itrocks/decorator/class'
+import { decorate, ownDecoratorOf } from '@itrocks/decorator/class'
 
 export function Super<T extends object>(self: object): T
 {
@@ -13,7 +13,7 @@ function uses<T extends Type>(target: T, mixins: Type[]): T
 		[index: string]: any
 		constructor(...args: any[]) {
 			super(...args)
-			for (const mixin of mixins) this[mixin.name]()
+			for (const mixin of mixins) this[mixin.name](...args)
 		}
 	})()
 
@@ -32,8 +32,8 @@ function uses<T extends Type>(target: T, mixins: Type[]): T
 
 	for (const mixin of mixins) {
 		Object.defineProperty(BuiltClass.prototype, mixin.name, {
-			value: function() {
-				for (const [name, value] of Object.entries(new mixin)) this[name] = value
+			value: function(...args: any[]) {
+				Object.assign(this, new mixin(...args))
 			}
 		})
 	}
@@ -54,7 +54,7 @@ export function Uses<T extends object>(...mixins: Type[])
 
 export function usesOf(target: ObjectOrType, resolveBuiltClass = false)
 {
-	const usesOf = decoratorOf<Type[]>(target, USES, [])
+	const usesOf = ownDecoratorOf<Type[]>(target, USES, [])
 	return resolveBuiltClass
 		? usesOf.map(type => baseType(type))
 		: usesOf
