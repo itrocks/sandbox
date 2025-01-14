@@ -4,7 +4,7 @@ import { prototypeOf }        from '@itrocks/class-type'
 import { typeOf, Type }       from '@itrocks/class-type'
 import { DecoratorOfType }    from '@itrocks/decorator/class'
 import { PrimitiveType }      from '@itrocks/property-type'
-import ReflectProperty        from '../reflect'
+import { ReflectProperty }    from '@itrocks/reflect'
 
 const TRANSFORMERS = Symbol('transformers')
 

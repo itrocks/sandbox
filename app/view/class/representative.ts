@@ -1,6 +1,6 @@
 import { KeyOf, ObjectOrType, typeOf }           from '@itrocks/class-type'
 import { decorateCallback, decoratorOfCallback } from '@itrocks/decorator/class'
-import ReflectClass                              from '../../class/reflect'
+import { ReflectClass }                          from '@itrocks/reflect'
 import { requiredOf }                            from '../../property/validate/required'
 
 const REPRESENTATIVE = Symbol('representative')

@@ -1,10 +1,10 @@
-import { isAnyType }      from '@itrocks/class-type'
-import { KeyOf, Type }    from '@itrocks/class-type'
-import { CollectionType } from '@itrocks/property-type'
-import ReflectClass       from '../class/reflect'
-import { dao }            from '../dao/dao'
-import { storeOf }        from '../dao/store'
-import ReflectProperty    from '../property/reflect'
+import { isAnyType }       from '@itrocks/class-type'
+import { KeyOf, Type }     from '@itrocks/class-type'
+import { CollectionType }  from '@itrocks/property-type'
+import { ReflectClass }    from '@itrocks/reflect'
+import { ReflectProperty } from '@itrocks/reflect'
+import { dao }             from '../dao/dao'
+import { storeOf }         from '../dao/store'
 
 export const PROTECT_GET = Symbol('protectGet')
 

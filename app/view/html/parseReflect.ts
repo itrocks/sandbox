@@ -1,5 +1,5 @@
-import ReflectClass    from '../../class/reflect'
-import ReflectProperty from '../../property/reflect'
+import { ReflectClass }    from '@itrocks/reflect'
+import { ReflectProperty } from '@itrocks/reflect'
 
 export default function parseReflect(variable: string, data: any)
 {

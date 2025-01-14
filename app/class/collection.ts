@@ -2,20 +2,20 @@ import { AnyObject, KeyOf }           from '@itrocks/class-type'
 import { ObjectOrType, Type }         from '@itrocks/class-type'
 import { decorate, decoratorOf }      from '@itrocks/decorator/class'
 import { CollectionType }             from '@itrocks/property-type'
+import { ReflectClass }               from '@itrocks/reflect'
+import { ReflectProperty }            from '@itrocks/reflect'
 import { routeOf }                    from '../action/route'
 import { dao, HasEntity }             from '../dao/dao'
 import { Identifier, MayEntity }      from '../dao/dao'
-import tr                             from '../locale/translate'
+import { tr }                         from '../locale/translate'
 import { componentOf }                from '../orm/component'
 import { compositeOf }                from '../orm/composite'
 import { EDIT, HTML, IGNORE }         from '../property/transform/transformer'
 import { INPUT, OUTPUT, SAVE, SQL }   from '../property/transform/transformer'
 import { HtmlContainer }              from '../property/transform/transformer'
 import { setPropertyTypeTransformer } from '../property/transform/transformer'
-import ReflectProperty                from '../property/reflect'
 import { representativeValueOf }      from '../view/class/representative'
 import { displayOf }                  from '../view/property/display'
-import ReflectClass                   from './reflect'
 
 const COLLECTION = Symbol('collection')
 
@@ -69,7 +69,7 @@ function collectionInput<T extends AnyObject>(values: Record<string, MayEntity |
 	return IGNORE
 }
 
-async function collectionOutput<T extends object, PT extends object>(
+function collectionOutput<T extends object, PT extends object>(
 	values: MayEntity<PT>[], object: T, property: KeyOf<T>, askFor: HtmlContainer
 ) {
 	if (!values.length) {
