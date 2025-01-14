@@ -1,44 +1,41 @@
-import { baseType }  from '@itrocks/class-type'
-import { isAnyType } from '@itrocks/class-type'
-import Type          from '@itrocks/class-type'
-import path          from 'path'
-import Route         from '../action/route'
-import { getRoute }  from '../action/routes'
-import config        from '../config/compose'
-import { initClass } from '../orm/orm'
-import Uses          from './uses'
+import { inherits }  from '@itrocks/class-type'
+import { Type }      from '@itrocks/class-type'
+import { normalize } from 'path'
+import { config }    from '../config/compose'
+import { Uses }      from './uses'
 
-type SubstitutionModule = { __esModule: true, default?: Type }
-
-function applyFileToType(module: any, file: string)
+function configPath(config: string)
 {
-	const type = module?.default
-	if (!isAnyType(type)) return module
-
-	const realType = baseType(type)
-	const route    = getRoute(file.slice(0, -3))
-	if (route) {
-		Route(route)(realType)
-	}
-
-	const withORM = initClass(type)
-	if (withORM) {
-		module.default = withORM
-	}
-
-	return module
+	return normalize(require.resolve((config[0] === '/') ? ('..' + config) : config))
 }
 
-const replacements = Object.fromEntries(
-	Object.entries(config).map(([module, replacement]) => [
-		path.normalize(require.resolve('..' + module)),
-		(typeof replacement === 'object')
-			? replacement.map(replacement => path.normalize(require.resolve('..' + replacement)))
-			: path.normalize(require.resolve('..' + replacement))
-	])
-)
+const replacements: Record<string, Record<string, { script: string, export: string }[]>> = {}
 
-const cache: Record<string, SubstitutionModule> = {}
+// initReplacements
+for (let [module, configReplacements] of Object.entries(config)) {
+	let moduleExport: string
+	[module, moduleExport] = module.split(':')
+	module         = configPath(module)
+	moduleExport ??= 'default'
+	if (!replacements[module]) {
+		replacements[module] = {}
+	}
+	replacements[module][moduleExport] = []
+	for (let replacement of Array.isArray(configReplacements) ? configReplacements : [configReplacements]) {
+		let replacementExport: string
+		[replacement, replacementExport] = replacement.split(':')
+		replacement         = configPath(replacement)
+		replacementExport ??= 'default'
+		replacements[module][moduleExport].push({ script: replacement, export: replacementExport })
+	}
+}
+
+type CachedModule  = { __esModule: true } & Record<string, boolean | Type> // TODO Only __esModule should be bool
+const EXCLUDE     = 2
+const ORIGINAL    = 1
+const REPLACEMENT = 0
+const cache: Record<string, [CachedModule, CachedModule, string[]]> = {}
+
 const Module = require('module')
 const superRequire: (...args: any) => typeof Module = Module.prototype.require
 
@@ -46,27 +43,48 @@ Module.prototype.require = function(file: string)
 {
 	// resolve and normalize
 	if (file.startsWith('.')) {
-		file = this.path + (this.path.endsWith('/') ? '' : '/') + file
+		file = this.path + (this.path.endsWith('/') ? file : ('/' + file))
 	}
-	file = path.normalize(require.resolve(file))
+	file = normalize(require.resolve(file))
 	// from cache
 	if (cache[file]) {
-		return cache[file]
+		const which = cache[file][EXCLUDE].includes(this.filename)
+			? ORIGINAL
+			: REPLACEMENT
+		return cache[file][which]
 	}
 	// no replacement
-	let replacementFiles = replacements[file]
-	if (!replacementFiles) {
-		return cache[file] = applyFileToType(superRequire.call(this, ...arguments), file)
+	let exportEntries = replacements[file]
+	if (!exportEntries) {
+		const original = superRequire.call(this, ...arguments)
+		cache[file]    = [original, original, []]
+		return original
 	}
-	// require parent
-	const module: SubstitutionModule = { __esModule: true }
-	cache[file]        = module
-	const parentModule = applyFileToType(superRequire.call(this, ...arguments), file)
+	// require original
+	const module: CachedModule = { __esModule: true }
+	const original             = superRequire.call(this, ...arguments)
+	const replacementFiles     = new Array<string>()
+	cache[file]                = [module, original, replacementFiles]
+	Object.assign(module, original)
 	// compose
-	if (typeof replacementFiles !== 'object') {
-		replacementFiles = [replacementFiles]
+	for (const [moduleExport, replacementEntries] of Object.entries(exportEntries)) {
+		const replacementTypes = replacementEntries.map((entry): Type => {
+			if (!replacementFiles.includes(entry.script)) {
+				replacementFiles.push(entry.script)
+			}
+			return this.require(entry.script)[entry.export]
+		})
+		const originalType = original[moduleExport]
+		let replacementType: Type | undefined
+		for (let replacementTypeIndex = 0; replacementTypeIndex < replacementTypes.length; replacementTypeIndex ++) {
+			if (inherits(replacementTypes[replacementTypeIndex], originalType)) {
+				replacementType = replacementTypes.splice(replacementTypeIndex, 1)[0]
+				break
+			}
+		}
+		module[moduleExport] = replacementType
+			? (replacementTypes.length ? Uses(...replacementTypes)(replacementType) : replacementType)
+			: Uses(...replacementTypes)(originalType)
 	}
-	const replacementTypes = replacementFiles.map((file): Type => this.require(file).default)
-	module.default = Uses(...replacementTypes)(parentModule.default)
 	return module
 }
