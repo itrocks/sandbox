@@ -14,7 +14,7 @@
 <main>
 <!--BEGIN-->
 
-	<article data-action="list" data-class="{type.%name}" data-route="{type.@route}">
+	<article data-action="list" data-class="{type.name}" data-route="{type.@route}">
 		<header>
 			<h2>{type.@output.ucFirst} list</h2>
 			<section class="summary">{objects.length} elements</section>
@@ -37,7 +37,7 @@
 					<tr>
 						<th class="select"><input name="id" type="checkbox" value="{id}"></th>
 						<!--%properties.*-->
-						<td>{%outputOptionalContainer}</td>
+						<td>{outputOptionalContainer}</td>
 						<!--end-->
 					</tr>
 					<!--end-->
