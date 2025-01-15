@@ -3,7 +3,7 @@ import { KeyOf, Type }     from '@itrocks/class-type'
 import { CollectionType }  from '@itrocks/property-type'
 import { ReflectClass }    from '@itrocks/reflect'
 import { ReflectProperty } from '@itrocks/reflect'
-import { dao }             from '../dao/dao'
+import { dataSource }      from '@itrocks/storage'
 import { storeOf }         from '../dao/store'
 
 export const PROTECT_GET = Symbol('protectGet')
@@ -20,8 +20,8 @@ function defineCollectionProperty<T extends object>(type: CollectionType<T>, pro
 			const elementType = type.elementType as Type
 			const ids         = this[property + '_ids']
 			return this[property] = ids
-				? await dao.readMultiple(elementType, ids)
-				: await dao.readCollection(this, property, elementType)
+				? await dataSource().readMultiple(elementType, ids)
+				: await dataSource().readCollection(this, property, elementType)
 		},
 
 		set(value) {
@@ -44,7 +44,7 @@ function defineObjectProperty<T extends object>(type: Type, property: KeyOf<T>, 
 
 		async get() {
 			const id = this[property + '_id']
-			return this[property] = id ? await dao.read(type, id) : undefined
+			return this[property] = id ? await dataSource().read(type, id) : undefined
 		},
 
 		set(value) {

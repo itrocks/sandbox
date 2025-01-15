@@ -3,19 +3,20 @@ import { KeyOf, ObjectOrType, Type } from '@itrocks/class-type'
 import { ReflectClass }              from '@itrocks/reflect'
 import { ReflectProperty }           from '@itrocks/reflect'
 import { toColumn }                  from '@itrocks/rename'
+import { DataSource }                from '@itrocks/storage'
+import { Entity, MayEntity }         from '@itrocks/storage'
+import { Identifier, SearchType }    from '@itrocks/storage'
 import mariadb                       from 'mariadb'
 import { componentOf }               from '../orm/component'
 import { PROTECT_GET }               from '../orm/orm'
 import { applyTransformer, IGNORE }  from '../property/transform/transformer'
 import { READ, SAVE, SQL }           from '../property/transform/transformer'
-import { Dao, HasEntity, MayEntity } from './dao'
-import { Identifier, SearchType }    from './dao'
 import DaoFunction                   from './functions'
 import { storeOf }                   from './store'
 
 const DEBUG = false
 
-export default class Mysql extends Dao
+export default class Mysql extends DataSource
 {
 
 	connection?: mariadb.Connection
@@ -34,20 +35,20 @@ export default class Mysql extends Dao
 		return this.connection = await mariadb.createConnection(mariaDbConfig)
 	}
 
-	async delete<T extends object>(object: HasEntity<T>, property: KeyOf<HasEntity<T>> = 'id')
+	async delete<T extends object>(object: Entity<T>, property: KeyOf<Entity<T>> = 'id')
 	{
 		await this.deleteId(object, object[property], property)
 		return this.disconnectObject(object)
 	}
 
-	async deleteId<T extends object>(type: ObjectOrType<T>, id: any, property: KeyOf<HasEntity<T>> = 'id')
+	async deleteId<T extends object>(type: ObjectOrType<T>, id: any, property: KeyOf<Entity<T>> = 'id')
 	{
 		const connection = this.connection ?? await this.connect()
 		if (DEBUG) console.log('DELETE FROM `' + storeOf(type) + '` WHERE ' + toColumn(property) + ' = ?', [id])
 		await connection.query('DELETE FROM `' + storeOf(type) + '` WHERE ' + toColumn(property) + ' = ?', [id])
 	}
 
-	async deleteLink<T extends HasEntity>(object: T, property: KeyOf<T>, id: Identifier)
+	async deleteLink<T extends Entity>(object: T, property: KeyOf<T>, id: Identifier)
 	{
 		const connection = this.connection ?? await this.connect()
 
@@ -82,7 +83,7 @@ export default class Mysql extends Dao
 		return entity
 	}
 
-	async insertLink<T extends HasEntity>(object: T, property: KeyOf<T>, id: Identifier)
+	async insertLink<T extends Entity>(object: T, property: KeyOf<T>, id: Identifier)
 	{
 		const connection = this.connection ?? await this.connect()
 
@@ -126,7 +127,7 @@ export default class Mysql extends Dao
 		const connection = this.connection ?? await this.connect()
 
 		if (DEBUG) console.log('SELECT * FROM `' + storeOf(type) + '` WHERE id = ?', [id])
-		const rows: HasEntity<T>[] = await connection.query(
+		const rows: Entity<T>[] = await connection.query(
 			'SELECT * FROM `' + storeOf(type) + '` WHERE id = ?',
 			[id]
 		)
@@ -135,7 +136,7 @@ export default class Mysql extends Dao
 	}
 
 	async readCollection<T extends object, PT extends object>(
-		object:   HasEntity<T>,
+		object:   Entity<T>,
 		property: KeyOf<T>,
 		type = new ReflectProperty(object, property).collectionType.elementType as Type<PT>
 	) {
@@ -154,13 +155,13 @@ export default class Mysql extends Dao
 				+ ' INNER JOIN `' + joinTable + '` ON `' + joinTable + '`.' + table + '_id = `' + table + '`.id'
 				+ ' WHERE `' + joinTable + '`.' + objectTable + '_id = ?'
 		}
-		const rows: HasEntity<PT>[] = await connection.query(query, [object.id])
+		const rows: Entity<PT>[] = await connection.query(query, [object.id])
 
 		return Promise.all(rows.map(row => this.valuesFromDb(row, type)))
 	}
 
 	async readCollectionIds<T extends object, PT extends object>(
-		object:   HasEntity<T>,
+		object:   Entity<T>,
 		property: KeyOf<T>,
 		type = new ReflectProperty(object, property).collectionType.elementType as Type<PT>
 	) {
@@ -190,7 +191,7 @@ export default class Mysql extends Dao
 
 		const questionMarks = Array(ids.length).fill('?').join(', ')
 		if (DEBUG) console.log('SELECT * FROM `' + storeOf(type) + '` WHERE id IN (' + questionMarks + ')', ids)
-		const rows: HasEntity<T>[] = await connection.query(
+		const rows: Entity<T>[] = await connection.query(
 			'SELECT * FROM `' + storeOf(type) + '` WHERE id IN (' + questionMarks + ')',
 			ids
 		)
@@ -205,14 +206,14 @@ export default class Mysql extends Dao
 			: this.insert(object)
 	}
 
-	async search<T extends object>(type: Type<T>, search: SearchType<T> = {})
+	async search<T extends object>(type: Type<T>, search: SearchType<T> = {}): Promise<Entity<T>[]>
 	{
 		const connection = this.connection ?? await this.connect()
 
 		const sql      = this.propertiesToSearchSql(search)
 		const [values] = await this.valuesToDb(search, type)
 		if (DEBUG) console.log('SELECT * FROM `' + storeOf(type) + '`' + sql, '[', values, ']')
-		const rows: HasEntity<T>[] = await connection.query(
+		const rows: Entity<T>[] = await connection.query(
 			'SELECT * FROM `' + storeOf(type) + '`' + sql,
 			Object.values(values)
 		)
@@ -220,7 +221,7 @@ export default class Mysql extends Dao
 		return Promise.all(rows.map(row => this.valuesFromDb(row, type)))
 	}
 
-	async update<T extends object>(object: HasEntity<T>)
+	async update<T extends object>(object: Entity<T>)
 	{
 		const connection = this.connection ?? await this.connect()
 
@@ -236,10 +237,10 @@ export default class Mysql extends Dao
 		return object
 	}
 
-	async valuesFromDb<T extends object>(row: HasEntity<T>, type: Type<T>)
+	async valuesFromDb<T extends object>(row: Entity<T>, type: Type<T>)
 	{
-		const object = (new type) as HasEntity<T>
-		let property: KeyOf<HasEntity<T>>
+		const object = (new type) as Entity<T>
+		let property: KeyOf<Entity<T>>
 		for (property in row) {
 			const value = await applyTransformer(row[property], object, property, SQL, READ, row)
 			if (value === IGNORE) continue

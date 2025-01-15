@@ -1,5 +1,5 @@
 import { StringObject, Type } from '@itrocks/class-type'
-import { dao, HasEntity }     from '../dao/dao'
+import { dataSource, Entity } from '@itrocks/storage'
 import ServerRequest          from '../server/request'
 import Exception              from './exception'
 import formats                from './formats'
@@ -7,11 +7,11 @@ import { getModule }          from './routes'
 
 export default class Request<T extends object = object>
 {
-	action                     = ''
-	format                     = ''
-	ids:     string[]          = []
-	objects: (HasEntity & T)[] = []
-	route                      = ''
+	action               = ''
+	format               = ''
+	ids:     string[]    = []
+	objects: Entity<T>[] = []
+	route                = ''
 
 	constructor(public request: ServerRequest)
 	{
@@ -41,7 +41,7 @@ export default class Request<T extends object = object>
 		this.objects = []
 		const type = this.type
 		return Promise.all(this.ids.map(async id => {
-			const object = await dao.read(type, id)
+			const object = await dataSource().read(type, id)
 			this.objects.push(object)
 			return object
 		}))

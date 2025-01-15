@@ -1,3 +1,4 @@
+import dataSource      from '@itrocks/storage'
 import { htmlToText }  from 'html-to-text'
 import * as fs         from 'node:fs/promises'
 import mailer          from 'nodemailer'
@@ -6,7 +7,6 @@ import Action          from '../../action/action'
 import Save            from '../../action/builtIn/save/save'
 import Request         from '../../action/request'
 import smtp            from '../../config/smtp'
-import dao             from '../../dao/dao'
 import { lessOrEqual } from '../../dao/functions'
 import { lang, tr }    from '../../locale/translate'
 import User            from '../user'
@@ -17,6 +17,7 @@ export default class Forgot extends Action
 
 	async html(request: Request<User>)
 	{
+		const dao = dataSource()
 		let defaultUser  = new request.type
 		let templateName = 'forgot'
 		let user: User|undefined
@@ -77,6 +78,7 @@ export default class Forgot extends Action
 			}
 		}
 
-		return this.htmlTemplateResponse(user ?? defaultUser, request, __dirname + '/' + templateName + '.html')	}
+		return this.htmlTemplateResponse(user ?? defaultUser, request, __dirname + '/' + templateName + '.html')
+	}
 
 }

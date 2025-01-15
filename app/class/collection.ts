@@ -1,3 +1,5 @@
+import { dataSource, Entity }         from '@itrocks/storage'
+import { Identifier, MayEntity }      from '@itrocks/storage'
 import { AnyObject, KeyOf }           from '@itrocks/class-type'
 import { ObjectOrType, Type }         from '@itrocks/class-type'
 import { decorate, decoratorOf }      from '@itrocks/decorator/class'
@@ -5,8 +7,6 @@ import { CollectionType }             from '@itrocks/property-type'
 import { ReflectClass }               from '@itrocks/reflect'
 import { ReflectProperty }            from '@itrocks/reflect'
 import { routeOf }                    from '../action/route'
-import { dao, HasEntity }             from '../dao/dao'
-import { Identifier, MayEntity }      from '../dao/dao'
 import { tr }                         from '../locale/translate'
 import { componentOf }                from '../orm/component'
 import { compositeOf }                from '../orm/composite'
@@ -45,7 +45,7 @@ function collectionEdit<T extends object>(values: MayEntity[], object: T, proper
 	for (const object of values) {
 		const attrValue = `value="${representativeValueOf(object)}"`
 		inputs.push('<li>' + (
-			dao.isObjectConnected(object)
+			dataSource().isObjectConnected(object)
 			? `<input id="${property}.${object.id}" name="${property}.${object.id}" ${attrValue}>`
 			: `<input id="${property}." name="${property}." ${attrValue}>`
 		) + '</li>')
@@ -60,7 +60,7 @@ function collectionInput<T extends AnyObject>(values: Record<string, MayEntity |
 {
 	const entries = Object.entries(values)
 	if (areMayEntityEntries(entries)) {
-		Object.assign(object, { [property]: entries.map(([id, value]) => dao.connectObject(value, +id)) })
+		Object.assign(object, { [property]: entries.map(([id, value]) => dataSource().connectObject(value, +id)) })
 	}
 	else {
 		delete object[property]
@@ -100,13 +100,14 @@ function collectionOutput<T extends object, PT extends object>(
 
 async function collectionSave<T extends AnyObject>(values: MayEntity[] | undefined, object: T, property: KeyOf<T>)
 {
+	const dao = dataSource()
 	const newIdsPromise: Identifier[] = object[property + '_ids']
 		?? values?.map(async value => (dao.isObjectConnected(value) ? value : await dao.save(value)).id).sort()
 		?? []
 	const previousIdsPromise = dao.isObjectConnected(object)
 		? await dao.readCollectionIds<T, MayEntity>(object, property)
 		: []
-	return async (object: HasEntity<T>) => {
+	return async (object: Entity<T>) => {
 		const previousIds = await Promise.all(previousIdsPromise)
 		const newIds      = await Promise.all(newIdsPromise)
 		for (const id of previousIds) {

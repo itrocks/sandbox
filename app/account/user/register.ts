@@ -1,8 +1,8 @@
-import Action  from '../../action/action'
-import Save    from '../../action/builtIn/save/save'
-import Request from '../../action/request'
-import dao     from '../../dao/dao'
-import User    from '../user'
+import dataSource from '@itrocks/storage'
+import Action     from '../../action/action'
+import Save       from '../../action/builtIn/save/save'
+import Request    from '../../action/request'
+import User       from '../user'
 
 export default class Register extends Action
 {
@@ -16,13 +16,14 @@ export default class Register extends Action
 			await ((new Save).dataToObject(user, request.request.data))
 			const { email, login, password } = user
 			if (email.length && login.length && password.length) {
+				const dao   = dataSource()
 				const found = (await dao.search(User, {email}))[0]
 					|| (await dao.search(User, {login}))[0]
 					|| (await dao.search(User, {email: login}))[0]
 					|| (await dao.search(User, {login: email}))[0]
 				if (found) {
-					user = found
 					templateName = 'register-error'
+					user         = found
 				}
 				else {
 					await dao.save(user)

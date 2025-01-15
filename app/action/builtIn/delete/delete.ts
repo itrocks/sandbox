@@ -1,9 +1,9 @@
-import Action  from '../../../action/action'
-import Need    from '../../../action/need'
-import Request from '../../../action/request'
-import dao     from '../../../dao/dao'
-import tr      from '../../../locale/translate'
-import Confirm from '../confirm/confirm'
+import dataSource from '@itrocks/storage'
+import Action     from '../../../action/action'
+import Need       from '../../../action/need'
+import Request    from '../../../action/request'
+import tr         from '../../../locale/translate'
+import Confirm    from '../confirm/confirm'
 
 @Need('object')
 export default class Delete extends Action
@@ -20,7 +20,7 @@ export default class Delete extends Action
 
 		const objects = request.objects
 		for (const object of objects) {
-			await dao.delete(object)
+			await dataSource().delete(object)
 		}
 		return this.htmlTemplateResponse({ objects, type: request.type }, request, __dirname + '/delete.html')
 	}
@@ -29,7 +29,7 @@ export default class Delete extends Action
 	{
 		const objects = request.objects
 		for (const object of objects) {
-			await dao.delete(object)
+			await dataSource().delete(object)
 		}
 		return this.jsonResponse(objects)
 	}

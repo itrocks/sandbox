@@ -1,7 +1,7 @@
 import { ReflectClass }          from '@itrocks/reflect'
+import { dataSource }            from '@itrocks/storage'
 import Action                    from '../../../action/action'
 import Request                   from '../../../action/request'
-import { dao }                   from '../../../dao/dao'
 import { applyTransformer }      from '../../../property/transform/transformer'
 import { HTML, IGNORE }          from '../../../property/transform/transformer'
 import { INPUT }                 from '../../../property/transform/transformer'
@@ -25,7 +25,7 @@ export default class Save extends Action
 	{
 		const object = request.object ?? new request.type
 		await this.dataToObject(object, request.request.data)
-		await dao.save(object)
+		await dataSource().save(object)
 
 		return this.htmlTemplateResponse(object, request, __dirname + '/save.html')
 	}
@@ -34,7 +34,7 @@ export default class Save extends Action
 	{
 		const object = request.object ?? new request.type
 		await this.dataToObject(object, request.request.data)
-		await dao.save(object)
+		await dataSource().save(object)
 		return this.jsonResponse(object)
 	}
 

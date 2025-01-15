@@ -9,12 +9,14 @@ import { fastifyFormbody }  from '@fastify/formbody'
 import { fastifyMultipart } from '@fastify/multipart'
 import { fastifySession }   from '@fastify/session'
 import appDir               from '@itrocks/app-dir'
+import { createDataSource } from '@itrocks/storage'
 import { frontScripts }     from '@itrocks/template'
 import { fastify }          from 'fastify'
 import { FastifyReply }     from 'fastify'
 import { FastifyRequest }   from 'fastify'
 import { readFile, stat }   from 'node:fs/promises'
 import { parse }            from 'qs'
+import dataSourceConfig     from '../local/data-source'
 import secret               from '../local/secret'
 import sessionConfig        from '../local/session'
 import Action               from './action/action'
@@ -59,6 +61,8 @@ frontScripts.push(
 	'/node_modules/air-datepicker/locale/fr.js',
 	'/node_modules/autocompleter/autocomplete.es.js'
 )
+
+createDataSource(dataSourceConfig)
 
 async function execute(request: ActionRequest)
 {
