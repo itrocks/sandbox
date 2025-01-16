@@ -71,7 +71,7 @@ frontScripts.push(
 )
 
 mysqlDependsOn({
-	applyReadTransformer: async function(object, property, data) {
+	applyReadTransformer: async function(data, property, object) {
 		return applyTransformer(data[property], object, property, SQL, READ, data)
 	},
 	applySaveTransformer: async function(object, property, data) {
