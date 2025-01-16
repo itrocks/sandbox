@@ -1,3 +1,4 @@
+import { componentOf, compositeOf }   from '@itrocks/composition'
 import { dataSource, Entity }         from '@itrocks/storage'
 import { Identifier, MayEntity }      from '@itrocks/storage'
 import { AnyObject, KeyOf }           from '@itrocks/class-type'
@@ -8,8 +9,6 @@ import { ReflectClass }               from '@itrocks/reflect'
 import { ReflectProperty }            from '@itrocks/reflect'
 import { routeOf }                    from '../action/route'
 import { tr }                         from '../locale/translate'
-import { componentOf }                from '../orm/component'
-import { compositeOf }                from '../orm/composite'
 import { EDIT, HTML, IGNORE }         from '../property/transform/transformer'
 import { INPUT, OUTPUT, SAVE, SQL }   from '../property/transform/transformer'
 import { HtmlContainer }              from '../property/transform/transformer'
@@ -29,9 +28,6 @@ export function collectionOf(target: ObjectOrType)
 {
 	return decoratorOf(target, COLLECTION, false)
 }
-
-Collection(true)(Array)
-Collection(true)(Set)
 
 const areMayEntityEntries = (entries: [string, MayEntity | string][]): entries is [string, MayEntity][] =>
 	(typeof entries[0]?.[1])[0] === 'o'
@@ -112,14 +108,17 @@ async function collectionSave<T extends AnyObject>(values: MayEntity[] | undefin
 		const newIds      = await Promise.all(newIdsPromise)
 		for (const id of previousIds) {
 			if (newIds.includes(id)) continue
-			dao.deleteLink(object, property, id)
+			dao.deleteRelatedId(object, property, id)
 		}
 		for (const id of newIds) {
 			if (previousIds.includes(id)) continue
-			dao.insertLink(object, property, id)
+			dao.insertRelatedId(object, property, id)
 		}
 	}
 }
+
+Collection()(Array)
+Collection()(Set)
 
 setPropertyTypeTransformer(CollectionType, HTML, EDIT,   collectionEdit)
 setPropertyTypeTransformer(CollectionType, HTML, INPUT,  collectionInput)

@@ -9,6 +9,9 @@ import { fastifyFormbody }  from '@fastify/formbody'
 import { fastifyMultipart } from '@fastify/multipart'
 import { fastifySession }   from '@fastify/session'
 import appDir               from '@itrocks/app-dir'
+import { componentOf }      from '@itrocks/composition'
+import { mysqlDependsOn }   from '@itrocks/mysql'
+import { toColumn }         from '@itrocks/rename'
 import { createDataSource } from '@itrocks/storage'
 import { frontScripts }     from '@itrocks/template'
 import { fastify }          from 'fastify'
@@ -27,10 +30,15 @@ import { getActionModule }  from './action/routes'
 import staticRoutes         from './action/static-routes'
 import                           './class/collection'
 import access               from './config/access'
+import DaoFunction          from './dao/functions'
 import { storeOf }          from './dao/store'
 import { mimeTypes }        from './mime'
 import { utf8Types }        from './mime'
+import { PROTECT_GET }      from './orm/orm'
 import                           './property/transform/primitive'
+import { applyTransformer } from './property/transform/transformer'
+import { IGNORE }           from './property/transform/transformer'
+import { READ, SAVE, SQL }  from './property/transform/transformer'
 import { fastifyRequest }   from './server/fastify'
 import { fastifyResponse }  from './server/fastify'
 import { Request }          from './server/request'
@@ -61,6 +69,22 @@ frontScripts.push(
 	'/node_modules/air-datepicker/locale/fr.js',
 	'/node_modules/autocompleter/autocomplete.es.js'
 )
+
+mysqlDependsOn({
+	applyReadTransformer: async function(object, property, data) {
+		return applyTransformer(data[property], object, property, SQL, READ, data)
+	},
+	applySaveTransformer: async function(object, property, data) {
+		const value = Reflect.getMetadata(PROTECT_GET, object, property) ? undefined : await object[property]
+		return applyTransformer(value, object, property, SQL, SAVE, data)
+	},
+	columnOf:               toColumn,
+	componentOf:            componentOf,
+	ignoreTransformedValue: IGNORE,
+	QueryFunction:          DaoFunction,
+	queryFunctionCall:      value => [value.value, value.sql],
+	storeOf:                storeOf
+})
 
 createDataSource(dataSourceConfig)
 
