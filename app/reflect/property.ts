@@ -1,7 +1,7 @@
 import { ReflectProperty as RP } from '@itrocks/reflect'
-import { applyTransformer }      from '../property/transform/transformer'
-import { EDIT, HTML, OUTPUT }    from '../property/transform/transformer'
-import { HtmlContainer }         from '../property/transform/transformer'
+import { applyTransformer }      from '@itrocks/transformer'
+import { EDIT, HTML, OUTPUT }    from '@itrocks/transformer'
+import { HtmlContainer }         from '../view/html/transformer'
 import { ReflectClass }          from './class'
 
 export { ReflectProperty }

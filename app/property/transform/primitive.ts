@@ -1,10 +1,10 @@
 import { KeyOf, ObjectOrType }         from '@itrocks/class-type'
+import { setPropertyTypeTransformers } from '@itrocks/transformer'
+import { EDIT, HTML, INPUT, OUTPUT }   from '@itrocks/transformer'
+import { READ, SAVE, SQL }             from '@itrocks/transformer'
 import { format, parse }               from 'date-fns'
 import tr                              from '../../locale/translate'
 import { displayOf }                   from '../../view/property/display'
-import { setPropertyTypeTransformers } from './transformer'
-import { EDIT, HTML, INPUT, OUTPUT }   from './transformer'
-import { READ, SAVE, SQL }             from './transformer'
 
 const lfTab = '\n\t\t\t\t'
 

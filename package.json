@@ -19,6 +19,7 @@
 		"@itrocks/storage": "latest",
 		"@itrocks/table": "latest",
 		"@itrocks/template": "latest",
+		"@itrocks/transformer": "latest",
 		"@itrocks/xtarget": "latest",
 		"air-datepicker": "^3.5",
 		"autocompleter": "^9.3",
