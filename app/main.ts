@@ -4,12 +4,10 @@ import './class/compose'
 import './action/routes'
 import './orm/orm'
 
-import { fastifyCookie }     from '@fastify/cookie'
-import { fastifyFormbody }   from '@fastify/formbody'
-import { fastifyMultipart }  from '@fastify/multipart'
-import { fastifySession }    from '@fastify/session'
 import appDir                from '@itrocks/app-dir'
 import { componentOf }       from '@itrocks/composition'
+import { FastifyServer }     from '@itrocks/fastify'
+import { FileStore }         from '@itrocks/fastify-file-session-store'
 import { mysqlDependsOn }    from '@itrocks/mysql'
 import { toColumn }          from '@itrocks/rename'
 import { Request, Response } from '@itrocks/request-response'
@@ -18,11 +16,6 @@ import { frontScripts }      from '@itrocks/template'
 import { applyTransformer }  from '@itrocks/transformer'
 import { READ, SAVE, SQL }   from '@itrocks/transformer'
 import { trInit }            from '@itrocks/translate'
-import { fastify }           from 'fastify'
-import { FastifyReply }      from 'fastify'
-import { FastifyRequest }    from 'fastify'
-import { readFile, stat }    from 'node:fs/promises'
-import { parse }             from 'qs'
 import dataSourceConfig      from '../local/data-source'
 import secret                from '../local/secret'
 import sessionConfig         from '../local/session'
@@ -36,14 +29,9 @@ import                            './class/collection'
 import access                from './config/access'
 import DaoFunction           from './dao/functions'
 import { storeOf }           from './dao/store'
-import { mimeTypes }         from './mime'
-import { utf8Types }         from './mime'
 import { PROTECT_GET }       from './orm/orm'
 import { IGNORE }            from './property/transform/password'
 import                            './property/transform/primitive'
-import { fastifyRequest }    from './server/fastify'
-import { fastifyResponse }   from './server/fastify'
-import FileStore             from './session-file-store'
 import                            './view/html/transformer'
 
 frontScripts.push(
@@ -135,73 +123,12 @@ async function execute(request: ActionRequest)
 	return action[request.format](request)
 }
 
-async function httpCall(
-	originRequest: FastifyRequest<{ Params: Record<string, string> }>,
-	finalResponse: FastifyReply
-) {
-	const request = await fastifyRequest(originRequest)
-	const dot     = request.path.lastIndexOf('.') + 1
-	if ((dot > request.path.length - 6) && !request.path.includes('./')) {
-		const fileExtension = request.path.substring(dot)
-		if (
-			!['js', 'ts'].includes(fileExtension)
-			|| request.path.startsWith('/front/')
-			|| frontScripts.includes(request.path)
-		) {
-			const filePath = (request.path === '/favicon.ico') ? '/app/style/2020/logo/favicon.ico' : request.path
-			const mimeType = mimeTypes.get(fileExtension)
-			if (mimeType) {
-				return fastifyResponse(finalResponse, await httpAsset(request, appDir + filePath, mimeType))
-			}
-		}
-	}
-	try {
-		return fastifyResponse(finalResponse, await execute(new ActionRequest(request)))
-	}
-	catch (exception) {
-		console.error(request.path)
-		console.error(exception)
-		if (exception instanceof Exception) {
-			return fastifyResponse(finalResponse, exception.response)
-		}
-		else {
-			throw exception
-		}
-	}
-}
-
-async function httpAsset(request: Request, filePath: string, mimeType: string)
-{
-	const ifModified   = request.headers['if-modified-since']
-	const lastModified = new Date((await stat(filePath)).mtime)
-	if (ifModified && (new Date(ifModified) >= lastModified)) {
-		return new Response('', 304)
-	}
-	const utf8Type = utf8Types.has(mimeType)
-	const headers  = {
-		'Content-Type': mimeType + (utf8Type ? '; charset=utf-8' : ''),
-		'Last-Modified': lastModified.toUTCString()
-	}
-	return new Response(await readFile(filePath, utf8Type ? 'utf-8' : undefined), 200, headers)
-}
-
-const server = fastify({ trustProxy: true })
-
-server.register(fastifyCookie)
-server.register(fastifyFormbody, { parser: str => parse(str, { allowDots: true }) })
-server.register(fastifyMultipart)
-server.register(fastifySession, {
-	cookie:            { maxAge: 30 * 24 * 60 * 60 * 1000, sameSite: 'strict', secure: false },
-	cookieName:        'itrSid',
-	saveUninitialized: false,
+new FastifyServer({
+	assetPath: appDir,
+	execute: async (request: Request) => execute(new ActionRequest(request)),
+	favicon: '/app/style/2020/logo/favicon.ico',
+	frontScripts,
+	port: 3000,
 	secret,
-	store:             new FileStore(sessionConfig.path)
-})
-server.delete('/*', httpCall)
-server.get   ('/*', httpCall)
-server.post  ('/*', httpCall)
-server.put   ('/*', httpCall)
-
-server.listen({ port: 3000 }).then()
-
-console.log('server is listening on http://localhost:3000')
+	store: new FileStore(sessionConfig.path)
+}).run()
