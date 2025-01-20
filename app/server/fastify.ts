@@ -1,6 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { Method, Request }              from './request'
-import Response                         from './response'
+import { Method, Request, Response }    from '@itrocks/server'
 
 export const fastifyRequest = async (request: FastifyRequest<{ Params: Record<string, string> }>) =>
 {
@@ -31,7 +30,8 @@ export const fastifyRequest = async (request: FastifyRequest<{ Params: Record<st
 		params,
 		data,
 		files,
-		request.session
+		request.session,
+		request
 	)
 }
 

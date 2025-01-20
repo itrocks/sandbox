@@ -1,4 +1,4 @@
-import Response from '../server/response'
+import { Response } from '@itrocks/server'
 
 export default class Exception extends Error
 {

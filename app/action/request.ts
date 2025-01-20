@@ -1,10 +1,11 @@
-import { StringObject, Type } from '@itrocks/class-type'
-import { dataSource, Entity } from '@itrocks/storage'
-import ServerRequest          from '../server/request'
-import Exception              from './exception'
-import formats                from './formats'
-import { getModule }          from './routes'
+import { StringObject, Type }       from '@itrocks/class-type'
+import { dataSource, Entity }       from '@itrocks/storage'
+import { Request as ServerRequest } from '@itrocks/server'
+import Exception                    from './exception'
+import formats                      from './formats'
+import { getModule }                from './routes'
 
+export { Request }
 export default class Request<T extends object = object>
 {
 	action               = ''

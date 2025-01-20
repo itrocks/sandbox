@@ -1,11 +1,11 @@
 import { ReflectClass }          from '@itrocks/reflect'
+import { RecursiveStringObject } from '@itrocks/server'
 import { dataSource }            from '@itrocks/storage'
 import { applyTransformer }      from '@itrocks/transformer'
 import { HTML, INPUT }           from '@itrocks/transformer'
 import Action                    from '../../../action/action'
 import Request                   from '../../../action/request'
 import { IGNORE }                from '../../../property/transform/password'
-import { RecursiveStringObject } from '../../../server/request'
 
 export default class Save extends Action
 {

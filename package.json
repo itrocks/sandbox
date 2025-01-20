@@ -16,6 +16,7 @@
 		"@itrocks/property-type": "latest",
 		"@itrocks/reflect": "latest",
 		"@itrocks/rename": "latest",
+		"@itrocks/server":  "latest",
 		"@itrocks/storage": "latest",
 		"@itrocks/table": "latest",
 		"@itrocks/template": "latest",

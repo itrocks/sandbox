@@ -1,4 +1,4 @@
-import { Headers, Response } from '../response'
+import { Headers, Response } from '@itrocks/server'
 
 export default class JsonResponse extends Response
 {
