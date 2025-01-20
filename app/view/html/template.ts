@@ -1,7 +1,8 @@
-import { Template as T, VariableParser } from '@itrocks/template'
-import tr             from '../../locale/translate'
-import parseDecorator from './parseDecorator'
-import parseReflect   from './parseReflect'
+import { Template as T }  from '@itrocks/template'
+import { VariableParser } from '@itrocks/template'
+import tr                 from '@itrocks/translate'
+import parseDecorator     from './parseDecorator'
+import parseReflect       from './parseReflect'
 
 export default class Template extends T
 {

@@ -1,4 +1,5 @@
 import dataSource      from '@itrocks/storage'
+import { lang, tr }    from '@itrocks/translate'
 import { htmlToText }  from 'html-to-text'
 import * as fs         from 'node:fs/promises'
 import mailer          from 'nodemailer'
@@ -8,7 +9,6 @@ import Save            from '../../action/builtIn/save/save'
 import Request         from '../../action/request'
 import smtp            from '../../config/smtp'
 import { lessOrEqual } from '../../dao/functions'
-import { lang, tr }    from '../../locale/translate'
 import User            from '../user'
 import Token           from './token'
 
@@ -55,7 +55,7 @@ export default class Forgot extends Action
 					port:   config.port,
 					secure: config.secure,
 				})
-				const content = (await fs.readFile(__dirname + '/forgot-email-' + lang + '.html')) + ''
+				const content = (await fs.readFile(__dirname + '/forgot-email-' + lang() + '.html')) + ''
 				const link    = request.request.url + '?token=' + token.token
 				const from    = (smtp.from.name ? ('"' + smtp.from.name + '" ') : '') + '<' + smtp.from.email + '>'
 				const html    = content.replaceAll('app://(resetLink)', link)

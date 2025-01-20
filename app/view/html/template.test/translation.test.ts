@@ -1,4 +1,4 @@
-import { translations } from '../../../locale/translate'
+import { translations } from '@itrocks/translate'
 import Template         from '../template'
 
 class TemplateMockTranslate extends Template

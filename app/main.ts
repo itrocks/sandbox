@@ -16,6 +16,7 @@ import { createDataSource } from '@itrocks/storage'
 import { frontScripts }     from '@itrocks/template'
 import { applyTransformer } from '@itrocks/transformer'
 import { READ, SAVE, SQL }  from '@itrocks/transformer'
+import { trInit }           from '@itrocks/translate'
 import { fastify }          from 'fastify'
 import { FastifyReply }     from 'fastify'
 import { FastifyRequest }   from 'fastify'
@@ -69,6 +70,8 @@ frontScripts.push(
 	'/node_modules/air-datepicker/locale/fr.js',
 	'/node_modules/autocompleter/autocomplete.es.js'
 )
+
+trInit('fr-FR', appDir + '/app/locale/fr-FR.csv')
 
 mysqlDependsOn({
 	applyReadTransformer: async function(data, property, object) {

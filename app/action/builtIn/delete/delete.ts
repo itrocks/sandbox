@@ -1,8 +1,8 @@
 import dataSource from '@itrocks/storage'
+import tr         from '@itrocks/translate'
 import Action     from '../../../action/action'
 import Need       from '../../../action/need'
 import Request    from '../../../action/request'
-import tr         from '../../../locale/translate'
 import Confirm    from '../confirm/confirm'
 
 @Need('object')
