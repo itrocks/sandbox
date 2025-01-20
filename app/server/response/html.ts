@@ -1,4 +1,4 @@
-import { Headers, Response } from '@itrocks/server'
+import { Headers, Response } from '@itrocks/request-response'
 
 export default class HtmlResponse extends Response
 {

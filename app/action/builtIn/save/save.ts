@@ -1,5 +1,5 @@
 import { ReflectClass }          from '@itrocks/reflect'
-import { RecursiveStringObject } from '@itrocks/server'
+import { RecursiveStringObject } from '@itrocks/request-response'
 import { dataSource }            from '@itrocks/storage'
 import { applyTransformer }      from '@itrocks/transformer'
 import { HTML, INPUT }           from '@itrocks/transformer'

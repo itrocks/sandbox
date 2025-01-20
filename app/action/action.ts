@@ -1,4 +1,4 @@
-import { Headers }  from '@itrocks/server'
+import { Headers }  from '@itrocks/request-response'
 import HtmlResponse from '../server/response/html'
 import JsonResponse from '../server/response/json'
 import Template     from '../view/html/template'

@@ -1,4 +1,4 @@
-import { Request as ServerRequest } from '@itrocks/server'
+import { Request as ServerRequest } from '@itrocks/request-response'
 import { Request }                  from './request'
 
 function pathTuple(path: Partial<Request>)

@@ -1,5 +1,5 @@
+import { Method, Request, Response }    from '@itrocks/request-response'
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { Method, Request, Response }    from '@itrocks/server'
 
 export const fastifyRequest = async (request: FastifyRequest<{ Params: Record<string, string> }>) =>
 {

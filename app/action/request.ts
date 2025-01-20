@@ -1,6 +1,6 @@
 import { StringObject, Type }       from '@itrocks/class-type'
+import { Request as ServerRequest } from '@itrocks/request-response'
 import { dataSource, Entity }       from '@itrocks/storage'
-import { Request as ServerRequest } from '@itrocks/server'
 import Exception                    from './exception'
 import formats                      from './formats'
 import { getModule }                from './routes'
