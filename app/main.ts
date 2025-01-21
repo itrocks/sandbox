@@ -1,8 +1,12 @@
 import '@itrocks/class-file/automation'
-import 'reflect-metadata'
-import './class/compose'
-import './action/routes'
-import './orm/orm'
+
+import composeConfig from './config/compose'
+import compose       from '@itrocks/compose'
+compose(__dirname, composeConfig)
+
+import './orm/orm' // lazy-loading
+
+import './action/routes' // route
 
 import appDir                from '@itrocks/app-dir'
 import { componentOf }       from '@itrocks/composition'

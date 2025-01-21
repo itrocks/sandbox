@@ -5,6 +5,7 @@
 		"@itrocks/build": "latest",
 		"@itrocks/class-file": "latest",
 		"@itrocks/class-type": "latest",
+		"@itrocks/compose": "latest",
 		"@itrocks/composition": "latest",
 		"@itrocks/contenteditable": "latest",
 		"@itrocks/decorator": "latest",
