@@ -1,7 +1,6 @@
 import { StringObject, Type }       from '@itrocks/class-type'
 import { Request as ServerRequest } from '@itrocks/request-response'
 import { dataSource, Entity }       from '@itrocks/storage'
-import Exception                    from './exception'
 import formats                      from './formats'
 import { getModule }                from './routes'
 
@@ -19,9 +18,9 @@ export default class Request<T extends object = object>
 		Object.assign(this, this.parsePath())
 	}
 
-	get object()
+	get object() : Entity<T> | undefined
 	{
-		return this.objects.length ? this.objects[0] : undefined
+		return this.objects[0]
 	}
 
 	get type(): Type<T>
@@ -31,7 +30,7 @@ export default class Request<T extends object = object>
 
 		const type = require('..' + module).default
 		if ((typeof type)[0] !== 'f') {
-			throw new Exception('Module ' + this.route.substring(1) + ' default is not a class')
+			throw 'Module ' + this.route.substring(1) + ' default is not a class'
 		}
 		Object.defineProperty(this, 'type', { value: type })
 		return type
