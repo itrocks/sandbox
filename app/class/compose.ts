@@ -1,8 +1,8 @@
 import { inherits }  from '@itrocks/class-type'
 import { Type }      from '@itrocks/class-type'
+import { Uses }      from '@itrocks/uses'
 import { normalize } from 'path'
 import { config }    from '../config/compose'
-import { Uses }      from './uses'
 
 function configPath(config: string)
 {

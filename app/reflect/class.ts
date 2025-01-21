@@ -1,6 +1,6 @@
 import { PropertyTypes }      from '@itrocks/property-type'
 import { ReflectClass as RC } from '@itrocks/reflect'
-import { usesOf }             from '../class/uses'
+import { usesOf }             from '@itrocks/uses'
 import { ReflectProperty }    from './property'
 
 export { ReflectClass }

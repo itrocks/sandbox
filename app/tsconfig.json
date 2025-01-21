@@ -5,9 +5,9 @@
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
 		"plugins": [
-			{ "transform": "./action/static-routes-plugin.ts" },
-			{ "transform": "./class/uses-interface-plugin.ts" },
-			{ "transform": "./class/uses-interface-plugin.ts", "afterDeclarations": true }
+			{ "transform": "@itrocks/uses/uses-interface-plugin" },
+			{ "transform": "@itrocks/uses/uses-interface-plugin", "afterDeclarations": true },
+			{ "transform": "./action/static-routes-plugin.ts" }
 		],
 		"target": "ESNext"
 	},
