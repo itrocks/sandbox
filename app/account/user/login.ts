@@ -1,7 +1,7 @@
-import Action  from '../../action/action'
-import Request from '../../action/request'
-import Display from '../../view/class/display'
-import User    from '../user'
+import { Display } from '@itrocks/class-view'
+import { Action }  from '../../action/action'
+import { Request } from '../../action/request'
+import User        from '../user'
 
 @Display('user login')
 export default class Login extends Action

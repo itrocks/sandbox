@@ -4,6 +4,7 @@ import JsonResponse from '../server/response/json'
 import Template     from '../view/html/template'
 import Request      from './request'
 
+export { Action }
 export default class Action
 {
 

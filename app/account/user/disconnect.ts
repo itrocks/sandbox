@@ -1,6 +1,6 @@
-import Action  from '../../action/action'
-import Request from '../../action/request'
-import Display from '../../view/class/display'
+import { Display } from '@itrocks/class-view'
+import { Action }  from '../../action/action'
+import { Request } from '../../action/request'
 import User    from '../user'
 import Login   from './login'
 

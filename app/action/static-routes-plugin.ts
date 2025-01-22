@@ -1,6 +1,6 @@
-import { readFileSync }  from 'node:fs'
-import { writeFileSync } from 'node:fs'
-import path              from 'path'
+import { readFileSync }  from 'fs'
+import { writeFileSync } from 'fs'
+import { normalize }     from 'path'
 import ts                from 'typescript'
 
 // TODO support aliasing: import { Route as Alias } from './route' ; @Alias('/')
@@ -24,7 +24,7 @@ export default () => (context: ts.TransformationContext) => (sourceFile: ts.Sour
 	let   hasRoute = false
 	const validRoutes: Record<string, string> = {}
 
-	const rootLength = path.normalize(__dirname + '/..').length
+	const rootLength = normalize(__dirname + '/..').length
 	const module     = sourceFile.fileName.slice(rootLength, -3)
 
 	function isRoute(node: ts.Node): boolean
@@ -36,7 +36,7 @@ export default () => (context: ts.TransformationContext) => (sourceFile: ts.Sour
 
 		const fileName   = sourceFile.fileName
 		const filePath   = fileName.slice(0, fileName.lastIndexOf('/'))
-		const modulePath = path.normalize(filePath + '/' + moduleSpecifier.text)
+		const modulePath = normalize(filePath + '/' + moduleSpecifier.text)
 		if (modulePath !== __dirname + '/route') return false
 
 		if (node.importClause.name?.getText() === 'Route') {

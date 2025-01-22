@@ -4,16 +4,21 @@ import composeConfig from './config/compose'
 import compose       from '@itrocks/compose'
 compose(__dirname, composeConfig)
 
-import './orm/orm' // lazy-loading
+import { initLazyLoading } from '@itrocks/lazy-loading'
+initLazyLoading()
 
 import './action/routes' // route
 
 import appDir                    from '@itrocks/app-dir'
+import { classViewDependsOn }    from '@itrocks/class-view'
+import { displayOf }             from '@itrocks/class-view'
+import { representativeValueOf } from '@itrocks/class-view'
 import { initCollection }        from '@itrocks/collection'
 import { componentOf }           from '@itrocks/composition'
 import { initCoreTransformers }  from '@itrocks/core-transformers'
 import { FastifyServer }         from '@itrocks/fastify'
 import { FileStore }             from '@itrocks/fastify-file-session-store'
+import { PROTECT_GET }           from '@itrocks/lazy-loading'
 import { mysqlDependsOn }        from '@itrocks/mysql'
 import { toColumn }              from '@itrocks/rename'
 import { Request, Response }     from '@itrocks/request-response'
@@ -37,10 +42,8 @@ import { getActionModule }       from './action/routes'
 import staticRoutes              from './action/static-routes'
 import access                    from './config/access'
 import DaoFunction               from './dao/functions'
-import { PROTECT_GET }           from './orm/orm'
 import { IGNORE }                from './property/transform/password'
-import { displayOf }             from './view/class/display'
-import { representativeValueOf } from './view/class/representative'
+import { requiredOf }            from './property/validate/required'
 
 frontScripts.push(
 	'/node_modules/@itrocks/build/build.js',
@@ -65,6 +68,8 @@ frontScripts.push(
 	'/node_modules/air-datepicker/locale/fr.js',
 	'/node_modules/autocompleter/autocomplete.es.js'
 )
+
+classViewDependsOn({ requiredOf, tr })
 
 createDataSource(dataSourceConfig)
 

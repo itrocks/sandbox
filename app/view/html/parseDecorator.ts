@@ -1,11 +1,11 @@
+import { displayOf as classDisplayOf }    from '@itrocks/class-view'
+import { trOutputOf }                     from '@itrocks/class-view'
+import { displayOf as propertyDisplayOf } from '@itrocks/property-view'
 import { ReflectClass }                   from '@itrocks/reflect'
 import { ReflectProperty }                from '@itrocks/reflect'
 import { Str }                            from '@itrocks/rename'
 import { tr }                             from '@itrocks/translate'
 import { objectRouteOf, routeOf }         from '../../action/route'
-import { displayOf as classDisplayOf }    from '../class/display'
-import { trOutputOf }                     from '../class/output'
-import { displayOf as propertyDisplayOf } from '../property/display'
 
 export default function parseDecorator(variable: string, data: any)
 {
