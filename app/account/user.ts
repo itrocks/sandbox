@@ -1,4 +1,4 @@
-import Store          from '../dao/store'
+import Store          from '@itrocks/store'
 import Email          from '../property/validate/email'
 import Required       from '../property/validate/required'
 import Representative from '../view/class/representative'

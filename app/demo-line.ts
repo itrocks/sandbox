@@ -1,6 +1,6 @@
 import { Composite }  from '@itrocks/composition'
+import { Store }      from '@itrocks/store'
 import { Uses }       from '@itrocks/uses'
-import { Store }      from './dao/store'
 import HasName        from './core/has-name'
 import Demo           from './demo'
 import Representative from './view/class/representative'

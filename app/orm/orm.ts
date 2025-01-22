@@ -4,7 +4,7 @@ import { CollectionType }  from '@itrocks/property-type'
 import { ReflectClass }    from '@itrocks/reflect'
 import { ReflectProperty } from '@itrocks/reflect'
 import { dataSource }      from '@itrocks/storage'
-import { storeOf }         from '../dao/store'
+import { storeOf }         from '@itrocks/store'
 
 export const PROTECT_GET = Symbol('protectGet')
 

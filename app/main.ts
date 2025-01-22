@@ -8,35 +8,39 @@ import './orm/orm' // lazy-loading
 
 import './action/routes' // route
 
-import appDir                from '@itrocks/app-dir'
-import { componentOf }       from '@itrocks/composition'
-import { FastifyServer }     from '@itrocks/fastify'
-import { FileStore }         from '@itrocks/fastify-file-session-store'
-import { mysqlDependsOn }    from '@itrocks/mysql'
-import { toColumn }          from '@itrocks/rename'
-import { Request, Response } from '@itrocks/request-response'
-import { createDataSource }  from '@itrocks/storage'
-import { frontScripts }      from '@itrocks/template'
-import { applyTransformer }  from '@itrocks/transformer'
-import { READ, SAVE, SQL }   from '@itrocks/transformer'
-import { trInit }            from '@itrocks/translate'
-import dataSourceConfig      from '../local/data-source'
-import secret                from '../local/secret'
-import sessionConfig         from '../local/session'
-import Action                from './action/action'
-import Exception             from './action/exception'
-import { needOf }            from './action/need'
-import ActionRequest         from './action/request'
-import { getActionModule }   from './action/routes'
-import staticRoutes          from './action/static-routes'
-import                            './class/collection'
-import access                from './config/access'
-import DaoFunction           from './dao/functions'
-import { storeOf }           from './dao/store'
-import { PROTECT_GET }       from './orm/orm'
-import { IGNORE }            from './property/transform/password'
-import                            './property/transform/primitive'
-import                            './view/html/transformer'
+import appDir                    from '@itrocks/app-dir'
+import { initCollection }        from '@itrocks/collection'
+import { componentOf }           from '@itrocks/composition'
+import { initCoreTransformers }  from '@itrocks/core-transformers'
+import { FastifyServer }         from '@itrocks/fastify'
+import { FileStore }             from '@itrocks/fastify-file-session-store'
+import { mysqlDependsOn }        from '@itrocks/mysql'
+import { toColumn }              from '@itrocks/rename'
+import { Request, Response }     from '@itrocks/request-response'
+import { createDataSource }      from '@itrocks/storage'
+import { storeDependsOn }        from '@itrocks/store'
+import { storeOf }               from '@itrocks/store'
+import { frontScripts }          from '@itrocks/template'
+import { applyTransformer }      from '@itrocks/transformer'
+import { READ, SAVE, SQL }       from '@itrocks/transformer'
+import { tr, trInit }            from '@itrocks/translate'
+import { format, parse }         from 'date-fns'
+import dataSourceConfig          from '../local/data-source'
+import secret                    from '../local/secret'
+import sessionConfig             from '../local/session'
+import Action                    from './action/action'
+import Exception                 from './action/exception'
+import { needOf }                from './action/need'
+import ActionRequest             from './action/request'
+import { routeOf }               from './action/route'
+import { getActionModule }       from './action/routes'
+import staticRoutes              from './action/static-routes'
+import access                    from './config/access'
+import DaoFunction               from './dao/functions'
+import { PROTECT_GET }           from './orm/orm'
+import { IGNORE }                from './property/transform/password'
+import { displayOf }             from './view/class/display'
+import { representativeValueOf } from './view/class/representative'
 
 frontScripts.push(
 	'/node_modules/@itrocks/build/build.js',
@@ -62,7 +66,19 @@ frontScripts.push(
 	'/node_modules/autocompleter/autocomplete.es.js'
 )
 
-trInit('fr-FR', appDir + '/app/locale/fr-FR.csv')
+createDataSource(dataSourceConfig)
+
+initCollection()
+
+initCoreTransformers({
+	displayOf,
+	formatDate:             date => format(date, tr('dd/MM/yyyy', { ucFirst: false })),
+	ignoreTransformedValue: IGNORE,
+	parseDate:              date => parse(date, tr('dd/MM/yyyy', { ucFirst: false }), new Date),
+	representativeValueOf,
+	routeOf,
+	tr
+})
 
 mysqlDependsOn({
 	applyReadTransformer: async function(data, property, object) {
@@ -80,7 +96,11 @@ mysqlDependsOn({
 	storeOf:                storeOf
 })
 
-createDataSource(dataSourceConfig)
+storeDependsOn({
+	toStoreName: toColumn
+})
+
+trInit('fr-FR', appDir + '/app/locale/fr-FR.csv')
 
 async function execute(request: ActionRequest)
 {

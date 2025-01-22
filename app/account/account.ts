@@ -1,4 +1,4 @@
-import Store    from '../dao/store'
+import Store    from '@itrocks/store'
 import Password from '../property/transform/password'
 import Required from '../property/validate/required'
 

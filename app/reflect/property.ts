@@ -1,7 +1,7 @@
+import { HtmlContainer }         from '@itrocks/core-transformers'
 import { ReflectProperty as RP } from '@itrocks/reflect'
 import { applyTransformer }      from '@itrocks/transformer'
 import { EDIT, HTML, OUTPUT }    from '@itrocks/transformer'
-import { HtmlContainer }         from '../view/html/transformer'
 import { ReflectClass }          from './class'
 
 export { ReflectProperty }

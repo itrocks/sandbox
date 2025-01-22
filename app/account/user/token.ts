@@ -1,5 +1,5 @@
-import { randomBytes } from 'node:crypto'
-import Store           from '../../dao/store'
+import { Store }       from '@itrocks/store'
+import { randomBytes } from 'crypto'
 import User            from '../user'
 
 @Store('password_reset_token')
