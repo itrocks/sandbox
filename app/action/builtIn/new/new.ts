@@ -1,4 +1,4 @@
-import { Need, NOTHING } from '../../need'
+import { Need, NOTHING } from '@itrocks/action'
 import Edit              from '../edit/edit'
 
 @Need(NOTHING)

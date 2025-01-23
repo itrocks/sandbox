@@ -7,43 +7,48 @@ compose(__dirname, composeConfig)
 import { initLazyLoading } from '@itrocks/lazy-loading'
 initLazyLoading()
 
-import './action/routes' // route
+import { initRoutes } from '@itrocks/route'
+initRoutes()
 
-import appDir                    from '@itrocks/app-dir'
-import { classViewDependsOn }    from '@itrocks/class-view'
-import { displayOf }             from '@itrocks/class-view'
-import { representativeValueOf } from '@itrocks/class-view'
-import { initCollection }        from '@itrocks/collection'
-import { componentOf }           from '@itrocks/composition'
-import { initCoreTransformers }  from '@itrocks/core-transformers'
-import { FastifyServer }         from '@itrocks/fastify'
-import { FileStore }             from '@itrocks/fastify-file-session-store'
-import { PROTECT_GET }           from '@itrocks/lazy-loading'
-import { mysqlDependsOn }        from '@itrocks/mysql'
-import { toColumn }              from '@itrocks/rename'
-import { Request, Response }     from '@itrocks/request-response'
-import { createDataSource }      from '@itrocks/storage'
-import { storeDependsOn }        from '@itrocks/store'
-import { storeOf }               from '@itrocks/store'
-import { frontScripts }          from '@itrocks/template'
-import { applyTransformer }      from '@itrocks/transformer'
-import { READ, SAVE, SQL }       from '@itrocks/transformer'
-import { tr, trInit }            from '@itrocks/translate'
-import { format, parse }         from 'date-fns'
-import dataSourceConfig          from '../local/data-source'
-import secret                    from '../local/secret'
-import sessionConfig             from '../local/session'
-import Action                    from './action/action'
-import Exception                 from './action/exception'
-import { needOf }                from './action/need'
-import ActionRequest             from './action/request'
-import { routeOf }               from './action/route'
-import { getActionModule }       from './action/routes'
-import staticRoutes              from './action/static-routes'
-import access                    from './config/access'
-import DaoFunction               from './dao/functions'
-import { IGNORE }                from './property/transform/password'
-import { requiredOf }            from './property/validate/required'
+import { Action }                   from '@itrocks/action'
+import { needOf }                   from '@itrocks/action'
+import { Request as ActionRequest } from '@itrocks/action'
+import { requestDependsOn }         from '@itrocks/action'
+import appDir                       from '@itrocks/app-dir'
+import { classViewDependsOn }       from '@itrocks/class-view'
+import { displayOf }                from '@itrocks/class-view'
+import { representativeValueOf }    from '@itrocks/class-view'
+import { initCollection }           from '@itrocks/collection'
+import { componentOf }              from '@itrocks/composition'
+import { initCoreTransformers }     from '@itrocks/core-transformers'
+import { FastifyServer }            from '@itrocks/fastify'
+import { FileStore }                from '@itrocks/fastify-file-session-store'
+import { PROTECT_GET }              from '@itrocks/lazy-loading'
+import { mysqlDependsOn }           from '@itrocks/mysql'
+import { toColumn }                 from '@itrocks/rename'
+import { Headers }                  from '@itrocks/request-response'
+import { Request, Response }        from '@itrocks/request-response'
+import { routeOf }                  from '@itrocks/route'
+import { getActionModule }          from '@itrocks/route'
+import { getModule }                from '@itrocks/route'
+import { staticRoutes }             from '@itrocks/route'
+import { createDataSource }         from '@itrocks/storage'
+import { storeDependsOn }           from '@itrocks/store'
+import { storeOf }                  from '@itrocks/store'
+import { frontScripts }             from '@itrocks/template'
+import { applyTransformer }         from '@itrocks/transformer'
+import { READ, SAVE, SQL }          from '@itrocks/transformer'
+import { tr, trInit }               from '@itrocks/translate'
+import { format, parse }            from 'date-fns'
+import dataSourceConfig             from '../local/data-source'
+import secret                       from '../local/secret'
+import sessionConfig                from '../local/session'
+import Exception                    from './action/exception'
+import access                       from './config/access'
+import DaoFunction                  from './dao/functions'
+import { IGNORE }                   from './property/transform/password'
+import { requiredOf }               from './property/validate/required'
+import Template                     from './view/html/template'
 
 frontScripts.push(
 	'/node_modules/@itrocks/build/build.js',
@@ -101,11 +106,24 @@ mysqlDependsOn({
 	storeOf:                storeOf
 })
 
-storeDependsOn({
-	toStoreName: toColumn
-})
+requestDependsOn({ getModule: route => {
+	const module = getModule(route)
+	return module ? (appDir + '/app' + module) : module
+}})
+
+storeDependsOn({ toStoreName: toColumn })
 
 trInit('fr-FR', appDir + '/app/locale/fr-FR.csv')
+
+Action.prototype.htmlTemplateResponse = async function(
+	data: any, request: ActionRequest, templateFile: string, statusCode = 200, headers: Headers = {}
+) {
+	const template    = new Template(data, { action: request.action, request, session: request.request.session })
+	template.included = (request.request.headers['sec-fetch-dest'] === 'empty')
+	return this.htmlResponse(
+		await template.parseFile(templateFile, appDir + '/app/home/container.html'), statusCode, headers
+	)
+}
 
 async function execute(request: ActionRequest)
 {

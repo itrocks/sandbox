@@ -1,8 +1,8 @@
+import { Action }      from '@itrocks/action'
+import { Need }        from '@itrocks/action'
+import { PdfResponse } from '@itrocks/core-responses'
 import PDFDocument     from 'pdfkit'
 import { PassThrough } from 'stream'
-import Action          from '../../../action/action'
-import Need            from '../../../action/need'
-import PdfResponse     from '../../../server/response/pdf'
 
 @Need('object')
 export default class Print extends Action

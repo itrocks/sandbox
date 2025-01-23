@@ -4,8 +4,8 @@ import { displayOf as propertyDisplayOf } from '@itrocks/property-view'
 import { ReflectClass }                   from '@itrocks/reflect'
 import { ReflectProperty }                from '@itrocks/reflect'
 import { Str }                            from '@itrocks/rename'
+import { objectRouteOf, routeOf }         from '@itrocks/route'
 import { tr }                             from '@itrocks/translate'
-import { objectRouteOf, routeOf }         from '../../action/route'
 
 export default function parseDecorator(variable: string, data: any)
 {

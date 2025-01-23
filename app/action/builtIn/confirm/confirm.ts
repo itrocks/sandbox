@@ -1,6 +1,6 @@
-import { v4 }  from 'uuid'
-import Action  from '../../action'
-import Request from '../../request'
+import { Action }  from '@itrocks/action'
+import { Request } from '@itrocks/action'
+import { v4 }      from 'uuid'
 
 export default class Confirm extends Action
 {

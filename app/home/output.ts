@@ -1,8 +1,8 @@
-import Action      from '../action/action'
-import Need        from '../action/need'
-import { NOTHING } from '../action/need'
-import Route       from '../action/route'
-import Request     from '../action/request'
+import { Action }  from '@itrocks/action'
+import { Need }    from '@itrocks/action'
+import { NOTHING } from '@itrocks/action'
+import { Request } from '@itrocks/action'
+import { Route }   from '@itrocks/route'
 
 @Need(NOTHING)
 @Route('/')

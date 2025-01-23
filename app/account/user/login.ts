@@ -1,6 +1,6 @@
+import { Action }  from '@itrocks/action'
+import { Request } from '@itrocks/action'
 import { Display } from '@itrocks/class-view'
-import { Action }  from '../../action/action'
-import { Request } from '../../action/request'
 import User        from '../user'
 
 @Display('user login')

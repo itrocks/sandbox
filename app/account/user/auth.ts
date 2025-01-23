@@ -1,8 +1,8 @@
-import dataSource from '@itrocks/storage'
-import Action     from '../../action/action'
-import Save       from '../../action/builtIn/save/save'
-import Request    from '../../action/request'
-import User       from '../user'
+import { Action }     from '@itrocks/action'
+import { Request }    from '@itrocks/action'
+import { dataSource } from '@itrocks/storage'
+import Save           from '../../action/builtIn/save/save'
+import User           from '../user'
 
 export default class Auth extends Action
 {

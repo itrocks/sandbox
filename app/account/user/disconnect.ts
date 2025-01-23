@@ -1,8 +1,8 @@
+import { Action }  from '@itrocks/action'
+import { Request } from '@itrocks/action'
 import { Display } from '@itrocks/class-view'
-import { Action }  from '../../action/action'
-import { Request } from '../../action/request'
-import User    from '../user'
-import Login   from './login'
+import User        from '../user'
+import Login       from './login'
 
 @Display('user login')
 export default class Disconnect extends Action

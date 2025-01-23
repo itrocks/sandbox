@@ -1,9 +1,9 @@
-import dataSource from '@itrocks/storage'
-import tr         from '@itrocks/translate'
-import Action     from '../../../action/action'
-import Need       from '../../../action/need'
-import Request    from '../../../action/request'
-import Confirm    from '../confirm/confirm'
+import { Action }  from '@itrocks/action'
+import { Need }    from '@itrocks/action'
+import { Request } from '@itrocks/action'
+import dataSource  from '@itrocks/storage'
+import tr          from '@itrocks/translate'
+import Confirm     from '../confirm/confirm'
 
 @Need('object')
 export default class Delete extends Action

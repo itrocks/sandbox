@@ -1,7 +1,7 @@
-import dataSource from '@itrocks/storage'
-import Action     from '../../action'
-import Need       from '../../need'
-import Request    from '../../request'
+import { Action }     from '@itrocks/action'
+import { Need }       from '@itrocks/action'
+import { Request }    from '@itrocks/action'
+import { dataSource } from '@itrocks/storage'
 
 @Need('Store')
 export default class Summary extends Action

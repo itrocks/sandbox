@@ -1,12 +1,12 @@
 .idea
 .sass-cache
 .yalc
-node_modules
 
 /coverage
 /local/*
 	!/local/*-example.*
 	!/local/session/contains-session-data
+/node_modules
 /package-lock.json
 /yalc.lock
 

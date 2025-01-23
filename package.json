@@ -1,6 +1,7 @@
 {
 	"author": "Baptiste Pillot",
 	"dependencies": {
+		"@itrocks/action": "latest",
 		"@itrocks/app-dir": "latest",
 		"@itrocks/build": "latest",
 		"@itrocks/class-file": "latest",
@@ -10,6 +11,7 @@
 		"@itrocks/compose": "latest",
 		"@itrocks/composition": "latest",
 		"@itrocks/contenteditable": "latest",
+		"@itrocks/core-responses": "latest",
 		"@itrocks/core-transformers": "latest",
 		"@itrocks/decorator": "latest",
 		"@itrocks/fastify": "latest",
@@ -21,6 +23,7 @@
 		"@itrocks/reflect": "latest",
 		"@itrocks/rename": "latest",
 		"@itrocks/request-response": "latest",
+		"@itrocks/route": "latest",
 		"@itrocks/storage": "latest",
 		"@itrocks/store": "latest",
 		"@itrocks/table": "latest",
