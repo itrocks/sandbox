@@ -5,7 +5,7 @@ import { v4 }      from 'uuid'
 export default class Confirm extends Action
 {
 
-	confirmed(request: Request)
+	confirmed(request: Request): Request | undefined
 	{
 		const data             = request.request.data
 		const session          = request.request.session
@@ -14,6 +14,7 @@ export default class Confirm extends Action
 		if (!confirmedRequest) return
 
 		delete session.confirm[confirm]
+		confirmedRequest.request.raw     = request.request.raw
 		confirmedRequest.request.session = session
 		return confirmedRequest
 	}
@@ -25,8 +26,11 @@ export default class Confirm extends Action
 		if (!session.confirm) {
 			session.confirm = {}
 		}
-		session.confirm[hash] = Object.assign(request)
-		delete session.confirm[hash].request.session
+		const requestClone    = Object.assign(Object.create(Object.getPrototypeOf(request)), request)
+		requestClone.request  = Object.assign(Object.create(Object.getPrototypeOf(request.request)), request.request)
+		delete requestClone.request.raw
+		delete requestClone.request.session
+		session.confirm[hash] = requestClone
 		return hash
 	}
 
