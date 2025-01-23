@@ -20,6 +20,7 @@ import { representativeValueOf }    from '@itrocks/class-view'
 import { initCollection }           from '@itrocks/collection'
 import { componentOf }              from '@itrocks/composition'
 import { initCoreTransformers }     from '@itrocks/core-transformers'
+import { initStoreTransformers }    from '@itrocks/core-transformers'
 import { FastifyServer }            from '@itrocks/fastify'
 import { FileStore }                from '@itrocks/fastify-file-session-store'
 import { PROTECT_GET }              from '@itrocks/lazy-loading'
@@ -111,7 +112,9 @@ requestDependsOn({ getModule: route => {
 	return module ? (appDir + '/app' + module) : module
 }})
 
-storeDependsOn({ toStoreName: toColumn })
+storeDependsOn({
+	setTransformers: initStoreTransformers,
+	toStoreName: toColumn })
 
 trInit('fr-FR', appDir + '/app/locale/fr-FR.csv')
 
