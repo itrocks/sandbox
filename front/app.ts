@@ -8,33 +8,41 @@ import XTargetHeadersSize        from '../node_modules/@itrocks/xtarget/headers-
 import XTargetHistory            from '../node_modules/@itrocks/xtarget/history.js'
 import XTargetModifier           from '../node_modules/@itrocks/xtarget/modifier.js'
 import { XTargetDefaultOptions } from '../node_modules/@itrocks/xtarget/xtarget.js'
-import autoFocus                 from './auto-focus.js'
-import breadcrumb                from './breadcrumb.js'
-import collapse                  from './collapse.js'
-import containedAutoWidth        from './contained-auto-width.js'
-import notification              from './notifications.js'
-import { notifications }         from './notifications.js'
-import                                './real-viewport-height.js'
+import autoFocus                 from '../node_modules/@itrocks/auto-focus/auto-focus.js'
+import breadcrumb                from '../node_modules/@itrocks/breadcrumb/breadcrumb.js'
+import collapse                  from '../node_modules/@itrocks/collapse/collapse.js'
+import containedAutoWidth        from '../node_modules/@itrocks/contained-auto-width/contained-auto-width.js'
+import notification              from '../node_modules/@itrocks/notifications/notifications.js'
+import { notifications }         from '../node_modules/@itrocks/notifications/notifications.js'
+import                                '../node_modules/@itrocks/real-viewport-height/real-viewport-height.js'
 
 let selector: string
 
-build<HTMLAnchorElement>('a.auto-redirect', async anchor => (await import('./auto-redirect.js')).default(anchor))
+build<HTMLAnchorElement>('a.auto-redirect', async anchor =>
+	(await import('../node_modules/@itrocks/auto-redirect/auto-redirect.js')).default(anchor)
+)
 
 selector = 'input[data-type=object], ul[data-type=objects] > li > input'
-build<HTMLInputElement>(selector, async input => (await import('./autocompleter.js')).default(input))
+build<HTMLInputElement>(selector, async input =>
+	(await import('../node_modules/@itrocks/autocompleter/autocompleter.js')).default(input)
+)
 
 build<HTMLHeadingElement>('main > * > h2, main > * > header > h2', breadcrumb)
 
 build<HTMLButtonElement>('button.collapse', button => collapse(button, 'body'))
 
-build<HTMLInputElement>('input[data-type=date]', async input => (await import('./air-datepicker.js')).default(input))
+build<HTMLInputElement>('input[data-type=date]', async input =>
+	(await import('../node_modules/@itrocks/air-datepicker/air-datepicker.js')).default(input)
+)
 
 build<HTMLFormElement>('form', autoFocus)
 
 selector = '[data-contained-auto-width], [data-multiple-contained-auto-width] > li'
 build<HTMLLIElement>(selector, async container => containedAutoWidth(container))
 
-build<HTMLFormElement>('#modal form', async form => (await import('./modal.js')).default(form))
+build<HTMLFormElement>('#modal form', async form =>
+	(await import('../node_modules/@itrocks/modal/modal.js')).default(form)
+)
 
 build<HTMLElement>('#notifications > li', notification)
 build<HTMLOListElement>('#notifications', notifications)

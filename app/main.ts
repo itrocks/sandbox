@@ -52,9 +52,22 @@ import { requiredOf }               from './property/validate/required'
 import Template                     from './view/html/template'
 
 frontScripts.push(
+	'/node_modules/@itrocks/air-datepicker/air-datepicker.js',
+	'/node_modules/@itrocks/asset-loader/asset-loader.js',
+	'/node_modules/@itrocks/asset-loader/load-css.js',
+	'/node_modules/@itrocks/asset-loader/load-script.js',
+	'/node_modules/@itrocks/auto-focus/auto-focus.js',
+	'/node_modules/@itrocks/auto-redirect/auto-redirect.js',
+	'/node_modules/@itrocks/autocompleter/autocompleter.js',
+	'/node_modules/@itrocks/breadcrumb/breadcrumb.js',
 	'/node_modules/@itrocks/build/build.js',
+	'/node_modules/@itrocks/collapse/collapse.js',
+	'/node_modules/@itrocks/contained-auto-width/contained-auto-width.js',
 	'/node_modules/@itrocks/form-fetch/form-fetch.js',
+	'/node_modules/@itrocks/modal/modal.js',
+	'/node_modules/@itrocks/notifications/notifications.js',
 	'/node_modules/@itrocks/plugin/plugin.js',
+	'/node_modules/@itrocks/real-viewport-height/real-viewport-height.js',
 	'/node_modules/@itrocks/table/freeze.js',
 	'/node_modules/@itrocks/table/freeze/inherit-background.js',
 	'/node_modules/@itrocks/table/freeze/inherit-border.js',
