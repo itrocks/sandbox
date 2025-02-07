@@ -1,10 +1,12 @@
 import { Action }     from '@itrocks/action'
-import { Request }    from '@itrocks/action'
+import { Request }    from '@itrocks/action-request'
 import { Need }       from '@itrocks/action'
+import { Route }      from '@itrocks/route'
 import { dataSource } from '@itrocks/storage'
 
 @Need('Store', 'new')
-export default class List extends Action
+@Route('/list')
+export class List extends Action
 {
 
 	async html(request: Request)

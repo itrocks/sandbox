@@ -7,49 +7,46 @@ compose(__dirname, composeConfig)
 import { initLazyLoading } from '@itrocks/lazy-loading'
 initLazyLoading()
 
-import { initRoutes } from '@itrocks/route'
-initRoutes()
-
-import { Action }                   from '@itrocks/action'
-import { needOf }                   from '@itrocks/action'
-import { Request as ActionRequest } from '@itrocks/action'
-import { requestDependsOn }         from '@itrocks/action'
-import appDir                       from '@itrocks/app-dir'
-import { classViewDependsOn }       from '@itrocks/class-view'
-import { representativeValueOf }    from '@itrocks/class-view'
-import { initCollection }           from '@itrocks/collection'
-import { componentOf }              from '@itrocks/composition'
-import { initCoreTransformers }     from '@itrocks/core-transformers'
-import { initStoreTransformers }    from '@itrocks/core-transformers'
-import { FastifyServer }            from '@itrocks/fastify'
-import { FileStore }                from '@itrocks/fastify-file-session-store'
-import { PROTECT_GET }              from '@itrocks/lazy-loading'
-import { mysqlDependsOn }           from '@itrocks/mysql'
-import { displayOf }                from '@itrocks/property-view'
-import { toColumn }                 from '@itrocks/rename'
-import { Headers }                  from '@itrocks/request-response'
-import { Request, Response }        from '@itrocks/request-response'
-import { routeOf }                  from '@itrocks/route'
-import { getActionModule }          from '@itrocks/route'
-import { getModule }                from '@itrocks/route'
-import { staticRoutes }             from '@itrocks/route'
-import { createDataSource }         from '@itrocks/storage'
-import { storeDependsOn }           from '@itrocks/store'
-import { storeOf }                  from '@itrocks/store'
-import { frontScripts }             from '@itrocks/template'
-import { applyTransformer }         from '@itrocks/transformer'
-import { READ, SAVE, SQL }          from '@itrocks/transformer'
-import { tr, trInit }               from '@itrocks/translate'
-import { format, parse }            from 'date-fns'
-import dataSourceConfig             from '../local/data-source'
-import secret                       from '../local/secret'
-import sessionConfig                from '../local/session'
-import Exception                    from './action/exception'
-import access                       from './config/access'
-import DaoFunction                  from './dao/functions'
-import { IGNORE }                   from './property/transform/password'
-import { requiredOf }               from './property/validate/required'
-import Template                     from './view/html/template'
+import { Action }                 from '@itrocks/action'
+import { needOf }                 from '@itrocks/action'
+import { Request }                from '@itrocks/action-request'
+import { actionRequestDependsOn } from '@itrocks/action-request'
+import appDir                     from '@itrocks/app-dir'
+import { fileOf }                 from '@itrocks/class-file'
+import { isAnyType, Type }        from '@itrocks/class-type'
+import { classViewDependsOn }     from '@itrocks/class-view'
+import { representativeValueOf }  from '@itrocks/class-view'
+import { initCollection }         from '@itrocks/collection'
+import { componentOf }            from '@itrocks/composition'
+import { initCoreTransformers }   from '@itrocks/core-transformers'
+import { initStoreTransformers }  from '@itrocks/core-transformers'
+import { FastifyServer }          from '@itrocks/fastify'
+import { FileStore }              from '@itrocks/fastify-file-session-store'
+import { PROTECT_GET }            from '@itrocks/lazy-loading'
+import { mysqlDependsOn }         from '@itrocks/mysql'
+import { displayOf }              from '@itrocks/property-view'
+import { toColumn }               from '@itrocks/rename'
+import { Headers, Response }      from '@itrocks/request-response'
+import { loadRoutes }             from '@itrocks/route'
+import { routeDependsOn }         from '@itrocks/route'
+import { routeOf, Routes }        from '@itrocks/route'
+import DaoFunction                from '@itrocks/sql-functions'
+import { createDataSource }       from '@itrocks/storage'
+import { storeDependsOn }         from '@itrocks/store'
+import { storeOf }                from '@itrocks/store'
+import { frontScripts }           from '@itrocks/template'
+import { applyTransformer }       from '@itrocks/transformer'
+import { READ, SAVE, SQL }        from '@itrocks/transformer'
+import { tr, trInit }             from '@itrocks/translate'
+import { format, parse }          from 'date-fns'
+import dataSourceConfig           from '../local/data-source'
+import secret                     from '../local/secret'
+import sessionConfig              from '../local/session'
+import Exception                  from './action/exception'
+import access                     from './config/access'
+import { IGNORE }                 from './property/transform/password'
+import { requiredOf }             from './property/validate/required'
+import Template                   from './view/html/template'
 
 frontScripts.push(
 	'/node_modules/@itrocks/air-datepicker/air-datepicker.js',
@@ -120,10 +117,9 @@ mysqlDependsOn({
 	storeOf:                storeOf
 })
 
-requestDependsOn({ getModule: route => {
-	const module = getModule(route)
-	return module ? (appDir + '/app' + module) : module
-}})
+routeDependsOn({
+	calculate: (target: Type) => routes.summarize(fileOf(target).slice(appDir.length, -3))
+})
 
 storeDependsOn({
 	setTransformers: initStoreTransformers,
@@ -131,67 +127,81 @@ storeDependsOn({
 
 trInit('fr-FR', appDir + '/app/locale/fr-FR.csv')
 
+type ActionObject   = Record<string, ActionFunction>
+type ActionFunction = (request: Request) => Promise<Response>
+
 Action.prototype.htmlTemplateResponse = async function(
-	data: any, request: ActionRequest, templateFile: string, statusCode = 200, headers: Headers = {}
+	data: any, request: Request, templateFile: string, statusCode = 200, headers: Headers = {}
 ) {
 	const template    = new Template(data, { action: request.action, request, session: request.request.session })
 	template.included = (request.request.headers['sec-fetch-dest'] === 'empty')
 	return this.htmlResponse(
-		await template.parseFile(templateFile, appDir + '/app/home/container.html'), statusCode, headers
+		await template.parseFile(templateFile, appDir + '/node_modules/@itrocks/home/cjs/container.html'),
+		statusCode,
+		headers
 	)
 }
 
-async function execute(request: ActionRequest)
+let routes: Routes
+
+async function execute(request: Request): Promise<Response>
 {
-	let action: Action & Record<string, (request: ActionRequest) => Promise<Response>>
-	let staticRoute = staticRoutes[request.request.path]
-	if (staticRoute) {
-		const position = staticRoute.lastIndexOf('/')
-		request.route  = staticRoute.slice(0, position)
-		request.action = staticRoute.slice(position + 1)
-		request.format = request.request.headers['accept'].split(',')[0].split('/')[1]
-		if (request.format === '*') {
-			request.format = 'html'
-		}
-	}
-	if (!request.action) {
-		throw new Exception('Action is missing')
-	}
+	// Access control
 	if (!request.request.session.user && !access.free.includes(request.route + '/' + request.action)) {
 		request.action = 'login'
 		request.route  = '/user'
-		staticRoute    = undefined
 	}
-	try {
-		action = new (require('.' + (staticRoute ?? await getActionModule(request.route, request.action))).default)
-	} catch (exception) {
-		console.error(exception)
-		throw new Exception('Action ' + request.action + ' not found')
+
+	// Resolve action class or function module
+	const module = routes.resolve(request.route + '/' + request.action)
+
+	// undefined module
+	if (!module) {
+		console.error('Action ' + request.route + '/' + request.action + ' not found')
+		throw new Exception('Action ' + request.route + '/' + request.action + ' not found')
 	}
-	if (!action[request.format]) {
-		throw new Exception('Action ' + request.action + ' unavailable in format ' + request.format)
+
+	// ActionClass module
+	if (isAnyType(module)) {
+		const action = (new module) as ActionObject
+		if (request.format in action) {
+			const need = needOf(action)
+			if (
+				need.alternative
+				&& (need.alternative !== request.action)
+				&& (
+					((need.need === 'object') && !request.ids.length)
+					|| ((need.need === 'Store') && !storeOf(request.type))
+				)
+			) {
+				request.action = need.alternative
+				return execute(request)
+			}
+			if ((need.need === 'object') && !request.ids.length && !request.request.data.confirm) {
+				console.error('Action ' + request.route + '/' + request.action + ' needs at least one object')
+				throw new Exception('Action ' + request.route + '/' + request.action + ' needs at least one ')
+			}
+			return action[request.format](request)
+		}
 	}
-	const need    = needOf(action)
-	const objects = storeOf(request.type) ? await request.getObjects() : []
-	if (need.alternative && (need.alternative !== request.action) && (
-		((need.need === 'object') && !objects.length)
-		|| ((need.need === 'Store') && !storeOf(request.type))
-	)) {
-		request.action = need.alternative
-		return execute(request)
-	}
-	if ((need.need === 'object') && !objects.length && !request.request.data.confirm) {
-		throw new Exception('Action ' + request.action + ' needs an object')
-	}
-	return action[request.format](request)
+
+	// ActionFunction module
+	return module(request)
 }
 
-new FastifyServer({
-	assetPath: appDir,
-	execute: async (request: Request) => execute(new ActionRequest(request)),
-	favicon: '/app/style/2020/logo/favicon.ico',
-	frontScripts,
-	port: 3000,
-	secret,
-	store: new FileStore(sessionConfig.path)
-}).run()
+async function main()
+{
+	routes = await loadRoutes()
+	actionRequestDependsOn({ getModule: routes.resolve.bind(routes) })
+	return new FastifyServer({
+		assetPath: appDir,
+		execute:   request => execute(new Request(request)),
+		favicon:   '/app/style/2020/logo/favicon.ico',
+		frontScripts,
+		port: 3000,
+		secret,
+		store: new FileStore(sessionConfig.path)
+	}).run()
+}
+
+main().catch(error => { throw error }).then()

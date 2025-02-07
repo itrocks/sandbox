@@ -1,12 +1,14 @@
-import { Action }  from '@itrocks/action'
-import { Need }    from '@itrocks/action'
-import { Request } from '@itrocks/action'
-import dataSource  from '@itrocks/storage'
-import tr          from '@itrocks/translate'
-import Confirm     from '../confirm/confirm'
+import { Action }     from '@itrocks/action'
+import { Need }       from '@itrocks/action'
+import { Request }    from '@itrocks/action-request'
+import { Route }      from '@itrocks/route'
+import { dataSource } from '@itrocks/storage'
+import { tr }         from '@itrocks/translate'
+import { Confirm }    from '../confirm/confirm'
 
 @Need('object')
-export default class Delete extends Action
+@Route('/delete')
+export class Delete extends Action
 {
 
 	async html(request: Request)
@@ -18,7 +20,7 @@ export default class Delete extends Action
 		}
 		request = confirmed
 
-		const objects = request.objects
+		const objects = await request.getObjects()
 		for (const object of objects) {
 			await dataSource().delete(object)
 		}
@@ -27,7 +29,7 @@ export default class Delete extends Action
 
 	async json(request: Request)
 	{
-		const objects = request.objects
+		const objects = await request.getObjects()
 		for (const object of objects) {
 			await dataSource().delete(object)
 		}

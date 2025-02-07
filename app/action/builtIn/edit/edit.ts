@@ -1,27 +1,30 @@
 import { Action }     from '@itrocks/action'
 import { Need }       from '@itrocks/action'
-import { Request }    from '@itrocks/action'
+import { Request }    from '@itrocks/action-request'
+import { Route }      from '@itrocks/route'
 import { dataSource } from '@itrocks/storage'
 
 @Need('object', 'new')
-export default class Edit extends Action
+@Route('/delete')
+export class Edit extends Action
 {
 
 	async html(request: Request)
 	{
-		return this.htmlTemplateResponse(request.object ?? new request.type, request, __dirname + '/edit.html')
+		const object = await request.getObject()
+		return this.htmlTemplateResponse(object ?? new request.type, request, __dirname + '/edit.html')
 	}
 
 	async json(request: Request)
 	{
-		if (request.objects.length === 1) {
-			return this.jsonResponse(request.object ?? new request.type)
+		const objects = await request.getObjects()
+		if (objects.length === 1) {
+			return this.jsonResponse(objects[0] ?? new request.type)
 		}
-		if (request.objects.length > 1) {
-			return this.jsonResponse(request.objects)
+		if (objects.length > 1) {
+			return this.jsonResponse(objects)
 		}
-		const objects = await dataSource().search(request.type)
-		return this.jsonResponse(objects)
+		return this.jsonResponse(await dataSource().search(request.type))
 	}
 
 }

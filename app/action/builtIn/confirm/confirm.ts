@@ -1,8 +1,8 @@
 import { Action }  from '@itrocks/action'
-import { Request } from '@itrocks/action'
+import { Request } from '@itrocks/action-request'
 import { v4 }      from 'uuid'
 
-export default class Confirm extends Action
+export class Confirm extends Action
 {
 
 	confirmed(request: Request): Request | undefined

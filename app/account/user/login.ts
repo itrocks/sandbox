@@ -1,5 +1,5 @@
 import { Action }  from '@itrocks/action'
-import { Request } from '@itrocks/action'
+import { Request } from '@itrocks/action-request'
 import { Display } from '@itrocks/class-view'
 import User        from '../user'
 

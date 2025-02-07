@@ -1,10 +1,12 @@
 import { Action }      from '@itrocks/action'
 import { Need }        from '@itrocks/action'
 import { PdfResponse } from '@itrocks/core-responses'
+import { Route }      from '@itrocks/route'
 import PDFDocument     from 'pdfkit'
 import { PassThrough } from 'stream'
 
 @Need('object')
+@Route('/print')
 export default class Print extends Action
 {
 

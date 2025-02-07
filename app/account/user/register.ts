@@ -1,5 +1,5 @@
 import { Action }     from '@itrocks/action'
-import { Request }    from '@itrocks/action'
+import { Request }    from '@itrocks/action-request'
 import { dataSource } from '@itrocks/storage'
 import Save           from '../../action/builtIn/save/save'
 import User           from '../user'

@@ -15,17 +15,17 @@
 <!--BEGIN-->
 
 	<form
-		action="app://(@objectRoute)/save" autocomplete="off"
+		action="app://(@route)/save" autocomplete="off"
 		data-action="edit" data-class="{%name}" data-id="{?id}" data-route="{@route}"
 		method="post" target="#notifications:prepend"
 	>
 		<header>
 			<h2>{-.action.ucFirst} {@output}</h2>
 			<ul class="general actions">
-				<li class="close"><a href="app://(@objectRoute)" target="main">Close</a></li>
+				<li class="close"><a href="app://(@route)" target="main">Close</a></li>
 				<li class="save"><input type="submit" value="Save"></li>
 				<!--id?-->
-				<li class="delete"><a href="app://(@objectRoute)/delete" target="#notifications:prepend">Delete</a></li>
+				<li class="delete"><a href="app://(@route)/delete" target="#notifications:prepend">Delete</a></li>
 				<!--end-->
 			</ul>
 		</header>

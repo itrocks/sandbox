@@ -1,12 +1,14 @@
 import { Action }                from '@itrocks/action'
-import { Request }               from '@itrocks/action'
+import { Request }               from '@itrocks/action-request'
 import { ReflectClass }          from '@itrocks/reflect'
 import { RecursiveStringObject } from '@itrocks/request-response'
+import { Route }                 from '@itrocks/route'
 import { dataSource }            from '@itrocks/storage'
 import { applyTransformer }      from '@itrocks/transformer'
 import { HTML, INPUT }           from '@itrocks/transformer'
 import { IGNORE }                from '../../../property/transform/password'
 
+@Route('/save')
 export default class Save extends Action
 {
 
@@ -23,7 +25,7 @@ export default class Save extends Action
 
 	async html(request: Request)
 	{
-		const object = request.object ?? new request.type
+		const object = request.getObject() ?? new request.type
 		await this.dataToObject(object, request.request.data)
 		await dataSource().save(object)
 
@@ -32,7 +34,7 @@ export default class Save extends Action
 
 	async json(request: Request)
 	{
-		const object = request.object ?? new request.type
+		const object = request.getObject() ?? new request.type
 		await this.dataToObject(object, request.request.data)
 		await dataSource().save(object)
 		return this.jsonResponse(object)
