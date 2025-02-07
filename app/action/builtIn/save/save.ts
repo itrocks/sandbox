@@ -25,7 +25,7 @@ export default class Save extends Action
 
 	async html(request: Request)
 	{
-		const object = request.getObject() ?? new request.type
+		const object = (await request.getObject()) ?? new request.type
 		await this.dataToObject(object, request.request.data)
 		await dataSource().save(object)
 
@@ -34,7 +34,7 @@ export default class Save extends Action
 
 	async json(request: Request)
 	{
-		const object = request.getObject() ?? new request.type
+		const object = (await request.getObject()) ?? new request.type
 		await this.dataToObject(object, request.request.data)
 		await dataSource().save(object)
 		return this.jsonResponse(object)
