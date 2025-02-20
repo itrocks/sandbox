@@ -40,10 +40,6 @@ build<HTMLFormElement>('form', autoFocus)
 selector = '[data-contained-auto-width], [data-multiple-contained-auto-width] > li'
 build<HTMLLIElement>(selector, async container => containedAutoWidth(container))
 
-build<HTMLFormElement>('#modal form', async form =>
-	(await import('../node_modules/@itrocks/modal/modal.js')).default(form)
-)
-
 build<HTMLElement>('#notifications > li', notification)
 build<HTMLOListElement>('#notifications', notifications)
 

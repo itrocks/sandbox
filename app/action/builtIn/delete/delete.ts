@@ -1,10 +1,10 @@
 import { Action }     from '@itrocks/action'
 import { Need }       from '@itrocks/action'
 import { Request }    from '@itrocks/action-request'
+import { Confirm }    from '@itrocks/confirm'
 import { Route }      from '@itrocks/route'
 import { dataSource } from '@itrocks/storage'
 import { tr }         from '@itrocks/translate'
-import { Confirm }    from '../confirm/confirm'
 
 @Need('object')
 @Route('/delete')
