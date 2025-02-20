@@ -18,10 +18,6 @@ import                                '../node_modules/@itrocks/real-viewport-he
 
 let selector: string
 
-build<HTMLAnchorElement>('a.auto-redirect', async anchor =>
-	(await import('../node_modules/@itrocks/auto-redirect/auto-redirect.js')).default(anchor)
-)
-
 selector = 'input[data-type=object], ul[data-type=objects] > li > input'
 build<HTMLInputElement>(selector, async input =>
 	(await import('../node_modules/@itrocks/autocompleter/autocompleter.js')).default(input)

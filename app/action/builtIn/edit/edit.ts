@@ -5,7 +5,7 @@ import { Route }      from '@itrocks/route'
 import { dataSource } from '@itrocks/storage'
 
 @Need('object', 'new')
-@Route('/delete')
+@Route('/edit')
 export class Edit extends Action
 {
 
