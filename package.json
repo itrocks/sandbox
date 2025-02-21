@@ -24,6 +24,7 @@
 		"@itrocks/core-responses": "latest",
 		"@itrocks/core-transformers": "latest",
 		"@itrocks/decorator": "latest",
+		"@itrocks/delete": "latest",
 		"@itrocks/fastify": "latest",
 		"@itrocks/fastify-file-session-store": "latest",
 		"@itrocks/home": "latest",
