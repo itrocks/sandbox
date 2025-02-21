@@ -2,7 +2,6 @@
 	"/edit": "./edit/edit",
 	"/list": "./list/list",
 	"/new": "./new/new",
-	"/output": "./output/output",
 	"/print": "./print/print",
 	"/save": "./save/save",
 	"/summary": "./summary/summary"

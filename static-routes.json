@@ -1,0 +1,8 @@
+{
+	"/save": "/app/action/builtIn/save/save",
+	"/list": "/app/action/builtIn/list/list",
+	"/new": "/app/action/builtIn/new/new",
+	"/print": "/app/action/builtIn/print/print",
+	"/summary": "/app/action/builtIn/summary/summary",
+	"/edit": "/app/action/builtIn/edit/edit"
+}
