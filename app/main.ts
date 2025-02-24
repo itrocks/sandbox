@@ -36,6 +36,7 @@ import { storeDependsOn }         from '@itrocks/store'
 import { storeOf }                from '@itrocks/store'
 import { frontScripts }           from '@itrocks/template'
 import { applyTransformer }       from '@itrocks/transformer'
+import { IGNORE }                 from '@itrocks/transformer'
 import { READ, SAVE, SQL }        from '@itrocks/transformer'
 import { tr, trInit }             from '@itrocks/translate'
 import { format, parse }          from 'date-fns'
@@ -44,7 +45,6 @@ import secret                     from '../local/secret'
 import sessionConfig              from '../local/session'
 import Exception                  from './action/exception'
 import access                     from './config/access'
-import { IGNORE }                 from './property/transform/password'
 import { requiredOf }             from './property/validate/required'
 import Template                   from './view/html/template'
 
@@ -55,6 +55,7 @@ frontScripts.push(
 	'/node_modules/@itrocks/asset-loader/load-script.js',
 	'/node_modules/@itrocks/auto-focus/auto-focus.js',
 	'/node_modules/@itrocks/auto-redirect/auto-redirect.js',
+	'/node_modules/@itrocks/auto-redirect/build.js',
 	'/node_modules/@itrocks/autocompleter/autocompleter.js',
 	'/node_modules/@itrocks/breadcrumb/breadcrumb.js',
 	'/node_modules/@itrocks/build/build.js',

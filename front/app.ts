@@ -9,6 +9,7 @@ import XTargetHistory            from '../node_modules/@itrocks/xtarget/history.
 import XTargetModifier           from '../node_modules/@itrocks/xtarget/modifier.js'
 import { XTargetDefaultOptions } from '../node_modules/@itrocks/xtarget/xtarget.js'
 import autoFocus                 from '../node_modules/@itrocks/auto-focus/auto-focus.js'
+import                                '../node_modules/@itrocks/auto-redirect/build.js'
 import breadcrumb                from '../node_modules/@itrocks/breadcrumb/breadcrumb.js'
 import collapse                  from '../node_modules/@itrocks/collapse/collapse.js'
 import containedAutoWidth        from '../node_modules/@itrocks/contained-auto-width/contained-auto-width.js'

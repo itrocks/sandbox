@@ -1,13 +1,11 @@
 import { KeyOf, ObjectOrType }     from '@itrocks/class-type'
 import { decorate, decoratorOf }   from '@itrocks/decorator/property'
 import { displayOf }               from '@itrocks/property-view'
-import { EDIT, HTML }              from '@itrocks/transformer'
+import { EDIT, HTML, IGNORE }      from '@itrocks/transformer'
 import { INPUT, JSON }             from '@itrocks/transformer'
 import { setPropertyTransformers } from '@itrocks/transformer'
 import { tr }                      from '@itrocks/translate'
 import { createHash }              from 'crypto'
-
-export const IGNORE = '¤~!~!~!~!~¤'
 
 const PASSWORD = Symbol('password')
 
