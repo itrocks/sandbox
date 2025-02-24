@@ -23,6 +23,7 @@
 		"@itrocks/contenteditable": "latest",
 		"@itrocks/core-responses": "latest",
 		"@itrocks/core-transformers": "latest",
+		"@itrocks/data-to-object": "latest",
 		"@itrocks/decorator": "latest",
 		"@itrocks/delete": "latest",
 		"@itrocks/fastify": "latest",

@@ -1,8 +1,8 @@
-import { Action }     from '@itrocks/action'
-import { Request }    from '@itrocks/action-request'
-import { dataSource } from '@itrocks/storage'
-import Save           from '../../action/builtIn/save/save'
-import User           from '../user'
+import { Action }       from '@itrocks/action'
+import { Request }      from '@itrocks/action-request'
+import { dataToObject } from '@itrocks/data-to-object'
+import { dataSource }   from '@itrocks/storage'
+import User             from '../user'
 
 export default class Register extends Action
 {
@@ -13,7 +13,7 @@ export default class Register extends Action
 		let user         = new request.type
 
 		if (Object.keys(request.request.data).length) {
-			await ((new Save).dataToObject(user, request.request.data))
+			await dataToObject(user, request.request.data)
 			const { email, login, password } = user
 			if (email.length && login.length && password.length) {
 				const dao   = dataSource()

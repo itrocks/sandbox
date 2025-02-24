@@ -1,16 +1,16 @@
-import { Action }      from '@itrocks/action'
-import { Request }     from '@itrocks/action-request'
-import { lessOrEqual } from '@itrocks/sql-functions'
-import dataSource      from '@itrocks/storage'
-import { lang, tr }    from '@itrocks/translate'
-import { htmlToText }  from 'html-to-text'
-import * as fs         from 'node:fs/promises'
-import mailer          from 'nodemailer'
-import config          from '../../../local/smtp'
-import Save            from '../../action/builtIn/save/save'
-import smtp            from '../../config/smtp'
-import User            from '../user'
-import Token           from './token'
+import { Action }       from '@itrocks/action'
+import { Request }      from '@itrocks/action-request'
+import { dataToObject } from '@itrocks/data-to-object'
+import { lessOrEqual }  from '@itrocks/sql-functions'
+import { dataSource }   from '@itrocks/storage'
+import { lang, tr }     from '@itrocks/translate'
+import { htmlToText }   from 'html-to-text'
+import * as fs          from 'node:fs/promises'
+import mailer           from 'nodemailer'
+import config           from '../../../local/smtp'
+import smtp             from '../../config/smtp'
+import User             from '../user'
+import Token            from './token'
 
 export default class Forgot extends Action
 {
@@ -32,7 +32,7 @@ export default class Forgot extends Action
 			const tokenUser = token?.user
 			if (tokenUser) {
 				if (request.request.data.password) {
-					await ((new Save).dataToObject(tokenUser, { password: request.request.data.password }))
+					await dataToObject(tokenUser, { password: request.request.data.password })
 					await dao.save(tokenUser)
 					await dao.delete(token, 'token')
 					return this.htmlTemplateResponse(tokenUser, request, __dirname + '/forgot-done.html')

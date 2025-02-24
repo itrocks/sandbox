@@ -1,8 +1,8 @@
-import { Action }     from '@itrocks/action'
-import { Request }    from '@itrocks/action-request'
-import { dataSource } from '@itrocks/storage'
-import Save           from '../../action/builtIn/save/save'
-import User           from '../user'
+import { Action }       from '@itrocks/action'
+import { Request }      from '@itrocks/action-request'
+import { dataToObject } from '@itrocks/data-to-object'
+import { dataSource }   from '@itrocks/storage'
+import User             from '../user'
 
 export default class Auth extends Action
 {
@@ -10,7 +10,7 @@ export default class Auth extends Action
 	async html(request: Request<User>)
 	{
 		let search = new request.type
-		await ((new Save).dataToObject(search, request.request.data))
+		await dataToObject(search, request.request.data)
 
 		const { login, password } = search
 		let user: User | undefined
