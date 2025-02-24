@@ -1,6 +1,0 @@
-{
-	"/edit": "./edit/edit",
-	"/new": "./new/new",
-	"/print": "./print/print",
-	"/save": "./save/save"
-}
