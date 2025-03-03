@@ -7,46 +7,48 @@ compose(__dirname, composeConfig)
 import { initLazyLoading } from '@itrocks/lazy-loading'
 initLazyLoading()
 
-import { Action }                 from '@itrocks/action'
-import { needOf }                 from '@itrocks/action'
-import { Request }                from '@itrocks/action-request'
-import { actionRequestDependsOn } from '@itrocks/action-request'
-import appDir                     from '@itrocks/app-dir'
-import { fileOf }                 from '@itrocks/class-file'
-import { isAnyType, Type }        from '@itrocks/class-type'
-import { classViewDependsOn }     from '@itrocks/class-view'
-import { representativeValueOf }  from '@itrocks/class-view'
-import { initCollection }         from '@itrocks/collection'
-import { componentOf }            from '@itrocks/composition'
-import { initCoreTransformers }   from '@itrocks/core-transformers'
-import { initStoreTransformers }  from '@itrocks/core-transformers'
-import { FastifyServer }          from '@itrocks/fastify'
-import { FileStore }              from '@itrocks/fastify-file-session-store'
-import { PROTECT_GET }            from '@itrocks/lazy-loading'
-import { mysqlDependsOn }         from '@itrocks/mysql'
-import { displayOf }              from '@itrocks/property-view'
-import { toColumn }               from '@itrocks/rename'
-import { Headers, Response }      from '@itrocks/request-response'
-import { requiredOf }             from '@itrocks/required'
-import { loadRoutes }             from '@itrocks/route'
-import { routeDependsOn }         from '@itrocks/route'
-import { routeOf, Routes }        from '@itrocks/route'
-import DaoFunction                from '@itrocks/sql-functions'
-import { createDataSource }       from '@itrocks/storage'
-import { storeDependsOn }         from '@itrocks/store'
-import { storeOf }                from '@itrocks/store'
-import { frontScripts }           from '@itrocks/template'
-import { applyTransformer }       from '@itrocks/transformer'
-import { IGNORE }                 from '@itrocks/transformer'
-import { READ, SAVE, SQL }        from '@itrocks/transformer'
-import { tr, trInit }             from '@itrocks/translate'
-import { format, parse }          from 'date-fns'
-import dataSourceConfig           from '../local/data-source'
-import secret                     from '../local/secret'
-import sessionConfig              from '../local/session'
-import Exception                  from './action/exception'
-import access                     from './config/access'
-import Template                   from './view/html/template'
+import { Action }                  from '@itrocks/action'
+import { needOf }                  from '@itrocks/action'
+import { Request }                 from '@itrocks/action-request'
+import { actionRequestDependsOn }  from '@itrocks/action-request'
+import appDir                      from '@itrocks/app-dir'
+import { fileOf }                  from '@itrocks/class-file'
+import { isAnyType, Type }         from '@itrocks/class-type'
+import { classViewDependsOn }      from '@itrocks/class-view'
+import { representativeValueOf }   from '@itrocks/class-view'
+import { initCollection }          from '@itrocks/collection'
+import { componentOf }             from '@itrocks/composition'
+import { initCoreTransformers }    from '@itrocks/core-transformers'
+import { initStoreTransformers }   from '@itrocks/core-transformers'
+import { FastifyServer }           from '@itrocks/fastify'
+import { FileStore }               from '@itrocks/fastify-file-session-store'
+import { PROTECT_GET }             from '@itrocks/lazy-loading'
+import { mysqlDependsOn }          from '@itrocks/mysql'
+import { passwordDependsOn }       from '@itrocks/password'
+import { setPasswordTransformers } from '@itrocks/password/transformers'
+import { displayOf }               from '@itrocks/property-view'
+import { toColumn }                from '@itrocks/rename'
+import { Headers, Response }       from '@itrocks/request-response'
+import { requiredOf }              from '@itrocks/required'
+import { loadRoutes }              from '@itrocks/route'
+import { routeDependsOn }          from '@itrocks/route'
+import { routeOf, Routes }         from '@itrocks/route'
+import DaoFunction                 from '@itrocks/sql-functions'
+import { createDataSource }        from '@itrocks/storage'
+import { storeDependsOn }          from '@itrocks/store'
+import { storeOf }                 from '@itrocks/store'
+import { frontScripts }            from '@itrocks/template'
+import { applyTransformer }        from '@itrocks/transformer'
+import { IGNORE }                  from '@itrocks/transformer'
+import { READ, SAVE, SQL }         from '@itrocks/transformer'
+import { tr, trInit }              from '@itrocks/translate'
+import { format, parse }           from 'date-fns'
+import dataSourceConfig            from '../local/data-source'
+import secret                      from '../local/secret'
+import sessionConfig               from '../local/session'
+import Exception                   from './action/exception'
+import access                      from './config/access'
+import Template                    from './view/html/template'
 
 frontScripts.push(
 	'/node_modules/@itrocks/air-datepicker/air-datepicker.js',
@@ -66,6 +68,7 @@ frontScripts.push(
 	'/node_modules/@itrocks/notifications/notifications.js',
 	'/node_modules/@itrocks/plugin/plugin.js',
 	'/node_modules/@itrocks/real-viewport-height/real-viewport-height.js',
+	'/node_modules/@itrocks/sorted-array/sorted-array.js',
 	'/node_modules/@itrocks/table/freeze.js',
 	'/node_modules/@itrocks/table/freeze/inherit-background.js',
 	'/node_modules/@itrocks/table/freeze/inherit-border.js',
@@ -79,7 +82,6 @@ frontScripts.push(
 	'/node_modules/@itrocks/xtarget/history.js',
 	'/node_modules/@itrocks/xtarget/modifier.js',
 	'/node_modules/@itrocks/xtarget/xtarget.js',
-	'/node_modules/@itrocks/sorted-array/sorted-array.js',
 	'/node_modules/air-datepicker/air-datepicker.js',
 	'/node_modules/air-datepicker/locale/en.js',
 	'/node_modules/air-datepicker/locale/fr.js',
@@ -118,13 +120,18 @@ mysqlDependsOn({
 	storeOf:                storeOf
 })
 
+passwordDependsOn({
+	setTransformers: setPasswordTransformers
+})
+
 routeDependsOn({
 	calculate: (target: Type) => routes.summarize(fileOf(target).slice(appDir.length, -3))
 })
 
 storeDependsOn({
 	setTransformers: initStoreTransformers,
-	toStoreName: toColumn })
+	toStoreName:     toColumn
+})
 
 trInit('fr-FR', appDir + '/app/locale/fr-FR.csv')
 
