@@ -1,6 +1,6 @@
-import Store    from '@itrocks/store'
-import Password from '../property/transform/password'
-import Required from '../property/validate/required'
+import { Required } from '@itrocks/required'
+import { Store }    from '@itrocks/store'
+import { Password } from '../property/transform/password'
 
 @Store()
 export default class Account

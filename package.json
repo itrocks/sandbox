@@ -44,6 +44,7 @@
 		"@itrocks/reflect": "latest",
 		"@itrocks/rename": "latest",
 		"@itrocks/request-response": "latest",
+		"@itrocks/required": "latest",
 		"@itrocks/route": "latest",
 		"@itrocks/save": "latest",
 		"@itrocks/sql-functions": "latest",

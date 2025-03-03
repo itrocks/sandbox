@@ -1,7 +1,7 @@
 import { Representative } from '@itrocks/class-view'
+import { Required }       from '@itrocks/required'
 import { Store }          from '@itrocks/store'
 import { Email }          from '../property/validate/email'
-import { Required }       from '../property/validate/required'
 import Account            from './account'
 
 @Representative('email') @Store()

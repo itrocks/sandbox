@@ -1,4 +1,4 @@
-import Required from '../property/validate/required'
+import { Required } from '@itrocks/required'
 
 export default class HasName
 {
