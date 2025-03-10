@@ -1,7 +1,7 @@
 import { ReflectClass }    from '@itrocks/reflect'
 import { ReflectProperty } from '@itrocks/reflect'
 
-export default function parseReflect(variable: string, data: any)
+export function parseReflect(variable: string, data: any)
 {
 	const typeOfDataChar = (typeof data)[0]
 	if ((typeOfDataChar !== 'f') && (typeOfDataChar !== 'o')) {

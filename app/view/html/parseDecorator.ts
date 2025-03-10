@@ -8,7 +8,7 @@ import { Str }                            from '@itrocks/rename'
 import { routeOf }                        from '@itrocks/route'
 import { tr }                             from '@itrocks/translate'
 
-export default function parseDecorator(variable: string, data: any)
+export function parseDecorator(variable: string, data: any)
 {
 	if ((typeof data !== 'function') && (typeof data !== 'object')) {
 		console.error('Bad data for variable', variable, 'data', data)

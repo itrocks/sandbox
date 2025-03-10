@@ -6,6 +6,7 @@ import XTargetDefaultTarget      from '../node_modules/@itrocks/xtarget/default-
 import XTargetHead               from '../node_modules/@itrocks/xtarget/head.js'
 import XTargetHeadersSize        from '../node_modules/@itrocks/xtarget/headers-size.js'
 import XTargetHistory            from '../node_modules/@itrocks/xtarget/history.js'
+import XTargetMainTarget         from '../node_modules/@itrocks/xtarget/main-target.js'
 import XTargetModifier           from '../node_modules/@itrocks/xtarget/modifier.js'
 import { XTargetDefaultOptions } from '../node_modules/@itrocks/xtarget/xtarget.js'
 import autoFocus                 from '../node_modules/@itrocks/auto-focus/auto-focus.js'
@@ -42,6 +43,6 @@ build<HTMLOListElement>('#notifications', notifications)
 
 XTargetDefaultOptions({ plugins: [
 	XTargetBeginEnd, XTargetComposite, XTargetDefaultTarget, XTargetHead, XTargetHeadersSize, XTargetHistory,
-	XTargetModifier
+	XTargetMainTarget, XTargetModifier
 ] })
 buildXTarget()

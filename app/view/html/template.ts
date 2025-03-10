@@ -1,8 +1,9 @@
+import { Str }            from '@itrocks/rename'
 import { Template as T }  from '@itrocks/template'
 import { VariableParser } from '@itrocks/template'
-import tr                 from '@itrocks/translate'
-import parseDecorator     from './parseDecorator'
-import parseReflect       from './parseReflect'
+import { tr }             from '@itrocks/translate'
+import { parseDecorator } from './parseDecorator'
+import { parseReflect }   from './parseReflect'
 
 export default class Template extends T
 {
@@ -18,4 +19,10 @@ export default class Template extends T
 		return tr(text, parts)
 	}
 
+}
+
+// @ts-ignore Added to be used in templates
+Str.prototype.tr = function()
+{
+	return tr(this + '')
 }

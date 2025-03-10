@@ -7,7 +7,9 @@ compose(__dirname, composeConfig)
 import { initLazyLoading } from '@itrocks/lazy-loading'
 initLazyLoading()
 
-import { Action }                  from '@itrocks/action'
+import { Action, setAction }       from '@itrocks/action'
+import { setActionCss }            from '@itrocks/action'
+import { setActionTemplates }      from '@itrocks/action'
 import { needOf }                  from '@itrocks/action'
 import { Request }                 from '@itrocks/action-request'
 import { actionRequestDependsOn }  from '@itrocks/action-request'
@@ -80,6 +82,7 @@ frontScripts.push(
 	'/node_modules/@itrocks/xtarget/head.js',
 	'/node_modules/@itrocks/xtarget/headers-size.js',
 	'/node_modules/@itrocks/xtarget/history.js',
+	'/node_modules/@itrocks/xtarget/main-target.js',
 	'/node_modules/@itrocks/xtarget/modifier.js',
 	'/node_modules/@itrocks/xtarget/xtarget.js',
 	'/node_modules/air-datepicker/air-datepicker.js',
@@ -87,6 +90,22 @@ frontScripts.push(
 	'/node_modules/air-datepicker/locale/fr.js',
 	'/node_modules/autocompleter/autocomplete.es.js'
 )
+
+setActionCss(
+	{ css: '/node_modules/@itrocks/(action)/css/action.css' }
+)
+setActionTemplates(
+	{ need: 'object', template: __dirname + '/../node_modules/@itrocks/action/cjs/selectionAction.html' },
+	{ template: __dirname + '/../node_modules/@itrocks/action/cjs/action.html' }
+)
+setAction('edit',   'save')
+setAction('edit',   'delete')
+setAction('list',   'new')
+setAction('list',   'delete', { need: 'object' })
+setAction('output', 'edit')
+setAction('output', 'print', { target: undefined } )
+setAction('output', 'delete')
+setAction('new',    'save')
 
 classViewDependsOn({ requiredOf, tr })
 
@@ -141,7 +160,13 @@ type ActionFunction = (request: Request) => Promise<Response>
 Action.prototype.htmlTemplateResponse = async function(
 	data: any, request: Request, templateFile: string, statusCode = 200, headers: Headers = {}
 ) {
-	const template    = new Template(data, { action: request.action, request, session: request.request.session })
+	const containerData = {
+		action:  request.action,
+		actions: this.actions,
+		request,
+		session: request.request.session
+	}
+	const template = new Template(data, containerData)
 	template.included = (request.request.headers['sec-fetch-dest'] === 'empty')
 	return this.htmlResponse(
 		await template.parseFile(templateFile, appDir + '/node_modules/@itrocks/home/cjs/container.html'),
