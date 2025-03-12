@@ -1,6 +1,6 @@
 import { Store }       from '@itrocks/store'
+import { User }        from '@itrocks/user'
 import { randomBytes } from 'crypto'
-import User            from '../user'
 
 @Store('password_reset_token')
 export default class Token

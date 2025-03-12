@@ -1,7 +1,5 @@
 {
-	"/account": "./account",
-	"/account/user": "./account/user",
-	"/account/user/token": "./account/user/token",
 	"/demo": "./demo",
-	"/demo-line": "./demo-line"
+	"/demo-line": "./demo-line",
+	"/user/token": "./account/user/token"
 }

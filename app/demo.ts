@@ -1,7 +1,7 @@
 import { Component } from '@itrocks/composition'
 import { Required }  from '@itrocks/required'
 import { Store }     from '@itrocks/store'
-import User          from './account/user'
+import { User }      from '@itrocks/user'
 import DemoLine      from './demo-line'
 
 @Store()

@@ -17,14 +17,11 @@ birthday;date de naissance
 cancel;annuler
 close;fermer
 confirm;confirmer
-connect;connecter
-connect user;connecter utilisateur
 continue;continuer
 could not create this user account;impossible de créer ce compte utilisateur
 delete;supprimer
 delete $1;supprimer $1
 demo objects;objets démo
-disconnect;déconnecter
 display $1;afficher $1
 do you confirm deletion;confirmez-vous la suppression
 edit;modifier
@@ -38,6 +35,9 @@ home;accueil
 id;id
 lines;lignes
 login;identifiant
+user login;connection utilisateur
+login user;connecter utilisateur
+logout;déconnecter
 main module;module principal
 dd/MM/yyyy;dd/MM/yyyy
 name;nom
@@ -60,8 +60,8 @@ save $1;enregistrer $1
 send;envoyer
 this is the $1 I love;c'est le $1 que j'aime
 true;vrai
-unable to connect;impossible de se connecter
-unable to connect: unknown email, login or password;impossible de se connecter : mail, identifiant ou mot de passe inconnu
+unable to login;impossible de se connecter
+unable to login: unknown email, login or password;impossible de se connecter : mail, identifiant ou mot de passe inconnu
 unknown;inconnu
 unknown email, login or password;mail, identifiant ou mot de passe inconnu
 user;utilisateur

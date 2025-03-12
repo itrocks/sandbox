@@ -4,12 +4,12 @@ import { dataToObject } from '@itrocks/data-to-object'
 import { lessOrEqual }  from '@itrocks/sql-functions'
 import { dataSource }   from '@itrocks/storage'
 import { lang, tr }     from '@itrocks/translate'
+import { User }         from '@itrocks/user'
 import { htmlToText }   from 'html-to-text'
 import * as fs          from 'node:fs/promises'
 import mailer           from 'nodemailer'
 import config           from '../../../local/smtp'
 import smtp             from '../../config/smtp'
-import User             from '../user'
 import Token            from './token'
 
 export default class Forgot extends Action

@@ -1,6 +1,0 @@
-{
-	"/save": "/app/action/builtIn/save/save",
-	"/new": "/app/action/builtIn/new/new",
-	"/print": "/app/action/builtIn/print/print",
-	"/edit": "/app/action/builtIn/edit/edit"
-}

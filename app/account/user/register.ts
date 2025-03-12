@@ -2,7 +2,7 @@ import { Action }       from '@itrocks/action'
 import { Request }      from '@itrocks/action-request'
 import { dataToObject } from '@itrocks/data-to-object'
 import { dataSource }   from '@itrocks/storage'
-import User             from '../user'
+import { User }         from '@itrocks/user'
 
 export default class Register extends Action
 {
