@@ -98,7 +98,6 @@ setActionTemplates(
 	{ need: 'object', template: __dirname + '/../node_modules/@itrocks/action/cjs/selectionAction.html' },
 	{ template: __dirname + '/../node_modules/@itrocks/action/cjs/action.html' }
 )
-setAction('edit',   'save')
 setAction('edit',   'delete')
 setAction('login',  'forgot-password')
 setAction('login',  'register')
@@ -107,7 +106,6 @@ setAction('list',   'delete', { need: 'object' })
 setAction('output', 'edit')
 setAction('output', 'print', { target: undefined } )
 setAction('output', 'delete')
-setAction('new',    'save')
 
 classViewDependsOn({ requiredOf, tr })
 
