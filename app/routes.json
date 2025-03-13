@@ -1,5 +1,4 @@
 {
 	"/demo": "./demo",
-	"/demo-line": "./demo-line",
-	"/user/token": "./account/user/token"
+	"/demo-line": "./demo-line"
 }

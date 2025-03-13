@@ -100,6 +100,8 @@ setActionTemplates(
 )
 setAction('edit',   'save')
 setAction('edit',   'delete')
+setAction('login',  'forgot-password')
+setAction('login',  'register')
 setAction('list',   'new')
 setAction('list',   'delete', { need: 'object' })
 setAction('output', 'edit')
@@ -125,7 +127,11 @@ initCoreTransformers({
 
 mysqlDependsOn({
 	applyReadTransformer: async function(data, property, object) {
-		return applyTransformer(data[property], object, property, SQL, READ, data)
+		const value = await applyTransformer(data[property], object, property, SQL, READ, data)
+		if ((value !== IGNORE) && Reflect.getOwnMetadata(PROTECT_GET, object, property)) {
+			Reflect.deleteMetadata(PROTECT_GET, object, property)
+		}
+		return value
 	},
 	applySaveTransformer: async function(object, property, data) {
 		const value = Reflect.getMetadata(PROTECT_GET, object, property) ? undefined : await object[property]

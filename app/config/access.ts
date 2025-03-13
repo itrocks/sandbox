@@ -3,7 +3,7 @@ export default
 {
 	free: [
 		'/user/authenticate',
-		'/user/forgot',
+		'/user/forgot-password',
 		'/user/login',
 		'/user/register'
 	]
