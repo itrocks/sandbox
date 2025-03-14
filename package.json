@@ -4,6 +4,7 @@
 		"@itrocks/framework": "latest"
 	},
 	"devDependencies": {
+		"@itrocks/webstorm": "latest",
 		"@types/jest": "^29.5",
 		"jest": "^29.7",
 		"nodemon": "^3.1",
