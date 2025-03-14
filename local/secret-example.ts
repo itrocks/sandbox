@@ -1,3 +1,2 @@
-// Example content for secret.ts
 
-export default 'ALocallyGeneratedSecretCode'
+export const localSecret = 'ALocallyGeneratedSecretCode'

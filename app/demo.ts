@@ -2,10 +2,10 @@ import { Component } from '@itrocks/composition'
 import { Required }  from '@itrocks/required'
 import { Store }     from '@itrocks/store'
 import { User }      from '@itrocks/user'
-import DemoLine      from './demo-line'
+import { DemoLine }  from './demo-line'
 
 @Store()
-export default class Demo
+export class Demo
 {
 
 	age?: number

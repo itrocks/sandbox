@@ -1,22 +1,13 @@
 .idea
-.sass-cache
-.yalc
 
 /coverage
 /local/*
-	!/local/*-example.*
-	!/local/session/contains-session-data
+!/local/*-example.ts
+!/local/session/contains-session-data
 /node_modules
 /package-lock.json
-/yalc.lock
 
 *.css
-*.css.map
 *.d.ts
 *.js
-*.js.map
-*.scssc
-*.tsbuildinfo
-
-!/app/class/caller.js
-!/jest.config.js
+*.map

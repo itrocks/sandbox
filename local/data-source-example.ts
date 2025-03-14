@@ -1,6 +1,5 @@
-// Example content for dao.ts
 
-export default
+export const localDataSource =
 {
 	database: 'dbname',
 	engine:   'mysql',

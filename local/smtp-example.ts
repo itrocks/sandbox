@@ -1,4 +1,6 @@
-export default {
+
+export const localSmtp =
+{
 	host:   'smtp.server.address.net',
 	pass:   'password',
 	port:   587,

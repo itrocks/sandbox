@@ -1,8 +1,5 @@
 
-export const config: Record<string, string | string[]> =
+export const composeConfig: Record<string, string | string[]> =
 {
-	'@itrocks/account': ['@itrocks/domain-components:Active'],
-	'@itrocks/reflect:ReflectClass': '/reflect/class',
-	'@itrocks/reflect:ReflectProperty': '/reflect/property',
+	'@itrocks/account': ['@itrocks/domain-components:Active']
 }
-export default config
