@@ -1,5 +1,5 @@
 
 export const smtpConfig =
 {
-	'from': { email: 'sandbox@lg3.fr', name: 'itrocks sandbox' }
+	from: { email: 'sandbox@lg3.fr', name: 'itrocks sandbox' }
 }
