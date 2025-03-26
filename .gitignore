@@ -1,10 +1,11 @@
-.idea
+/.idea
 
 /coverage
-/local/*
-!/local/*-example.ts
-!/local/session/contains-session-data
+/session/*
+!/session/contains-session-data
 /node_modules
+
+/local.yaml
 /package-lock.json
 
 *.css

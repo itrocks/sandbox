@@ -1,0 +1,16 @@
+compose:
+  '@itrocks/account': [ '@itrocks/domain-components:Active' ]
+
+menu:
+  Administration:
+    /demo:      Demo
+    /demo-line: Demo line
+
+routes:
+  /demo:      ./app/demo
+  /demo-line: ./app/demo-line
+
+smtp:
+  from:
+    email: sandbox@log3.fr
+    name:  it.rocks sandbox
