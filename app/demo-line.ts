@@ -5,7 +5,9 @@ import { Store }          from '@itrocks/store'
 import { Uses }           from '@itrocks/uses'
 import { Demo }           from './demo'
 
-@Representative('number') @Store() @Uses(HasName)
+@Representative('number')
+@Store()
+@Uses(HasName)
 export class DemoLine
 {
 

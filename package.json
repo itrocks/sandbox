@@ -1,7 +1,14 @@
 {
 	"author": "Baptiste Pillot",
 	"dependencies": {
-		"@itrocks/framework": "latest"
+		"@itrocks/crud-pack": "latest",
+		"@itrocks/domain-components": "latest",
+		"@itrocks/forgot-password": "latest",
+		"@itrocks/framework": "latest",
+		"@itrocks/home": "latest",
+		"@itrocks/menu": "latest",
+		"@itrocks/signup": "latest",
+		"@itrocks/user": "latest"
 	},
 	"devDependencies": {
 		"@itrocks/webstorm": "latest",

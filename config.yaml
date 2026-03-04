@@ -12,5 +12,5 @@ routes:
 
 smtp:
   from:
-    email: sandbox@log3.fr
+    email: sandbox@crafter.fr
     name:  it.rocks sandbox
